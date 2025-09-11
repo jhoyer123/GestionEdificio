@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export interface propsResidente {
-  residenteId: number;
+  idResidente: number;
   telefono: string;
   usuarioId: number;
   nombre: string;
@@ -25,7 +25,10 @@ export interface propsResidente {
     fecha: string;
     tipoResidencia: string;
   };
-  rol: string;
+  rol: {
+    idRol: number;
+    rol: string;
+  };
 }
 
 const myCustomFilterFn: FilterFn<propsResidente> = (
@@ -34,9 +37,9 @@ const myCustomFilterFn: FilterFn<propsResidente> = (
   filterValue: string,
   addMeta: (meta: any) => void
 ) => {
-  if (row.original.email.includes(filterValue)) {
+  /* if (row.original.email.includes(filterValue)) {
     return true;
-  }
+  } */
   if (row.original.nombre.includes(filterValue)) {
     return true;
   }
@@ -67,7 +70,7 @@ export const columns: ColumnDef<propsResidente>[] = [
       );
     },
   },
-  {
+  /* {
     accessorKey: "email",
     filterFn: myCustomFilterFn,
     header: ({ column }) => {
@@ -81,7 +84,7 @@ export const columns: ColumnDef<propsResidente>[] = [
         </Button>
       );
     },
-  },
+  }, */
   /* {
     accessorKey: "rol",
     header: "Rol",
@@ -95,6 +98,11 @@ export const columns: ColumnDef<propsResidente>[] = [
   {
     accessorKey: "departamento.numero",
     header: "Nro Departamento",
+    filterFn: myCustomFilterFn,
+  },
+  {
+    accessorKey: "departamento.tipoResidencia",
+    header: "Tipo de Residencia",
     filterFn: myCustomFilterFn,
   },
   {
@@ -121,10 +129,10 @@ export const columns: ColumnDef<propsResidente>[] = [
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(personal.nombre)}
             >
-              Ver Personal
+              Ver Residente
             </DropdownMenuItem>
-            <DropdownMenuItem>Editar Personal</DropdownMenuItem>
-            <DropdownMenuItem>Eliminar Personal</DropdownMenuItem>
+            <DropdownMenuItem>Editar Residente</DropdownMenuItem>
+            <DropdownMenuItem>Eliminar Residente</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

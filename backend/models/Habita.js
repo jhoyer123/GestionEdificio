@@ -7,18 +7,10 @@ const Habita = sequelize.define(
     usuarioId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: "usuarios",
-        key: "id",
-      },
     },
     departamentoId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: "departamentos",
-        key: "id",
-      },
     },
     fecha: {
       type: DataTypes.DATE,
@@ -30,7 +22,7 @@ const Habita = sequelize.define(
     },
   },
   {
-    tableName: "Habita",
+    tableName: "habita",
     timestamps: true,
   }
 );

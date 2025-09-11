@@ -1,16 +1,4 @@
-import {
-  LayoutDashboard,
-  Users,
-  GraduationCap,
-  BarChart2,
-  BookOpen,
-  MessageSquare,
-  Settings,
-  HelpCircle,
-  LogOut,
-} from "lucide-react";
-import { Button } from "@/components/ui/button"; // Asegúrate que la ruta sea correcta
-import type { ComponentType, ReactNode } from "react";
+import { LayoutDashboard, Users, LogOut, Home, FolderCog } from "lucide-react";
 import { logout } from "@/services/authService";
 
 import {
@@ -30,10 +18,6 @@ interface propsSidebar {
 }
 
 export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
-  const handleNavLinkClick = (view: string) => {
-    setActiveView(view);
-  };
-
   const handleDashboardClick = () => {
     setActiveView("dashboard");
   };
@@ -44,6 +28,18 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
 
   const handlePersonalClick = () => {
     setActiveView("personal");
+  };
+
+  const handleDepartamentoClick = () => {
+    setActiveView("departamentos");
+  };
+
+  const handleFuncionClick = () => {
+    setActiveView("funciones");
+  };
+
+  const handleUsuarioClick = () => {
+    setActiveView("usuarios");
   };
 
   const navigate = useNavigate();
@@ -75,8 +71,11 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
                 Usuarios
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
+                {/* <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator /> */}
+                <DropdownMenuItem onClick={handleUsuarioClick}>
+                  Todos
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleResidentesClick}>
                   Residentes
                 </DropdownMenuItem>
@@ -85,6 +84,20 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <button
+              onClick={handleDepartamentoClick}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+            >
+              <Home className="mr-2 h-4 w-4" />
+              Departamentos
+            </button>
+            <button
+              onClick={handleFuncionClick}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+            >
+              <FolderCog className="mr-2 h-4 w-4" />
+              Funciones De Personal
+            </button>
           </nav>
         </div>
         <div className="mt-auto p-4">
@@ -93,7 +106,8 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
               onClick={handleCerrarSesionClick}
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
             >
-              <LogOut />Cerrar Sesion
+              <LogOut />
+              Cerrar Sesion
             </button>
           </nav>
         </div>

@@ -15,7 +15,13 @@ export const login = async (req, res) => {
     const usuario = await Usuario.findOne({
       where: { email },
       attributes: { exclude: ["createdAt", "updatedAt"] },
-      include: { model: Rol, as: "rol" , attributes: ["rol"] },
+      include: [
+        {
+          model: Rol,
+          as: "roles",
+          through: { attributes: [] }, // Excluye datos de tabla intermedia
+        },
+      ],
     });
     if (!usuario) {
       return res.status(401).json({ error: "Credenciales inválidas" });
@@ -64,7 +70,6 @@ export const login = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 // Cerrar sesion logout
 export const logout = (req, res) => {

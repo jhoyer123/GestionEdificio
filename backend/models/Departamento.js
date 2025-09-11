@@ -4,7 +4,7 @@ import sequelize from "../config/database.js";
 const Departamento = sequelize.define(
   "Departamento",
   {
-    id: {
+    idDepartamento: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
@@ -20,6 +20,11 @@ const Departamento = sequelize.define(
     piso: {
       type: DataTypes.INTEGER,
       allowNull: true,
+    },
+    alquilerPrecio: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+      defaultValue: 0.0,
     },
   },
   {

@@ -1,11 +1,10 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
-import Usuario from "./Usuario.js";
 
 const Rol = sequelize.define(
   "Rol",
   {
-    id: {
+    idRol: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
@@ -17,7 +16,7 @@ const Rol = sequelize.define(
   },
   {
     tableName: "roles",
-    timestamps: true, // quita createdAt / updatedAt automáticos
+    timestamps: true,
   }
 );
 

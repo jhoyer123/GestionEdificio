@@ -4,7 +4,7 @@ import sequelize from "../config/database.js";
 const Planilla = sequelize.define(
   "Planilla",
   {
-    id: {
+    idPlanilla: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
@@ -27,7 +27,7 @@ const Planilla = sequelize.define(
     },
   },
   {
-    tableName: "Planillas",
+    tableName: "planillas",
     timestamps: true,
   }
 );

@@ -4,7 +4,7 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("usuarios", {
-      id: {
+      idUsuario: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
@@ -27,16 +27,16 @@ module.exports = {
         allowNull: false,
         defaultValue: true,
       },
-      rolId: {
+      /* rolId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: "roles", // nombre de la tabla de roles
-          key: "id",
+          key: "idRol",
         },
         onUpdate: "CASCADE",
         onDelete: "RESTRICT",// Evita que se eliminen roles si hay usuarios asociados
-      },
+      }, */
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

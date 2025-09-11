@@ -7,6 +7,10 @@ export const createRol = async (req, res) => {
     if (!rol) {
       return res.status(400).json({ error: "El campo 'rol' es obligatorio" });
     }
+    const rolExistente = await Rol.findOne({ where: { rol } });
+    if (rolExistente) {
+      return res.status(400).json({ error: "El rol ya existe" });
+    }
     const nuevoRol = await Rol.create({ rol });
     res.status(201).json(nuevoRol);
   } catch (error) {

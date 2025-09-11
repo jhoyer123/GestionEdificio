@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import LoginPage from "./app/pages/Login";
 import RegisterPage from "./app/pages/Register";
 import PrivateRoute from "./components/shared/PrivateRoute";
+import EditPersonal from "./app/dashboard/personal/EditPersonal";
 
 export const App = () => {
   return (
@@ -20,7 +21,8 @@ export const App = () => {
           }
         /> */}
         <Route path="/dashboard" element={<Layout />} />
-      </Routes> 
+        
+      </Routes>
   );
 };
 

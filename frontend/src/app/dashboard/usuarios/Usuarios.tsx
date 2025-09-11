@@ -3,29 +3,16 @@ import { DataTable } from "../../../components/shared/DataTable";
 import { useEffect, useState } from "react";
 import { columns } from "./Columns";
 import { type propsUsuarios } from "./Columns";
- 
-//Solo para probar el modal
-let UsuariosPrueba: propsUsuarios[] = [
-  {
-    id: 1,
-    nombre: "Juan Pérez",
-    email: "juan.perez@example.com",
-    estado: "true",
-    rol: { rol: "Admin" }
-  },
-  {
-    id: 2,
-    nombre: "María Gómez",
-    email: "maria.gomez@example.com",
-    estado: "false",
-    rol: { rol: "Personal" }
-  }
-]
-  
+import { Button } from "@/components/ui/button";
 
+type Props = {
+  setEditState: React.Dispatch<
+    React.SetStateAction<{ view: string; entity: string; id: number | null }>
+  >;
+};
 
 //Creando la tabla
-export const Usuarios = () => {
+export const Usuarios: React.FC<Props> = ({ setEditState }) => {
   const [usuarios, setUsuarios] = useState<propsUsuarios[]>([]);
 
   useEffect(() => {
@@ -38,8 +25,17 @@ export const Usuarios = () => {
 
   return (
     <div className="container mx-auto py-10">
+      <Button
+        className="bg-amber-300 hover:bg-amber-400 cursor-pointer"
+        variant={"outline"}
+        onClick={() =>
+          setEditState({ view: "create", entity: "usuario", id: null })
+        }
+      >
+        Agregar Usuario
+      </Button>
       {/* <DataTable columns={columns} data={usuarios} /> */}
-      <DataTable columns={columns} data={UsuariosPrueba} />
+      <DataTable columns={columns} data={usuarios} />
     </div>
   );
 };

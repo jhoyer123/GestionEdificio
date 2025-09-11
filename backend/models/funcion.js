@@ -4,7 +4,7 @@ import sequelize from "../config/database.js";
 const Funcion = sequelize.define(
   "Funcion",
   {
-    id: {
+    idFuncion: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
@@ -23,7 +23,7 @@ const Funcion = sequelize.define(
     },
   },
   {
-    tableName: "Funciones",
+    tableName: "funciones",
     timestamps: true,
   }
 );

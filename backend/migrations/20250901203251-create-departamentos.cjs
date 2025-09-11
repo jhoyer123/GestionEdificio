@@ -4,7 +4,7 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.createTable('departamentos', {
-      id: {
+      idDepartamento: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true
@@ -21,14 +21,21 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true
       },
+      alquilerPrecio: {
+        type: Sequelize.DECIMAL(10, 2),
+        allowNull: false,
+        defaultValue: 0.0,
+      },
       createdAt: {
+        allowNull: false,
         type: Sequelize.DATE,
-        allowNull: false
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       updatedAt: {
+        allowNull: false,
         type: Sequelize.DATE,
-        allowNull: false
-      }
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+      },
     });
   },
 

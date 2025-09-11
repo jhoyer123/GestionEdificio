@@ -7,10 +7,13 @@ import authRoutes from "./routes/auth.routes.js";
 import personalRoutes from "./routes/personal.routes.js";
 import departamentoRoutes from "./routes/departamentos.routes.js";
 import residenteRoutes from "./routes/residentes.routes.js";
+import turnosRoutes from "./routes/turnos.routes.js";
 // importamos asociaciones
 import roleRoutes from "./routes/roles.routes.js";
 //import de cors
 import cors from "cors";
+//import de tareas automaticas como facturas
+//import './tasks/generarFacturas.js';
 
 import cookieParser from "cookie-parser";
 import "./asociaciones/asociaciones.js"; 
@@ -21,7 +24,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: "http://localhost:5173", // Reemplaza con la URL de tu frontend
+  origin: "http://localhost:5173",// Reemplaza con la URL de tu frontend
   credentials: true,
 }));
 
@@ -33,7 +36,9 @@ app.use(authRoutes);
 app.use(personalRoutes);
 app.use(departamentoRoutes);
 app.use(residenteRoutes);
+app.use(turnosRoutes);
 
+// Iniciar el servidor
 app.listen(process.env.PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${process.env.PORT}`);
 });

@@ -1,12 +1,11 @@
 // modelo de Usuario
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
-import Rol from "./Rol.js";
 
 const Usuario = sequelize.define(
   "Usuario",
   {
-    id: {
+    idUsuario: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
@@ -29,20 +28,15 @@ const Usuario = sequelize.define(
       allowNull: false,
       defaultValue: false,
     },
-    rolId: {
+    /* rolId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-    },
+    }, */
   },
   {
     tableName: "usuarios",
-    timestamps: true, // quita createdAt / updatedAt automáticos
+    timestamps: true,
   }
 );
-
-/* //relaciones
-Rol.hasMany(Usuario, { foreignKey: "rolId", as: "usuarios" });
-Usuario.belongsTo(Rol, { foreignKey: "rolId", as: "rol" }); */
-
 
 export default Usuario;

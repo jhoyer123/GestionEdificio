@@ -6,62 +6,40 @@ import sequelize from "../config/database.js";
 import Residente from "../models/Residente.js";
 import Habita from "../models/Habita.js";
 import Departamento from "../models/Departamento.js";
+import Funcion from "../models/Funcion.js";
+import { QueryTypes } from "sequelize";
 
-//***** Obtener todos los usuarios   *****//
-export const getUsuarios = async (req, res) => {
-  try {
-    const usuarios = await Usuario.findAll({
-      attributes: { exclude: ["createdAt", "updatedAt", "password"] },
-      include: { model: Rol, as: "rol", attributes: ["rol"] },
-    });
-    res.json(usuarios);
-  } catch (error) {
-    console.error("Error fetching usuarios:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
-
-//Obtener un usuario
-export const getUsuario = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const usuario = await Usuario.findByPk(id, {
-      attributes: { exclude: ["createdAt", "updatedAt", "password"] },
-    });
-    if (!usuario) {
-      return res.status(404).json({ error: "Usuario no encontrado (id)" });
-    }
-    delete usuario.password; // No enviar la contraseña en la respuesta
-    res.json(usuario);
-  } catch (error) {
-    console.error("Error fetching usuario:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
-
-//***** Crear un nuevo usuario *****//
+//***** Crear un usuario *****//
 export const createUsuario = async (req, res) => {
   const t = await sequelize.transaction();
   try {
-    const { nombre, email, password, rolId } = req.body;
+    const { nombre, email, password, rol } = req.body;
 
     // Validar la entrada
-    if (!nombre || !email || !password || !rolId) {
+    if (!nombre || !email || !password) {
+      await t.rollback();
       return res
         .status(400)
-        .json({ error: "Todos los campos son obligatorios" });
+        .json({ message: "Todos los campos son obligatorios" });
     }
 
     // Verificar si el usuario ya existe
-    const usuarioExistente = await Usuario.findOne({ where: { email } });
+    const usuarioExistente = await Usuario.findOne({
+      where: { email },
+      transaction: t,
+    });
+
     if (usuarioExistente) {
-      return res.status(409).json({ error: "El usuario ya existe" });
+      await t.rollback();
+      return res.status(409).json({ message: "El usuario ya existe" });
     }
 
     // verificar si el rol existe
-    const rolFind = await Rol.findByPk(rolId);
+    const rolFind = await Rol.findOne({ where: { rol: rol }, transaction: t });
+
     if (!rolFind) {
-      return res.status(404).json({ error: "Rol no encontrado (id)" });
+      await t.rollback();
+      return res.status(404).json({ message: "Rol no encontrado (id)" });
     }
 
     // Hash de la contraseña
@@ -74,113 +52,145 @@ export const createUsuario = async (req, res) => {
         nombre,
         email,
         password: hashedPassword,
-        rolId,
+        estado: true,
       },
       { transaction: t }
     );
 
-    // Convertimos la instancia de Sequelize a un objeto plano para evitar problemas
-    let usuarioResponse = nuevoUsuario.get({ plain: true });
+    // ✅ SOLUCIÓN: Asignar rol ANTES de convertir a objeto plano
+    await nuevoUsuario.addRoles(rolFind.idRol, { transaction: t });
 
-    // Si el rol es 'personal', creamos un registro en la tabla Personal y lo combinamos con el usuario
-    if (rolFind.rol === "personal") {
-      const { telefono, direccion, funcionId } = req.body;
+    if (rol === "administrador") {
+      // ✅ Convertir a objeto plano DESPUÉS de usar addRol()
+      nuevoUsuario = nuevoUsuario.get({ plain: true });
+    }
 
-      if (!telefono || !direccion || !funcionId) {
+    // Si el rol es 'personal'
+    if (rol === "personal") {
+      const { telefono, direccion, funcionId, fechaNacimiento, genero } =
+        req.body;
+
+      if (
+        !telefono ||
+        !direccion ||
+        !funcionId ||
+        !fechaNacimiento ||
+        !genero
+      ) {
+        await t.rollback();
         return res
           .status(400)
-          .json({ error: "Todos los campos son obligatorios" });
+          .json({ message: "Todos los campos son obligatorios" });
       }
 
+      // verificar si la funcion existe
+      const funcionFind = await Funcion.findByPk(funcionId, {
+        transaction: t,
+      });
+
+      if (!funcionFind) {
+        await t.rollback();
+        return res.status(404).json({ message: "Funcion no encontrada (id)" });
+      }
+      
       let nuevoPersonal = await Personal.create(
         {
+          fechaNacimiento,
+          genero,
           telefono,
           direccion,
           funcionId,
-          usuarioId: usuarioResponse.id, // Usamos el ID del usuario recién creado
+          usuarioId: nuevoUsuario.idUsuario,
         },
         { transaction: t }
       );
 
-      // Convertimos la instancia de Sequelize de Personal a un objeto plano
       const personalResponse = nuevoPersonal.get({ plain: true });
-
-      // Combinamos ambos objetos planos. Este es el paso clave.
-      usuarioResponse = { ...usuarioResponse, ...personalResponse };
+      // ✅ Convertir a objeto plano DESPUÉS de todas las operaciones de Sequelize
+      nuevoUsuario = { ...nuevoUsuario.get({ plain: true }), ...personalResponse };
     }
 
-    if (rolFind.rol === "residente") {
+    if (rol === "residente") {
       const { telefono, tipoResidencia, departamentoId } = req.body;
-      const fecha = new Date(); // Fecha actual
-      const verDepartamento = await Departamento.findByPk(departamentoId, {
-        include: [
-          {
-            model: Usuario,
-            as: "usuarios",
-            where: { estado: true }, // 👈 solo trae usuarios activos
-            through: { attributes: [] },
-          },
-        ],
-      });
 
-      if (verDepartamento.usuarios && verDepartamento.usuarios.length > 0) {
+      if (!telefono || !tipoResidencia || !departamentoId) {
+        await t.rollback();
         return res
           .status(400)
-          .json({ error: "Este departamento ya tiene un usuario asociado." });
-      }
-
-      if (!telefono || !fecha || !tipoResidencia || !departamentoId) {
-        return res
-          .status(400)
-          .json({ error: "Todos los campos son obligatorios (residente)" });
+          .json({ message: "Todos los campos son obligatorios (residente)" });
       }
 
       const deptoById = await Departamento.findByPk(departamentoId);
-
       if (!deptoById) {
+        await t.rollback();
         return res
           .status(404)
-          .json({ error: "Departamento no encontrado (id)" });
+          .json({ message: "Departamento no encontrado (id)" });
       }
+
+      const usuariosActivosCount = await sequelize.query(
+        `
+        SELECT COUNT(*) as total 
+        FROM habita h 
+        INNER JOIN usuarios u ON h.usuarioId = u.idUsuario 
+        WHERE h.departamentoId = :departamentoId 
+          AND u.estado = true
+      `,
+        {
+          replacements: { departamentoId },
+          type: QueryTypes.SELECT,
+          transaction: t,
+        }
+      );
+
+      if (usuariosActivosCount[0].total > 0) {
+        await t.rollback();
+        return res.status(400).json({
+          message: "Este departamento ya tiene un usuario asociado.",
+        });
+      }
+
+      const fecha = new Date();
 
       let nuevoResidente = await Residente.create(
         {
           telefono,
-          id: usuarioResponse.id, // Usamos el ID del usuario recién creado
+          usuarioId: nuevoUsuario.idUsuario, // ✅ Corregido: era usuarioId sin definir
         },
         { transaction: t }
       );
 
-      // Crear un nuevo registro en la tabla Habita
       let nuevoHabita = await Habita.create(
         {
           departamentoId,
           fecha,
           tipoResidencia,
-          usuarioId: usuarioResponse.id, // Usamos el ID del usuario recién creado
+          usuarioId: nuevoUsuario.idUsuario, // ✅ Corregido: era usuarioId sin definir
         },
         { transaction: t }
       );
 
-      // Convertimos la instancia de Sequelize de Residente a un objeto plano
       const residenteResponse = nuevoResidente.get({ plain: true });
-      const habitanResponse = nuevoHabita.get({ plain: true });
+      const habitaResponse = nuevoHabita.get({ plain: true });
 
-      // Combinamos ambos objetos planos. Este es el paso clave.
-      usuarioResponse = {
-        ...usuarioResponse,
+      // ✅ Convertir a objeto plano DESPUÉS de todas las operaciones
+      nuevoUsuario = {
+        ...nuevoUsuario.get({ plain: true }), // ✅ Corregido: era nuevoUsuarios
         ...residenteResponse,
-        ...habitanResponse,
+        ...habitaResponse,
       };
     }
 
-    // Excluimos campos sensibles como la contraseña y los timestamps antes de responder
-    delete usuarioResponse.password;
-    delete usuarioResponse.createdAt;
-    delete usuarioResponse.updatedAt;
+    // Limpiar campos sensibles
+    delete nuevoUsuario.password;
+    delete nuevoUsuario.createdAt;
+    delete nuevoUsuario.updatedAt;
 
     await t.commit();
-    res.status(201).json(usuarioResponse);
+    res.status(201).json({
+      usuario: nuevoUsuario,
+      message: "Usuario creado exitosamente",
+    });
   } catch (error) {
     await t.rollback();
     console.error("Error creating usuario:", error);
@@ -209,19 +219,96 @@ export const updateUsuario = async (req, res) => {
   }
 };
 
-//***** Eliminar un usuario *****//
-export const deleteUsuario = async (req, res) => {
+//***** Obtener todos los usuarios   *****//
+export const getUsuarios = async (req, res) => {
+  try {
+    const usuarios = await Usuario.findAll({
+      attributes: { exclude: ["createdAt", "updatedAt", "password"] },
+      include: [
+        {
+          model: Rol,
+          as: "roles",
+          through: { attributes: [] },
+          attributes: ["idRol", "rol"],
+        },
+      ],
+    });
+    res.json(usuarios);
+  } catch (error) {
+    console.error("Error fetching usuarios:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+//Obtener un usuario
+export const getUsuario = async (req, res) => {
   try {
     const { id } = req.params;
-    const usuarioFind = await Usuario.findByPk(id);
+    const usuario = await Usuario.findByPk(id, {
+      attributes: { exclude: ["createdAt", "updatedAt", "password"] },
+      include: [
+        {
+          model: Rol,
+          as: "roles",
+        },
+      ],
+    });
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuario no encontrado (id)" });
+    }
+    delete usuario.password; // No enviar la contraseña en la respuesta
+    res.json(usuario);
+  } catch (error) {
+    console.error("Error fetching usuario:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+//***** Eliminar un usuario *****//
+export const deleteUsuario = async (req, res) => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const { id } = req.params;
+
+    const usuarioFind = await Usuario.findByPk(id, {
+      include: [
+        {
+          model: Rol,
+          through: { attributes: [] }, // Excluye datos de tabla intermedia
+        },
+      ],
+    });
+
     if (!usuarioFind) {
+      await transaction.rollback();
       return res.status(404).json({ error: "Usuario no encontrado (id)" });
     }
-    await usuarioFind.destroy();
-    res.json({ message: "Usuario eliminado" });
+
+    if (usuarioFind.Rols.some((r) => r.rol === "residente")) {
+      // ✅ 1. PRIMERO eliminar los registros dependientes
+      await Habita.destroy({
+        where: { usuarioId: id },
+        transaction,
+      });
+
+      // ✅ 2. Eliminar otros registros relacionados si existen
+      await Residente.destroy({
+        where: { usuarioId: id },
+        transaction,
+      });
+    }
+    // ✅ 3. FINALMENTE eliminar el usuario
+    await usuarioFind.destroy({ transaction });
+
+    await transaction.commit();
+    res.json({
+      message: "Usuario y registros relacionados eliminados correctamente",
+    });
   } catch (error) {
+    await transaction.rollback();
     console.error("Error deleting usuario:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 };
 

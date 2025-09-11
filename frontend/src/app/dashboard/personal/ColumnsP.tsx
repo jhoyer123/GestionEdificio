@@ -13,16 +13,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { differenceInYears } from "date-fns";
+
 export interface propsPersonal {
-  id: number;
+  idPersonal: number;
+  fechaNacimiento: string;
   telefono: string;
   direccion: string;
   funcionId: number;
+  genero: string;
   usuarioId: number;
   nombre: string;
   email: string;
   estado: string;
-  rol: string;
+  rol: {
+    idRol: number;
+    rol: string;
+  };
 }
 
 const myCustomFilterFn: FilterFn<propsPersonal> = (
@@ -31,15 +38,15 @@ const myCustomFilterFn: FilterFn<propsPersonal> = (
   filterValue: string,
   addMeta: (meta: any) => void
 ) => {
-  if (row.original.email.includes(filterValue)) {
+  /* if (row.original.email.includes(filterValue)) {
     return true;
-  }
+  } */
   if (row.original.nombre.includes(filterValue)) {
     return true;
   }
-  if (row.original.rol.includes(filterValue)) {
+  /*  if (row.original.rol.includes(filterValue)) {
     return true;
-  }
+  } */
   if (row.original.telefono.includes(filterValue)) {
     return true;
   }
@@ -50,7 +57,12 @@ const myCustomFilterFn: FilterFn<propsPersonal> = (
 };
 
 //Columnas de la tabla
-export const columns: ColumnDef<propsPersonal>[] = [
+export const columns = (
+  
+  onEdit: (id: number) => void,
+  onProfile: (id: number) => void
+
+): ColumnDef<propsPersonal>[] => [
   {
     accessorKey: "nombre",
     filterFn: myCustomFilterFn,
@@ -67,7 +79,7 @@ export const columns: ColumnDef<propsPersonal>[] = [
       );
     },
   },
-  {
+  /* {
     accessorKey: "email",
     filterFn: myCustomFilterFn,
     header: ({ column }) => {
@@ -81,10 +93,10 @@ export const columns: ColumnDef<propsPersonal>[] = [
         </Button>
       );
     },
-  },
+  }, */
   {
-    accessorKey: "rol",
-    header: "Rol",
+    accessorKey: "genero",
+    header: "Género",
     filterFn: myCustomFilterFn,
   },
   {
@@ -93,9 +105,14 @@ export const columns: ColumnDef<propsPersonal>[] = [
     filterFn: myCustomFilterFn,
   },
   {
-    accessorKey: "direccion",
-    header: "Dirección",
+    accessorKey: "cargo",
+    header: "Cargo",
     filterFn: myCustomFilterFn,
+  },
+  {
+    accessorKey: "fechaNacimiento",
+    header: "Edad",
+    accessorFn: (row) => differenceInYears(new Date(), new Date(row.fechaNacimiento))
   },
   {
     id: "actions",
@@ -113,12 +130,14 @@ export const columns: ColumnDef<propsPersonal>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuItem>Ver Personal</DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(personal.nombre)}
+              onClick={() => {
+                onEdit(personal.idPersonal);
+              }}
             >
-              Ver Personal
+              Editar Personal
             </DropdownMenuItem>
-            <DropdownMenuItem>Editar Personal</DropdownMenuItem>
             <DropdownMenuItem>Eliminar Personal</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

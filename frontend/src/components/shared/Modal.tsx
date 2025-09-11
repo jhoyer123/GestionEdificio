@@ -9,15 +9,10 @@ interface ModalProps {
   footer?: React.ReactNode
 }
 
-export default function Modal({ open, onClose, title, children, footer }: ModalProps) {
+export default function Modal({ open, onClose, children, footer }: ModalProps) {
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-lg">
-        {title && (
-          <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-          </DialogHeader>
-        )}
         <div className="py-4">{children}</div>
         {footer && <DialogFooter>{footer}</DialogFooter>}
       </DialogContent>

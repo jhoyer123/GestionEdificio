@@ -54,19 +54,18 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4">
-        <Input 
+      <div className="flex items-center py-5 justify-end w-64 inline-block margin auto">
+        <Input
           placeholder="Caja de busqueda..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn("nombre")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
-            
+            table.getColumn("nombre")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm bg-yellow-50"
+          className="max-w-sm bg-white"
         />
       </div>
       <div className="overflow-hidden rounded-md border">
-        <Table className="bg-yellow-50 font-medium">
+        <Table className="bg-white font-medium">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

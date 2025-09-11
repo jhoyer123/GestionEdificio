@@ -22,8 +22,9 @@ export const getResidentes = async (req, res) => {
             },
             {
               model: Rol,
-              as: "rol",
-              attributes: ["rol"],
+              as: "roles",
+              through: { attributes: [] }, // no incluir columnas de la tabla intermedia
+              attributes: ["idRol", "rol"],
             },
           ],
         },
@@ -32,22 +33,20 @@ export const getResidentes = async (req, res) => {
     });
 
     residentes = residentes.map((r) => ({
-      residenteId: r.id,
+      idResidente: r.idResidente,
       telefono: r.telefono,
-      usuarioId: r.usuario.id,
+      usuarioId: r.usuario.idUsuario,
       nombre: r.usuario.nombre,
       email: r.usuario.email,
       estado: r.usuario.estado,
-      rolId: r.usuario.rolId,
+      rol: r.usuario.roles,
       departamento: r.usuario.departamentos[0]
         ? {
             numero: r.usuario.departamentos[0].numero,
-            fecha: r.usuario.departamentos[0].Habita.fecha,
+            fecha: r.usuario.departamentos[0].Habita.fecha.toISOString().split('T')[0],
             tipoResidencia: r.usuario.departamentos[0].Habita.tipoResidencia,
           }
         : null,
-      rolId: r.usuario.rol.id,
-      rol: r.usuario.rol.rol,
     }));
     res.json(residentes);
   } catch (error) {

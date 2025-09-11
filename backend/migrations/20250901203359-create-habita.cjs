@@ -11,7 +11,7 @@ module.exports = {
         allowNull: false,
         references: {
           model: "usuarios",
-          key: "id",
+          key: "idUsuario",
         },
       },
       departamentoId: {
@@ -19,7 +19,7 @@ module.exports = {
         allowNull: false,
         references: {
           model: "departamentos",
-          key: "id",
+          key: "idDepartamento",
         },
       },
       fecha: {
@@ -31,12 +31,14 @@ module.exports = {
         allowNull: true,
       },
       createdAt: {
-        type: Sequelize.DATE,
         allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       updatedAt: {
-        type: Sequelize.DATE,
         allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
     });
   },

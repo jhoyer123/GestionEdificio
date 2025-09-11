@@ -4,13 +4,17 @@ import sequelize from "../config/database.js";
 const Residente = sequelize.define(
   "Residente",
   {
-    id: {
+    idResidente: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
     telefono: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    usuarioId: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
   },

@@ -4,7 +4,7 @@ import sequelize from "../config/database.js";
 const Personal = sequelize.define(
   "Personal",
   {
-    id: {
+    idPersonal: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
@@ -17,6 +17,14 @@ const Personal = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    fechaNacimiento: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    genero: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     funcionId: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -27,7 +35,7 @@ const Personal = sequelize.define(
     },
   },
   {
-    tableName: "Personal",
+    tableName: "personales",
     timestamps: true,
   }
 );
