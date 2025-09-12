@@ -26,7 +26,7 @@ export const Residente: React.FC<Props> = ({ setEditState }) => {
   return (
     <div className="container mx-auto py-10">
       {/* <DataTable columns={columns} data={usuarios} /> */}
-      <Button
+      {/* <Button
         className="bg-amber-300 hover:bg-amber-400 cursor-pointer"
         variant="outline"
         onClick={() =>
@@ -34,7 +34,7 @@ export const Residente: React.FC<Props> = ({ setEditState }) => {
         }
       >
         Agregar Residente
-      </Button>
+      </Button> */}
       <DataTable columns={columns} data={residente} />
     </div>
   );

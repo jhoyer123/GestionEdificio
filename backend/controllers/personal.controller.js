@@ -2,8 +2,59 @@ import Personal from "../models/Personal.js";
 import Usuario from "../models/Usuario.js";
 import Rol from "../models/Rol.js";
 import Funcion from "../models/Funcion.js";
+import sequelize from "../config/database.js";
 
-//Los personales ya son creados en el controlador de usuarios crear usuario
+//Crear un nuevo personal y ademas agregar la relacion en rolesUsuario
+export const createPersonal = async (req, res) => {
+  const { telefono, direccion, fechaNacimiento, genero, funcionId, usuarioId ,idRol} = req.body;
+
+  try {
+    // Validar que se recibieron todos los datos necesarios
+    if (!telefono || !direccion || !fechaNacimiento || !genero || !funcionId || !usuarioId || !idRol) {
+      return res.status(400).json({ message: "Todos los campos son obligatorios" });
+    }
+
+    // Verificar si el usuario existe
+    const usuario = await Usuario.findByPk(usuarioId);
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+    // Verificar si la función existe
+    const funcion = await Funcion.findByPk(funcionId);
+    if (!funcion) {
+      return res.status(404).json({ message: "Función no encontrada" });
+    }
+    // Verificar si el rol existe
+    const rol = await Rol.findByPk(idRol);
+    if (!rol) {
+      return res.status(404).json({ message: "Rol no encontrado" });
+    }
+    //definir la transaccion
+    const t = await sequelize.transaction();
+
+    // Crear el nuevo personal
+    const newPersonal = await Personal.create({
+      telefono,
+      direccion,
+      fechaNacimiento,
+      genero,
+      funcionId,
+      usuarioId
+    },{ transaction: t });
+
+    // Agregar la relación en rolesUsuario
+    await usuario.addRoles(idRol, { transaction: t });
+
+    await t.commit();
+    res.status(201).json({
+      personal: newPersonal,
+      message: "Personal creado exitosamente"
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al crear el personal" });
+  }
+};
 
 //Obtener todos los personales
 export const getAllPersonales = async (req, res) => {

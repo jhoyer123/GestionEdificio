@@ -164,9 +164,78 @@ export default function CreateUsuario({ setEditState }: createResidentProps) {
           <>
             <Input
               placeholder="Teléfono"
-              {...register("telefono", { required: "Obligatorio" })}
+              {...register("telefono", {
+                required: "campo obligatorio",
+                minLength: { value: 7, message: "Mínimo 7 caracteres" },
+              })}
             />
-            <Input placeholder="Dirección" {...register("direccion")} />
+            {errors.telefono && (
+              <p className="text-red-500">{errors.telefono.message}</p>
+            )}
+            <Input
+              placeholder="Dirección"
+              {...register("direccion", {
+                required: "campo obligatorio",
+                minLength: { value: 3, message: "Mínimo 3 caracteres" },
+              })}
+            />
+            {/* Opción más simple sin Controller */}
+            <div>
+              <Select
+                onValueChange={(val) => {
+                  setValue("genero", val, { shouldValidate: true });
+                  clearErrors("genero");
+                }}
+                defaultValue="" // ✅ Valor por defecto para el Select
+              >
+                <SelectTrigger
+                  className={`w-full bg-gray-100 ${
+                    errors.genero ? "border-red-500 focus:border-red-500" : ""
+                  }`}
+                >
+                  <SelectValue placeholder="Selecciona un género" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="masculino">Masculino</SelectItem>
+                  <SelectItem value="femenino">Femenino</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Input hidden para react-hook-form */}
+              <input
+                type="hidden"
+                {...register("genero", {
+                  required: "Debe seleccionar un género",
+                })}
+              />
+
+              {errors.genero && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.genero.message}
+                </p>
+              )}
+            </div>
+            <Input
+              placeholder="Fecha de nacimiento"
+              className="bg-gray-100"
+              type="date"
+              {...register("fechaNacimiento", {
+                required: "La fecha de nacimiento es obligatoria",
+                validate: (value) => {
+                  if (!value) return "La fecha es obligatoria";
+                  const hoy = new Date();
+                  const fecha = new Date(value);
+                  if (fecha > hoy) return "La fecha no puede ser en el futuro";
+                  return true;
+                },
+              })}
+            />
+            {errors.fechaNacimiento && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.fechaNacimiento.message}
+              </p>
+            )}
+
             <Controller
               name="funcionId"
               control={control}
@@ -253,6 +322,9 @@ export default function CreateUsuario({ setEditState }: createResidentProps) {
                 </Select>
               )}
             />
+            {errors.departamentoId && (
+              <p className="text-red-500">{errors.departamentoId.message}</p>
+            )}
           </>
         )}
 
