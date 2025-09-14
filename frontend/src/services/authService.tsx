@@ -26,7 +26,6 @@ export const login = async (AuthCredentials: AuthCredentials) => {
 
 // CERRAR SESION
 export const logout = async () => {
-  
   try {
     // Petición al backend
     await axios.post(
@@ -36,12 +35,7 @@ export const logout = async () => {
         withCredentials: true, // si usas cookies
       }
     );
-
-    // Eliminar token del almacenamiento local
-    //localStorage.removeItem("token");
-    //localStorage.removeItem("user");
     localStorage.clear();
-    //return true;
     return console.log("Sesión cerrada correctamente");
   } catch (error) {
     console.error("Error al cerrar sesión:", error);

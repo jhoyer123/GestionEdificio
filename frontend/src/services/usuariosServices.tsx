@@ -23,3 +23,17 @@ export const createUsuario = async (usuarioData: any) => {
     throw error;
   }
 };
+
+//Cambiar contraseña
+export const changePassword = async (passwordData: any) => {
+  try {
+    //traer id del usuario del localstorage
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const userId = user.id;
+    const response = await axios.put(`${API_URL}/${userId}/cambiar-contrasena`, passwordData);
+    return response.data;
+  } catch (error) {
+    console.error("Error cambiando la contraseña:", error);
+    throw error;
+  }
+};

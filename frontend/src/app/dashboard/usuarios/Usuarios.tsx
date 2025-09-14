@@ -15,11 +15,12 @@ type Props = {
 export const Usuarios: React.FC<Props> = ({ setEditState }) => {
   const [usuarios, setUsuarios] = useState<propsUsuarios[]>([]);
 
+  const fetchData = async () => {
+    const data = await getUsuarios();
+    setUsuarios(data);
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getUsuarios();
-      setUsuarios(data);
-    };
     fetchData();
   }, []);
 
@@ -35,7 +36,10 @@ export const Usuarios: React.FC<Props> = ({ setEditState }) => {
         Agregar Usuario
       </Button>
       {/* <DataTable columns={columns} data={usuarios} /> */}
-      <DataTable columns={columns} data={usuarios} />
+      <DataTable
+        columns={columns(fetchData)}
+        data={usuarios}
+      />
     </div>
   );
 };

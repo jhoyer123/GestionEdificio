@@ -13,3 +13,25 @@ export const getResidentes = async () => {
     throw error;
   }
 };
+
+//crear residente
+export const createResidente = async (residenteData: any) => {
+  try {
+    const response = await axios.post(API_URL, residenteData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating residente:", error);
+    throw error;
+  }
+};
+
+//Eliminar un residente quitandole el rol
+export const deleteResidente = async (id: number, data: any) => {
+  try {
+    const response = await axios.delete(`${API_URL}/${id}`, { data });
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting residente:", error);
+    throw error;
+  }
+};

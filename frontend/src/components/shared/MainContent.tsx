@@ -1,3 +1,4 @@
+import AreasComunes from "@/app/dashboard/areasComunes/AreasComunes";
 import Departamento from "@/app/dashboard/departamento/Departamento";
 import { Principal } from "@/app/dashboard/maindashboard/Principal";
 import CreatePersonal from "@/app/dashboard/personal/CreatePersonal";
@@ -7,6 +8,7 @@ import CreateResidente from "@/app/dashboard/residente/CreateResidente";
 import EditResidente from "@/app/dashboard/residente/EditResidente";
 import { Residente } from "@/app/dashboard/residente/Residente";
 import CreateUsuario from "@/app/dashboard/usuarios/CreateUsuario";
+import PerfilUsuario from "@/app/dashboard/usuarios/PerfilUsuario";
 import { Usuarios } from "@/app/dashboard/usuarios/Usuarios";
 
 type EditState = {
@@ -31,10 +33,14 @@ export default function MainContent({
       return <Residente setEditState={setEditState} />;
     case "usuarios":
       return <Usuarios setEditState={setEditState} />;
+    case "perfil":
+      return <PerfilUsuario />;
     case "personal":
       return <Personal setEditState={setEditState} />;
     case "departamentos":
       return <Departamento />;
+    case "areasComunes":
+      return <AreasComunes />;
     case "edit":
       if (editState.entity === "personal") {
         return (

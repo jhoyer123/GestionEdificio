@@ -1,32 +1,26 @@
 //Tabla
 import { type ColumnDef, type FilterFn, type Row } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
 import { ArrowUpDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { Badge } from "@/components/ui/badge";
+import ActionsUsuarios from "./useUsuarios/ActionsUsuarios";
 
 export interface propsUsuarios {
-  id: number;
+  idUsuario: number;
   nombre: string;
   email: string;
   estado: string;
-  rol: { idRol: number; rol: string };
+  roles: { idRol: number; rol: string }[];
+  refresh: () => void;
 }
 
 const myCustomFilterFn: FilterFn<propsUsuarios> = (
   row: Row<propsUsuarios>,
   columnId: string,
   filterValue: string,
-  addMeta: (meta: any) => void
+  addMeta: (meta: any) => void,
 ) => {
   if (row.original.email.includes(filterValue)) {
     return true;
@@ -34,14 +28,11 @@ const myCustomFilterFn: FilterFn<propsUsuarios> = (
   if (row.original.nombre.includes(filterValue)) {
     return true;
   }
-  /*   if (row.original.rol.rol.includes(filterValue)) {
-    return true;
-  } */
   return false;
 };
 
 //Columnas de la tabla
-export const columns: ColumnDef<propsUsuarios>[] = [
+export const columns = (refresh: () => void): ColumnDef<propsUsuarios>[] => [
   {
     accessorKey: "nombre",
     filterFn: myCustomFilterFn,
@@ -73,18 +64,6 @@ export const columns: ColumnDef<propsUsuarios>[] = [
       );
     },
   },
-  /* {
-    accessorKey: "estado",
-    header: "Estado",
-    cell: ({ row }) => {
-      const estado = row.getValue("estado");
-      return estado ? (
-        <div className="text-green-500 font-bold">Activo</div>
-      ) : (
-        <div className="text-red-500 text-bold font-bold">Inactivo</div>
-      );
-    },
-  },*/
   {
     accessorKey: "roles",
     header: "Rol/es",
@@ -105,22 +84,25 @@ export const columns: ColumnDef<propsUsuarios>[] = [
           {roles.map((rol) => {
             if (!rol.rol) return null; // Verificamos que 'rol.rol' exista
             if (rol.rol === "administrador") {
-              return (
-                <Badge key={rol.idRol}>
-                  {rol.rol}
-                </Badge>
-              );
+              return <Badge key={rol.idRol}>{rol.rol}</Badge>;
             }
             if (rol.rol === "residente") {
               return (
-                <Badge key={rol.idRol} className="capitalize bg-blue-600 text-white">
+                <Badge
+                  key={rol.idRol}
+                  className="capitalize bg-blue-600 text-white"
+                >
                   {rol.rol}
                 </Badge>
               );
             }
             if (rol.rol === "personal") {
               return (
-                <Badge key={rol.idRol} variant={"outline"} className="bg-green-600 text-white">
+                <Badge
+                  key={rol.idRol}
+                  variant={"outline"}
+                  className="bg-green-600 text-white"
+                >
                   {rol.rol}
                 </Badge>
               );
@@ -134,28 +116,7 @@ export const columns: ColumnDef<propsUsuarios>[] = [
     id: "actions",
     cell: ({ row }) => {
       const usuario = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(usuario.nombre)}
-            >
-              Ver Usuario
-            </DropdownMenuItem>
-            <DropdownMenuItem>Editar Usuario</DropdownMenuItem>
-            <DropdownMenuItem>Eliminar Usuario</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+      return <ActionsUsuarios data={usuario} refresh={refresh} />;
     },
   },
 ];

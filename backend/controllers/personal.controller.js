@@ -6,12 +6,30 @@ import sequelize from "../config/database.js";
 
 //Crear un nuevo personal y ademas agregar la relacion en rolesUsuario
 export const createPersonal = async (req, res) => {
-  const { telefono, direccion, fechaNacimiento, genero, funcionId, usuarioId ,idRol} = req.body;
+  const {
+    telefono,
+    direccion,
+    fechaNacimiento,
+    genero,
+    funcionId,
+    usuarioId,
+    idRol,
+  } = req.body;
 
   try {
     // Validar que se recibieron todos los datos necesarios
-    if (!telefono || !direccion || !fechaNacimiento || !genero || !funcionId || !usuarioId || !idRol) {
-      return res.status(400).json({ message: "Todos los campos son obligatorios" });
+    if (
+      !telefono ||
+      !direccion ||
+      !fechaNacimiento ||
+      !genero ||
+      !funcionId ||
+      !usuarioId ||
+      !idRol
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Todos los campos son obligatorios" });
     }
 
     // Verificar si el usuario existe
@@ -33,14 +51,17 @@ export const createPersonal = async (req, res) => {
     const t = await sequelize.transaction();
 
     // Crear el nuevo personal
-    const newPersonal = await Personal.create({
-      telefono,
-      direccion,
-      fechaNacimiento,
-      genero,
-      funcionId,
-      usuarioId
-    },{ transaction: t });
+    const newPersonal = await Personal.create(
+      {
+        telefono,
+        direccion,
+        fechaNacimiento,
+        genero,
+        funcionId,
+        usuarioId,
+      },
+      { transaction: t }
+    );
 
     // Agregar la relación en rolesUsuario
     await usuario.addRoles(idRol, { transaction: t });
@@ -48,7 +69,7 @@ export const createPersonal = async (req, res) => {
     await t.commit();
     res.status(201).json({
       personal: newPersonal,
-      message: "Personal creado exitosamente"
+      message: "Personal creado exitosamente",
     });
   } catch (error) {
     console.error(error);
@@ -65,13 +86,17 @@ export const getAllPersonales = async (req, res) => {
           model: Usuario,
           as: "usuario",
           attributes: { exclude: ["createdAt", "updatedAt", "password"] },
-          include: { model: Rol, as: "roles", attributes: { exclude: ["createdAt", "updatedAt"] } },
+          include: {
+            model: Rol,
+            as: "roles",
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          },
         },
         {
           model: Funcion,
           as: "funcion",
           attributes: { exclude: ["createdAt", "updatedAt"] },
-        }
+        },
       ],
       attributes: { exclude: ["createdAt", "updatedAt"] },
     });
@@ -81,7 +106,7 @@ export const getAllPersonales = async (req, res) => {
       telefono: p.telefono,
       direccion: p.direccion,
       genero: p.genero,
-      fechaNacimiento: p.fechaNacimiento.toISOString().split('T')[0],
+      fechaNacimiento: p.fechaNacimiento.toISOString().split("T")[0],
 
       funcionId: p.funcionId,
       cargo: p.funcion.cargo,
@@ -136,13 +161,17 @@ export const getPersonalById = async (req, res) => {
           model: Usuario,
           as: "usuario",
           attributes: { exclude: ["createdAt", "updatedAt", "password"] },
-          include: { model: Rol, as: "roles", attributes: { exclude: ["createdAt", "updatedAt"] } },
+          include: {
+            model: Rol,
+            as: "roles",
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          },
         },
         {
           model: Funcion,
           as: "funcion",
           attributes: { exclude: ["createdAt", "updatedAt"] },
-        }
+        },
       ],
       attributes: { exclude: ["createdAt", "updatedAt"] },
     });
@@ -154,7 +183,7 @@ export const getPersonalById = async (req, res) => {
       telefono: personal.telefono,
       direccion: personal.direccion,
       genero: personal.genero,
-      fechaNacimiento: personal.fechaNacimiento.toISOString().split('T')[0],
+      fechaNacimiento: personal.fechaNacimiento.toISOString().split("T")[0],
       funcionId: personal.funcionId,
       cargo: personal.funcion.cargo,
       usuarioId: personal.usuario.idUsuario,
@@ -166,5 +195,32 @@ export const getPersonalById = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error al obtener el personal" });
+  }
+};
+
+//Eliminar un personal
+export const deletePersonal = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { idRol } = req.body; // Recibir idRol desde el cuerpo de la solicitud
+    if (!idRol) {
+      return res.status(400).json({ message: "idRol es obligatorio" });
+    }
+    const personal = await Personal.findOne({ where: { usuarioId: id } });
+    if (!personal) {
+      return res.status(404).json({ message: "Personal no encontrado" });
+    }
+    const t = await sequelize.transaction(); 
+    await personal.destroy({ transaction: t });
+
+    //Tambien eliminar la relacion en rolesUsuario
+    const usuario = await Usuario.findByPk(personal.usuarioId);
+
+    await usuario.removeRoles(idRol, { transaction: t });
+    await t.commit();
+    res.status(200).json({ message: "Personal eliminado exitosamente" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al eliminar el personal" });
   }
 };

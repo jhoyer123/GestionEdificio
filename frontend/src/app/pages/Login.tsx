@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { useNavigate, NavLink } from "react-router-dom";
 import { login } from "@/services/authService";
+import { toast } from "sonner";
 
 type FormData = {
   email: string;
@@ -26,8 +27,10 @@ export default function Login() {
     try {
       const response = await login(data);
       const usuario = response.usuario;
-      //const message = response.message;
+      console.log("Respuesta del backend:", usuario);
+      const message = response.message;
       localStorage.setItem("user", JSON.stringify(usuario));
+      toast.success(message, { duration: 4000, position: "top-left"});
       navigate("/dashboard");
     } catch (error) {
       console.log("Error del backend:", (error as Error).message);
@@ -94,6 +97,13 @@ export default function Login() {
                 )}
               </div>
 
+              {/* Separador */}
+              <div className="flex items-center my-6">
+                <div className="flex-grow h-px bg-gray-700"></div>
+                <span className="px-3 text-gray-400 text-sm">*</span>
+                <div className="flex-grow h-px bg-gray-700"></div>
+              </div>
+
               {/* Botón principal */}
               <Button
                 type="submit"
@@ -104,15 +114,9 @@ export default function Login() {
               </Button>
             </form>
 
-            {/* Separador */}
-            <div className="flex items-center my-6">
-              <div className="flex-grow h-px bg-gray-700"></div>
-              <span className="px-3 text-gray-400 text-sm">o</span>
-              <div className="flex-grow h-px bg-gray-700"></div>
-            </div>
             {/* Botón principal */}
 
-            <NavLink
+            {/* <NavLink
               to="/register"
               className={({ isActive }) =>
                 isActive
@@ -121,7 +125,7 @@ export default function Login() {
               }
             >
               Regístrate
-            </NavLink>
+            </NavLink> */}
           </CardContent>
         </Card>
       </div>

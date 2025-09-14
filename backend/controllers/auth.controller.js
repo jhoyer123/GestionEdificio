@@ -54,6 +54,7 @@ export const login = async (req, res) => {
 
     const usuarioParaCliente = {
       // Asumiendo que tu modelo tiene un campo 'nombre'
+      id: usuario.idUsuario,
       nombre: usuario.nombre,
       email: usuario.email,
       // Accedemos al rol a través de la relación que definiste

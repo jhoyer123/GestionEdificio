@@ -8,6 +8,7 @@ import Habita from "../models/Habita.js";
 import Departamento from "../models/Departamento.js";
 import Funcion from "../models/Funcion.js";
 import { QueryTypes } from "sequelize";
+import Administrador from "../models/Administrador.js";
 
 //***** Crear un usuario *****//
 export const createUsuario = async (req, res) => {
@@ -61,8 +62,25 @@ export const createUsuario = async (req, res) => {
     await nuevoUsuario.addRoles(rolFind.idRol, { transaction: t });
 
     if (rol === "administrador") {
+      const { cedula } = req.body;
+
+      if (!cedula) {
+        await t.rollback();
+        return res.status(400).json({
+          message: "Todos los campos son obligatorios (administrador)",
+        });
+      }
+      let nuevoAdministrador = await Administrador.create(
+        {
+          cedula,
+          usuarioId: nuevoUsuario.idUsuario,
+        },
+        { transaction: t }
+      );
+      nuevoAdministrador = nuevoAdministrador.get({ plain: true });
       // ✅ Convertir a objeto plano DESPUÉS de usar addRol()
       nuevoUsuario = nuevoUsuario.get({ plain: true });
+      nuevoUsuario = { ...nuevoUsuario, ...nuevoAdministrador };
     }
 
     // Si el rol es 'personal'
@@ -92,7 +110,7 @@ export const createUsuario = async (req, res) => {
         await t.rollback();
         return res.status(404).json({ message: "Funcion no encontrada (id)" });
       }
-      
+
       let nuevoPersonal = await Personal.create(
         {
           fechaNacimiento,
@@ -107,7 +125,10 @@ export const createUsuario = async (req, res) => {
 
       const personalResponse = nuevoPersonal.get({ plain: true });
       // ✅ Convertir a objeto plano DESPUÉS de todas las operaciones de Sequelize
-      nuevoUsuario = { ...nuevoUsuario.get({ plain: true }), ...personalResponse };
+      nuevoUsuario = {
+        ...nuevoUsuario.get({ plain: true }),
+        ...personalResponse,
+      };
     }
 
     if (rol === "residente") {
@@ -202,20 +223,24 @@ export const createUsuario = async (req, res) => {
 export const updateUsuario = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, email, rolId } = req.body;
+    const { nombre, email } = req.body;
+    if (!nombre || !email) {
+      return res
+        .status(400)
+        .json({ message: "Todos los campos son obligatorios" });
+    }
     const usuarioFind = await Usuario.findByPk(id);
     if (!usuarioFind) {
       return res.status(404).json({ error: "Usuario no encontrado (id)" });
     }
-    const rolFind = await Rol.findByPk(rolId);
-    if (!rolFind) {
-      return res.status(404).json({ error: "Rol no encontrado (id)" });
-    }
-    await usuarioFind.update({ nombre, email, rolId });
-    res.json(usuarioFind);
+    await usuarioFind.update({ nombre, email });
+    res.json({
+      usuario: usuarioFind,
+      message: "Usuario actualizado exitosamente",
+    });
   } catch (error) {
     console.error("Error updating usuario:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -250,9 +275,12 @@ export const getUsuario = async (req, res) => {
         {
           model: Rol,
           as: "roles",
+          attributes: { exclude: ["createdAt", "updatedAt"] },
+          through: { attributes: [] },
         },
       ],
     });
+    
     if (!usuario) {
       return res.status(404).json({ message: "Usuario no encontrado (id)" });
     }
@@ -328,3 +356,8 @@ export const toggleUsuarioEstado = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+
+//Aqui user el cambio de contraseña del helper de usuario.js
+import { cambiarContrasena } from "./helpers/usuario.js";
+export { cambiarContrasena };

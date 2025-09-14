@@ -35,7 +35,7 @@ interface Funcion {
   idFuncion: number;
   cargo: string;
 }
-interface createResidentProps {
+interface createUserProps {
   setEditState: React.Dispatch<
     React.SetStateAction<{ view: string; entity: string; id: number | null }>
   >;
@@ -48,7 +48,7 @@ interface DepartamentoProps {
   piso: number;
 }
 
-export default function CreateUsuario({ setEditState }: createResidentProps) {
+export default function CreateUsuario({ setEditState }: createUserProps) {
   const {
     control,
     register,

@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, LogOut, Home, FolderCog } from "lucide-react";
+import { LayoutDashboard, Users, LogOut, Home, FolderCog, UserCog } from "lucide-react";
 import { logout } from "@/services/authService";
 
 import {
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { useNavigate } from "react-router-dom";
+import { set } from "date-fns";
 
 interface propsSidebar {
   activeView: string;
@@ -42,6 +43,14 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
     setActiveView("usuarios");
   };
 
+  const handleAreaComunClick = () => {
+    setActiveView("areasComunes");
+  };
+
+  const handlePerfilClick = () => {
+    setActiveView("perfil");
+  }
+
   const navigate = useNavigate();
   const handleCerrarSesionClick = () => {
     logout();
@@ -62,6 +71,13 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
             >
               <LayoutDashboard className="mr-2 h-4 w-4" />
               Dashboard
+            </button>
+            <button
+              onClick={handlePerfilClick}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+            >
+              <UserCog className="mr-2 h-4 w-4" />
+              Perfil
             </button>
             <DropdownMenu>
               <DropdownMenuTrigger
@@ -97,6 +113,13 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
             >
               <FolderCog className="mr-2 h-4 w-4" />
               Funciones De Personal
+            </button>
+            <button
+              onClick={handleAreaComunClick}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+            >
+              <FolderCog className="mr-2 h-4 w-4" />
+              Areas Comunes
             </button>
           </nav>
         </div>

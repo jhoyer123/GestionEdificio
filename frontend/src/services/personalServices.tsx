@@ -23,3 +23,25 @@ export const getPersonalById = async (id: number | null) => {
     throw error;
   }
 };
+
+//Crear un nuevo personal
+export const createPersonal = async (personalData: any) => {
+  try {
+    const response = await axios.post(API_URL, personalData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating personal:", error);
+    throw error;
+  }
+};
+
+//Eliminar un personal quitandole el rol
+export const deletePersonalRol = async (id: number, data: any) => {
+  try {
+    const response = await axios.delete(`${API_URL}/${id}`, { data });
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting personal:", error);
+    throw error;
+  }
+};
