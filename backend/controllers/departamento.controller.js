@@ -15,9 +15,7 @@ export const createDepartamento = async (req, res) => {
       where: { numero },
     });
     if (departamentoExistente) {
-      return res
-        .status(400)
-        .json({ message: "El departamento ya existe" });
+      return res.status(400).json({ message: "El departamento ya existe" });
     }
     const nuevoDepartamento = await departamento.create({
       numero,
@@ -26,7 +24,7 @@ export const createDepartamento = async (req, res) => {
       alquilerPrecio,
     });
 
-    res.status(201).json(nuevoDepartamento);
+    res.status(201).json({ message: "Departamento creado correctamente" });
   } catch (error) {
     console.error("Error al crear departamento:", error);
     res.status(500).json({ error: "Error al crear departamento" });
@@ -85,11 +83,9 @@ export const updateDepartamento = async (req, res) => {
     departamentoU.alquilerPrecio = alquilerPrecio;
 
     await departamentoU.save();
-    res
-      .status(200)
-      .json(departamentoU, {
-        message: "Departamento actualizado correctamente",
-      });
+    res.status(200).json(departamentoU, {
+      message: "Departamento actualizado correctamente",
+    });
   } catch (error) {
     console.error("Error al editar departamento:", error);
     res.status(500).json({ error: "Error al editar departamento" });

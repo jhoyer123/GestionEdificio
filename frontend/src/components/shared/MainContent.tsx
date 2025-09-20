@@ -3,11 +3,8 @@ import AreasComunes from "@/app/dashboard/areasComunes/AreasComunes";
 import Departamento from "@/app/dashboard/departamento/Departamento";
 import DetalleDepartamento from "@/app/dashboard/departamento/DetalleDepartamento";
 import { Principal } from "@/app/dashboard/maindashboard/Principal";
-import CreatePersonal from "@/app/dashboard/personal/CreatePersonal";
-import EditPersonal from "@/app/dashboard/personal/EditPersonal";
 import { Personal } from "@/app/dashboard/personal/Personal";
 import CreateResidente from "@/app/dashboard/residente/CreateResidente";
-import EditResidente from "@/app/dashboard/residente/EditResidente";
 import { Residente } from "@/app/dashboard/residente/Residente";
 import CreateUsuario from "@/app/dashboard/usuarios/CreateUsuario";
 import PerfilUsuario from "@/app/dashboard/usuarios/PerfilUsuario";
@@ -31,22 +28,36 @@ export default function MainContent({
   switch (editState.view) {
     case "dashboard":
       return <Principal />;
+    //seccion de usuarios ***
     case "residentes":
       return <Residente setEditState={setEditState} />;
     case "usuarios":
       return <Usuarios setEditState={setEditState} />;
-    case "perfil":
-      return <PerfilUsuario />;
     case "personal":
       return <Personal setEditState={setEditState} />;
+    case "perfil":
+      return <PerfilUsuario />;
+
+    //seccion de departamentos ***
     case "departamentos":
       return <Departamento setEditState={setEditState} />;
     case "detalleDepartamento":
-      return <DetalleDepartamento setEditState={setEditState} idDepartamento={editState.id} />;
+      return (
+        <DetalleDepartamento
+          setEditState={setEditState}
+          idDepartamento={editState.id}
+        />
+      );
+
+    //seccion de areas comunes ***
     case "areasComunes":
-      return <AreasComunes setEditState={setEditState}/>;
+      return <AreasComunes setEditState={setEditState} />;
     case "reservas":
-      return <AreaDetailPage setEditState={setEditState} idParams={editState.id}/>;
+      return (
+        <AreaDetailPage setEditState={setEditState} idParams={editState.id} />
+      );
+    
+    //seccion de creacion y edicion de entidades ***
     case "edit":
       /* if (editState.entity === "personal") {
         return (
@@ -59,9 +70,6 @@ export default function MainContent({
       // Aquí puedes agregar otros componentes de edición para otras entidades
       return <p>Selecciona una entidad para editar</p>;
     case "create":
-      if (editState.entity === "personal") {
-        return <CreatePersonal setEditState={setEditState} />;
-      }
       if (editState.entity === "residente") {
         return <CreateResidente setEditState={setEditState} />;
       }

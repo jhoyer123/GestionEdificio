@@ -53,18 +53,17 @@ export default function DeleteUser({
       {children}
 
       {/* Botones */}
-      <div className="flex justify-end gap-3">
+      <div className="flex gap-x-28">
         <Button
-          variant="outline"
           onClick={() => setOpenDelete(false)}
-          className="cursor-pointer"
+          className="flex-1 cursor-pointer"
         >
           Cancelar
         </Button>
         <Button
           variant="destructive"
           onClick={handleDelete}
-          className="cursor-pointer"
+          className="flex-1 cursor-pointer"
         >
           Eliminar usuario
         </Button>

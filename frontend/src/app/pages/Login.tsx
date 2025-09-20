@@ -6,14 +6,21 @@ import { useForm } from "react-hook-form";
 import { useNavigate, NavLink } from "react-router-dom";
 import { login } from "@/services/authService";
 import { toast } from "sonner";
+import { useState } from "react";
+import axios from "axios";
+import { Label } from "@radix-ui/react-label";
 
 type FormData = {
   email: string;
   password: string;
   remember: boolean;
+  token?: string; // nuevo, para 2FA
 };
 
 export default function Login() {
+  const [twoFactorRequired, setTwoFactorRequired] = useState(false);
+  const [twoFAToken, setTwoFAToken] = useState("");
+
   //localStorage.clear();
   const {
     register,
@@ -25,16 +32,37 @@ export default function Login() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await login(data);
+      // Si estamos en paso 2FA, añadimos el token
+      const payload = {
+        ...data,
+        token: twoFactorRequired ? twoFAToken : undefined,
+      };
+
+      const response = await login(payload);
+
+      // Si el backend indica que requiere 2FA
+      if (response.twoFactorRequired) {
+        setTwoFactorRequired(true);
+        toast.info("Ingresa tu código 2FA", { duration: 4000 });
+        return; // no continuar hasta que se ingrese token
+      }
+
+      // Login completo
       const usuario = response.usuario;
-      console.log("Respuesta del backend:", usuario);
-      const message = response.message;
       localStorage.setItem("user", JSON.stringify(usuario));
-      toast.success(message, { duration: 4000, position: "top-left"});
+      toast.success(response.message, { duration: 4000, position: "top-left" });
       navigate("/dashboard");
     } catch (error) {
-      toast.error("Error del backend", { duration: 4000, position: "top-left"});
-      console.log("Error del backend:", (error as Error).message);
+      toast.error(
+        axios.isAxiosError(error)
+          ? error.response?.data?.message
+          : "Error en el login",
+        {
+          duration: 4000,
+          position: "bottom-left",
+        }
+      );
+      console.log("Error del backend:", error);
     }
   };
 
@@ -104,6 +132,23 @@ export default function Login() {
                 <span className="px-3 text-gray-400 text-sm">*</span>
                 <div className="flex-grow h-px bg-gray-700"></div>
               </div>
+
+              {/* Campo 2FA, solo si es requerido */}
+              {twoFactorRequired && (
+                <div className="mt-4">
+                  <Label className="mb-2 block text-sm font-medium text-gray-300">
+                    Ingrese su código 2FA
+                  </Label>
+                  <Input
+                    type="text"
+                    placeholder="Código 6 dígitos 2FA"
+                    maxLength={6}
+                    value={twoFAToken}
+                    onChange={(e) => setTwoFAToken(e.target.value)}
+                    className="bg-gray-800 border border-gray-700 text-white placeholder:text-gray-500"
+                  />
+                </div>
+              )}
 
               {/* Botón principal */}
               <Button

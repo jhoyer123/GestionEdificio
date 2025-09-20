@@ -4,6 +4,7 @@ import { AreaCard } from "./AreaCard";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { EditState } from "@/components/shared/MainContent";
+import { Button } from "@/components/ui/button";
 
 export default function AreaList({
   setEditState,
@@ -31,6 +32,9 @@ export default function AreaList({
 
   return (
     <div className="p-6 space-y-6">
+      <Button className="bg-amber-300 text-black hover:bg-amber-400 cursor-pointer">
+        Agregar Área Común
+      </Button>
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Áreas Comunes</h2>
         <Input

@@ -70,13 +70,15 @@ const ActionsUsuarios = ({ data, refresh }: GestionarRolUsuarioProps) => {
             setOpenEdit={setOpenEditRol}
             refresh={refresh}
           >
-            <DialogFooter>
+            <DialogFooter className="flex justify-between w-full gap-20">
               <DialogClose asChild>
-                <Button type="button" variant="outline">
+                <Button type="button" className="cursor-pointer flex-1">
                   Cancelar
                 </Button>
               </DialogClose>
-              <Button type="submit">Guardar cambios</Button>
+              <Button type="submit" className="cursor-pointer flex-1 bg-blue-600 hover:bg-blue-700 text-white">
+                Guardar cambios
+              </Button>
             </DialogFooter>
           </GestionarRolUsuario>
         </DialogContent>
@@ -89,13 +91,18 @@ const ActionsUsuarios = ({ data, refresh }: GestionarRolUsuarioProps) => {
             <DialogDescription>Actualizar datos del usuario</DialogDescription>
           </DialogHeader>
           <EditUsuario data={data} setOpenEdit={setOpenEdit} refresh={refresh}>
-            <DialogFooter>
+            <DialogFooter className="flex justify-between w-full gap-20">
               <DialogClose asChild>
-                <Button type="button" variant="outline">
+                <Button type="button" className="cursor-pointer flex-1">
                   Cancelar
                 </Button>
               </DialogClose>
-              <Button type="submit">Guardar cambios</Button>
+              <Button
+                type="submit"
+                className="cursor-pointer flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                Guardar cambios
+              </Button>
             </DialogFooter>
           </EditUsuario>
         </DialogContent>

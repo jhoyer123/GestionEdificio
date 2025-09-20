@@ -105,7 +105,7 @@ export default function CreateUsuario({ setEditState }: createUserProps) {
       <h2 className="text-2xl font-bold mb-6 m-auto text-center">
         Crear Nuevo Usuario
       </h2>
-      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         {/* Datos generales de Usuario */}
         <Input
           placeholder="Nombre"
@@ -152,10 +152,10 @@ export default function CreateUsuario({ setEditState }: createUserProps) {
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
-            {errors.password && (
-              <p className="text-red-500">{errors.password.message}</p>
-            )}
           </div>
+          {errors.password && (
+            <p className="text-red-500">{errors.password.message}</p>
+          )}
 
           {/* Campo confirmar contraseña */}
           <div className="relative">
@@ -174,45 +174,11 @@ export default function CreateUsuario({ setEditState }: createUserProps) {
             >
               {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
-            {errors.confirmPassword && (
-              <p className="text-red-500">{errors.confirmPassword.message}</p>
-            )}
           </div>
+          {errors.confirmPassword && (
+            <p className="text-red-500">{errors.confirmPassword.message}</p>
+          )}
         </div>
-        {/* <Input
-          placeholder="Contraseña"
-          type="password"
-          {...register("password", {
-            required: "La contraseña es obligatoria",
-            minLength: {
-              value: 8,
-              message: "Debe tener al menos 8 caracteres",
-            },
-            pattern: {
-              value:
-                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+.,?":{}|<>]).{8,}$/,
-              message:
-                "Debe incluir mayúscula, minúscula, número y carácter especial",
-            },
-          })}
-        />
-
-        {errors.password && (
-          <p className="text-red-500">{errors.password.message}</p>
-        )}
-
-        <Input
-          placeholder="Confirmar contraseña"
-          type="password"
-          {...register("confirmPassword", {
-            validate: (value) =>
-              value === watch("password") || "Las contraseñas no coinciden",
-          })}
-        />
-        {errors.confirmPassword && (
-          <p className="text-red-500">{errors.confirmPassword.message}</p>
-        )} */}
-
         {/* Select Rol */}
         <Select
           onValueChange={(val) => {
@@ -411,12 +377,10 @@ export default function CreateUsuario({ setEditState }: createUserProps) {
             </p>
           </>
         )}
-        <div className="flex gap-4 mt-8">
+        <div className="flex gap-x-40 mt-8">
           <Button
             type="button"
-            variant="outline"
-            className="flex-1 border-orange-500 text-orange-500 hover:bg-orange-50 cursor-pointer
-            "
+            className="flex-1 cursor-pointer"
             onClick={() =>
               setEditState({ view: "usuarios", entity: "", id: null })
             }
@@ -425,7 +389,7 @@ export default function CreateUsuario({ setEditState }: createUserProps) {
           </Button>
           <Button
             type="submit"
-            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white cursor-pointer"
+            className="cursor-pointer flex-1 bg-blue-600 hover:bg-blue-700 text-white"
           >
             Crear Usuario
           </Button>

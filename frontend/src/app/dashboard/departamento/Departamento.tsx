@@ -5,12 +5,23 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { CreateDepartamento } from "./CreateDepartamento";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 interface Departamento {
-  idDepartamento: number;
+  idDepartamento: number | null;
+  nombre?: string | null;
   numero: number;
   descripcion: string;
-  nombre: string | null;
+  piso: number;
+  alquilerPrecio: number;
 }
 
 type Props = {
@@ -22,17 +33,18 @@ type Props = {
 export default function Departamento({ setEditState }: Props) {
   const [departamentos, setDepartamentos] = useState<Departamento[]>([]);
   const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const fetchDepartamentos = async () => {
+    try {
+      const response = await getDepartamentosConUsuarios();
+      setDepartamentos(response);
+    } catch (error) {
+      console.error("Error fetching departamentos:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchDepartamentos = async () => {
-      try {
-        const response = await getDepartamentosConUsuarios();
-        setDepartamentos(response);
-      } catch (error) {
-        console.error("Error fetching departamentos:", error);
-      }
-    };
-
     fetchDepartamentos();
   }, []);
 
@@ -47,12 +59,24 @@ export default function Departamento({ setEditState }: Props) {
   return (
     <div className="p-6 space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <Button
-          className="bg-amber-300 hover:bg-amber-400 cursor-pointer"
-          variant={"outline"}
-        >
-          Agregar Departamento
-        </Button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-amber-300 text-black hover:bg-amber-400 cursor-pointer">
+              Agregar Departamento
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-center mb-4">
+                Crear Nuevo Departamento
+              </DialogTitle>
+              <DialogDescription>
+                Llene todos los datos para registrar un nuevo departamento
+              </DialogDescription>
+            </DialogHeader>
+            <CreateDepartamento setOpen={setOpen} refresh={fetchDepartamentos} />
+          </DialogContent>
+        </Dialog>
 
         <div className="flex items-center gap-2">
           <Search className="w-4 h-4" />
@@ -101,7 +125,6 @@ export default function Departamento({ setEditState }: Props) {
                     <span className="italic">Sin residente</span>
                   )}
                 </p>
-                {/* 🔹 Botón de detalles */}
                 <Button
                   variant="outline"
                   className="w-full"

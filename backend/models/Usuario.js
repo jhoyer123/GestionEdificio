@@ -28,10 +28,16 @@ const Usuario = sequelize.define(
       allowNull: false,
       defaultValue: false,
     },
-    /* rolId: {
-      type: DataTypes.INTEGER,
+    two_factor_enabled: {
+      type: DataTypes.BOOLEAN,
       allowNull: false,
-    }, */
+      defaultValue: false,
+    },
+    two_factor_secret: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: null,
+    },
   },
   {
     tableName: "usuarios",

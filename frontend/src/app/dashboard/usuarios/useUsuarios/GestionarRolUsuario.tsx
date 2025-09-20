@@ -197,8 +197,8 @@ export function GestionarRolUsuario({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {/* Nombre */}
       <div className="grid gap-3">
-        <Label>Nombre</Label>
-        <span className="font-medium bg-amber-200">{data.nombre}</span>
+        <Label className="text-center">Nombre</Label>
+        <span className="font-medium bg-cyan-200 rounded-2xl text-center">{data.nombre}</span>
       </div>
 
       {/* Acción */}

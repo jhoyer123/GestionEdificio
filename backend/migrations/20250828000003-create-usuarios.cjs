@@ -27,16 +27,16 @@ module.exports = {
         allowNull: false,
         defaultValue: true,
       },
-      /* rolId: {
-        type: Sequelize.INTEGER,
+      two_factor_enabled: {
+        type: Sequelize.BOOLEAN,
         allowNull: false,
-        references: {
-          model: "roles", // nombre de la tabla de roles
-          key: "idRol",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "RESTRICT",// Evita que se eliminen roles si hay usuarios asociados
-      }, */
+        defaultValue: false,
+      },
+      two_factor_secret: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
