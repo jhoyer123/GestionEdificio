@@ -28,6 +28,8 @@ module.exports = {
           model: "personales",
           key: "idPersonal",
         },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       createdAt: {
         allowNull: false,

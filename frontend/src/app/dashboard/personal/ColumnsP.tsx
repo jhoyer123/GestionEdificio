@@ -4,16 +4,8 @@ import { MoreHorizontal } from "lucide-react";
 import { ArrowUpDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
 import { differenceInYears } from "date-fns";
+import ActionsPersonal from "./usePersonal/ActionsPersonal";
 
 export interface propsPersonal {
   idPersonal: number;
@@ -29,7 +21,7 @@ export interface propsPersonal {
   rol: {
     idRol: number;
     rol: string;
-  };
+  }[];
 }
 
 const myCustomFilterFn: FilterFn<propsPersonal> = (
@@ -59,8 +51,7 @@ const myCustomFilterFn: FilterFn<propsPersonal> = (
 //Columnas de la tabla
 export const columns = (
   
-  onEdit: (id: number) => void,
-  onProfile: (id: number) => void
+  refresh: () => Promise<void>
 
 ): ColumnDef<propsPersonal>[] => [
   {
@@ -79,8 +70,8 @@ export const columns = (
       );
     },
   },
-  /* {
-    accessorKey: "email",
+  {
+    accessorKey: "direccion",
     filterFn: myCustomFilterFn,
     header: ({ column }) => {
       return (
@@ -88,12 +79,12 @@ export const columns = (
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Email
+          Dirección
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
-  }, */
+  }, 
   {
     accessorKey: "genero",
     header: "Género",
@@ -111,37 +102,14 @@ export const columns = (
   },
   {
     accessorKey: "fechaNacimiento",
-    header: "Edad",
+    header: "Edad",   
     accessorFn: (row) => differenceInYears(new Date(), new Date(row.fechaNacimiento))
   },
   {
     id: "actions",
     cell: ({ row }) => {
       const personal = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Ver Personal</DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                onEdit(personal.idPersonal);
-              }}
-            >
-              Editar Personal
-            </DropdownMenuItem>
-            <DropdownMenuItem>Eliminar Personal</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+      return <ActionsPersonal data={personal} refresh={refresh} />;
     },
   },
 ];

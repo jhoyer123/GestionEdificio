@@ -12,6 +12,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ref } from "process";
+import ActionsResidentes from "./useResidentes/ActionsResidentes";
 
 export interface propsResidente {
   idResidente: number;
@@ -28,7 +30,8 @@ export interface propsResidente {
   rol: {
     idRol: number;
     rol: string;
-  };
+  }[];
+  refresh: () => void;
 }
 
 const myCustomFilterFn: FilterFn<propsResidente> = (
@@ -53,7 +56,7 @@ const myCustomFilterFn: FilterFn<propsResidente> = (
 };
 
 //Columnas de la tabla
-export const columns: ColumnDef<propsResidente>[] = [
+export const columns = (refresh: () => void): ColumnDef<propsResidente>[] => [
   {
     accessorKey: "nombre",
     filterFn: myCustomFilterFn,
@@ -114,28 +117,7 @@ export const columns: ColumnDef<propsResidente>[] = [
     id: "actions",
     cell: ({ row }) => {
       const personal = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(personal.nombre)}
-            >
-              Ver Residente
-            </DropdownMenuItem>
-            <DropdownMenuItem>Editar Residente</DropdownMenuItem>
-            <DropdownMenuItem>Eliminar Residente</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+      return <ActionsResidentes data={personal} refresh={refresh} />;
     },
   },
 ];

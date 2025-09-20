@@ -20,6 +20,8 @@ module.exports = {
           model: "usuarios",
           key: "idUsuario",
         },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       createdAt: {
         allowNull: false,

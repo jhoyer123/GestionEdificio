@@ -38,6 +38,8 @@ module.exports = {
           model: "departamentos", // nombre de la tabla referenciada
           key: "idDepartamento", // columna referenciada
         },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       createdAt: {
         allowNull: false,

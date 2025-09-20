@@ -33,6 +33,7 @@ export default function Login() {
       toast.success(message, { duration: 4000, position: "top-left"});
       navigate("/dashboard");
     } catch (error) {
+      toast.error("Error del backend", { duration: 4000, position: "top-left"});
       console.log("Error del backend:", (error as Error).message);
     }
   };
@@ -113,19 +114,6 @@ export default function Login() {
                 Iniciar sesión
               </Button>
             </form>
-
-            {/* Botón principal */}
-
-            {/* <NavLink
-              to="/register"
-              className={({ isActive }) =>
-                isActive
-                  ? "w-full text-center text-lg py-2 px-4 rounded-md text-white bg-blue-800 block"
-                  : "w-full text-center text-lg py-2 px-4 rounded-md text-white bg-blue-600 hover:bg-blue-700 block "
-              }
-            >
-              Regístrate
-            </NavLink> */}
           </CardContent>
         </Card>
       </div>

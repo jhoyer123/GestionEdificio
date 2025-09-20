@@ -8,6 +8,10 @@ import personalRoutes from "./routes/personal.routes.js";
 import departamentoRoutes from "./routes/departamentos.routes.js";
 import residenteRoutes from "./routes/residentes.routes.js";
 import turnosRoutes from "./routes/turnos.routes.js";
+import reservasRoutes from "./routes/reservas.routes.js";
+import pagosRoutes from "./routes/pagos.routes.js";
+import areasComunesRoutes from "./routes/areasComunes.routes.js";
+
 // importamos asociaciones
 import roleRoutes from "./routes/roles.routes.js";
 //import de cors
@@ -37,6 +41,9 @@ app.use(personalRoutes);
 app.use(departamentoRoutes);
 app.use(residenteRoutes);
 app.use(turnosRoutes);
+app.use(reservasRoutes);
+app.use(pagosRoutes);
+app.use(areasComunesRoutes);
 
 // Iniciar el servidor
 app.listen(process.env.PORT, () => {

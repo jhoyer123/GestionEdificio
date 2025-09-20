@@ -1,5 +1,7 @@
+import AreaDetailPage from "@/app/dashboard/areasComunes/AreaDetailPage";
 import AreasComunes from "@/app/dashboard/areasComunes/AreasComunes";
 import Departamento from "@/app/dashboard/departamento/Departamento";
+import DetalleDepartamento from "@/app/dashboard/departamento/DetalleDepartamento";
 import { Principal } from "@/app/dashboard/maindashboard/Principal";
 import CreatePersonal from "@/app/dashboard/personal/CreatePersonal";
 import EditPersonal from "@/app/dashboard/personal/EditPersonal";
@@ -11,7 +13,7 @@ import CreateUsuario from "@/app/dashboard/usuarios/CreateUsuario";
 import PerfilUsuario from "@/app/dashboard/usuarios/PerfilUsuario";
 import { Usuarios } from "@/app/dashboard/usuarios/Usuarios";
 
-type EditState = {
+export type EditState = {
   view: string;
   entity: string;
   id: number | null;
@@ -38,18 +40,22 @@ export default function MainContent({
     case "personal":
       return <Personal setEditState={setEditState} />;
     case "departamentos":
-      return <Departamento />;
+      return <Departamento setEditState={setEditState} />;
+    case "detalleDepartamento":
+      return <DetalleDepartamento setEditState={setEditState} idDepartamento={editState.id} />;
     case "areasComunes":
-      return <AreasComunes />;
+      return <AreasComunes setEditState={setEditState}/>;
+    case "reservas":
+      return <AreaDetailPage setEditState={setEditState} idParams={editState.id}/>;
     case "edit":
-      if (editState.entity === "personal") {
+      /* if (editState.entity === "personal") {
         return (
           <EditPersonal setEditState={setEditState} personalId={editState.id} />
         );
       }
       if (editState.entity === "residente") {
         return <EditResidente setEditState={setEditState} />;
-      }
+      } */
       // Aquí puedes agregar otros componentes de edición para otras entidades
       return <p>Selecciona una entidad para editar</p>;
     case "create":

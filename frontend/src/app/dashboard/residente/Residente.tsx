@@ -15,11 +15,12 @@ type Props = {
 export const Residente: React.FC<Props> = ({ setEditState }) => {
   const [residente, setResidente] = useState<propsResidente[]>([]);
 
+  const fetchData = async () => {
+    const data = await getResidentes();
+    setResidente(data);
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getResidentes();
-      setResidente(data);
-    };
     fetchData();
   }, []);
 
@@ -35,7 +36,7 @@ export const Residente: React.FC<Props> = ({ setEditState }) => {
       >
         Agregar Residente
       </Button> */}
-      <DataTable columns={columns} data={residente} />
+      <DataTable columns={columns(fetchData)} data={residente} />
     </div>
   );
 };

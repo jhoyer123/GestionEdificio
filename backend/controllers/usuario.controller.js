@@ -234,9 +234,9 @@ export const updateUsuario = async (req, res) => {
       return res.status(404).json({ error: "Usuario no encontrado (id)" });
     }
     await usuarioFind.update({ nombre, email });
-    res.json({
+    res.status(200).json({
       usuario: usuarioFind,
-      message: "Usuario actualizado exitosamente",
+      message: "Datos actualizados exitosamente",
     });
   } catch (error) {
     console.error("Error updating usuario:", error);
@@ -280,7 +280,7 @@ export const getUsuario = async (req, res) => {
         },
       ],
     });
-    
+
     if (!usuario) {
       return res.status(404).json({ message: "Usuario no encontrado (id)" });
     }
@@ -293,7 +293,7 @@ export const getUsuario = async (req, res) => {
 };
 
 //***** Eliminar un usuario *****//
-export const deleteUsuario = async (req, res) => {
+export const EliminarUsuario = async (req, res) => {
   const transaction = await sequelize.transaction();
 
   try {
@@ -357,7 +357,23 @@ export const toggleUsuarioEstado = async (req, res) => {
   }
 };
 
-
 //Aqui user el cambio de contraseña del helper de usuario.js
 import { cambiarContrasena } from "./helpers/usuario.js";
 export { cambiarContrasena };
+
+// Eliminar un usuario probando el ondelete cascade
+export const deleteUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const usuarioFind = await Usuario.findByPk(id);
+    if (!usuarioFind) {
+      return res.status(404).json({ error: "Usuario no encontrado (id)" });
+    }
+    await usuarioFind.destroy();
+    res.status(200).json({ message: "Usuario eliminado correctamente" });
+  } catch (error) {
+    console.error("Error deleting usuario:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+

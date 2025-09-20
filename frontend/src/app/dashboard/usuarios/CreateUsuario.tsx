@@ -16,6 +16,8 @@ import { getDepartamentos } from "@/services/departamentosServices";
 import { createUsuario } from "@/services/usuariosServices";
 import type { AxiosError } from "axios";
 
+import { Eye, EyeOff } from "lucide-react";
+
 type FormData = {
   nombre: string;
   email: string;
@@ -95,6 +97,9 @@ export default function CreateUsuario({ setEditState }: createUserProps) {
     }
   };
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
   return (
     <div className="max-w-2xl mx-auto bg-white rounded-xl shadow p-8">
       <h2 className="text-2xl font-bold mb-6 m-auto text-center">
@@ -120,11 +125,82 @@ export default function CreateUsuario({ setEditState }: createUserProps) {
         />
         {errors.email && <p className="text-red-500">{errors.email.message}</p>}
 
-        <Input
+        <div className="space-y-4">
+          {/* Campo contraseña */}
+          <div className="relative">
+            <Input
+              placeholder="Contraseña"
+              type={showPassword ? "text" : "password"}
+              {...register("password", {
+                required: "La contraseña es obligatoria",
+                minLength: {
+                  value: 8,
+                  message: "Debe tener al menos 8 caracteres",
+                },
+                pattern: {
+                  value:
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+.,?":{}|<>]).{8,}$/,
+                  message:
+                    "Debe incluir mayúscula, minúscula, número y carácter especial",
+                },
+              })}
+            />
+            <button
+              type="button"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+            {errors.password && (
+              <p className="text-red-500">{errors.password.message}</p>
+            )}
+          </div>
+
+          {/* Campo confirmar contraseña */}
+          <div className="relative">
+            <Input
+              placeholder="Confirmar contraseña"
+              type={showConfirm ? "text" : "password"}
+              {...register("confirmPassword", {
+                validate: (value) =>
+                  value === watch("password") || "Las contraseñas no coinciden",
+              })}
+            />
+            <button
+              type="button"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+              onClick={() => setShowConfirm(!showConfirm)}
+            >
+              {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+            {errors.confirmPassword && (
+              <p className="text-red-500">{errors.confirmPassword.message}</p>
+            )}
+          </div>
+        </div>
+        {/* <Input
           placeholder="Contraseña"
           type="password"
-          {...register("password", { required: "Obligatorio" })}
+          {...register("password", {
+            required: "La contraseña es obligatoria",
+            minLength: {
+              value: 8,
+              message: "Debe tener al menos 8 caracteres",
+            },
+            pattern: {
+              value:
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+.,?":{}|<>]).{8,}$/,
+              message:
+                "Debe incluir mayúscula, minúscula, número y carácter especial",
+            },
+          })}
         />
+
+        {errors.password && (
+          <p className="text-red-500">{errors.password.message}</p>
+        )}
+
         <Input
           placeholder="Confirmar contraseña"
           type="password"
@@ -135,7 +211,7 @@ export default function CreateUsuario({ setEditState }: createUserProps) {
         />
         {errors.confirmPassword && (
           <p className="text-red-500">{errors.confirmPassword.message}</p>
-        )}
+        )} */}
 
         {/* Select Rol */}
         <Select

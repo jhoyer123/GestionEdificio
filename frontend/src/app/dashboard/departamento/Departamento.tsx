@@ -13,11 +13,16 @@ interface Departamento {
   nombre: string | null;
 }
 
-export default function Departamento() {
-  const [departamentos, setDepartamentos] = useState<Departamento[]>([]);
-  const [search, setSearch] = useState(""); // 🔹 Estado del buscador
+type Props = {
+  setEditState: React.Dispatch<
+    React.SetStateAction<{ view: string; entity: string; id: number | null }>
+  >;
+};
 
-  // Cargar datos desde la API
+export default function Departamento({ setEditState }: Props) {
+  const [departamentos, setDepartamentos] = useState<Departamento[]>([]);
+  const [search, setSearch] = useState("");
+
   useEffect(() => {
     const fetchDepartamentos = async () => {
       try {
@@ -31,12 +36,11 @@ export default function Departamento() {
     fetchDepartamentos();
   }, []);
 
-  // 🔹 Filtro de departamentos según búsqueda
   const filteredDepartamentos = departamentos
     .filter(
       (dpto) =>
-        dpto.numero.toString().includes(search) || // busca por número
-        dpto.nombre?.toLowerCase().includes(search.toLowerCase()) // busca por nombre
+        dpto.numero.toString().includes(search) ||
+        dpto.nombre?.toLowerCase().includes(search.toLowerCase())
     )
     .sort((a, b) => a.numero - b.numero);
 
@@ -50,7 +54,6 @@ export default function Departamento() {
           Agregar Departamento
         </Button>
 
-        {/* 🔹 Input de búsqueda */}
         <div className="flex items-center gap-2">
           <Search className="w-4 h-4" />
           <Input
@@ -65,42 +68,57 @@ export default function Departamento() {
 
       <h2 className="text-2xl font-bold">Departamentos</h2>
 
-      {/* Grid de 4 columnas */}
+      {/* Grid de cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {filteredDepartamentos.map((dpto) => (
-          <Card
-            key={dpto.idDepartamento}
-            className={`border-2 transition-transform hover:scale-105 cursor-pointer
-              ${
-                dpto.nombre === null
-                  ? "border-green-500 bg-green-50"
-                  : "border-red-500 bg-red-50"
-              }
-            `}
-          >
-            <CardHeader>
-              <CardTitle className="flex justify-between items-center">
-                <span>Depto {dpto.numero}</span>
-                <Badge
-                  className={`text-white px-2 py-1 rounded-full text-xs
-                    ${dpto.nombre === null ? "bg-green-600" : "bg-red-600"}
-                  `}
+        {filteredDepartamentos.map((dpto) => {
+          const disponible = dpto.nombre === null;
+          return (
+            <Card
+              key={dpto.idDepartamento}
+              className={`border transition-transform hover:scale-105 ${
+                disponible
+                  ? "bg-green-50 border-green-300"
+                  : "bg-red-50 border-red-300"
+              }`}
+            >
+              <CardHeader>
+                <CardTitle className="flex justify-between items-center">
+                  <span>Depto {dpto.numero}</span>
+                  <Badge
+                    className={`text-white ${
+                      disponible ? "bg-green-600" : "bg-red-600"
+                    }`}
+                  >
+                    {disponible ? "Disponible" : "Ocupado"}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  {dpto.nombre ? (
+                    <span>👤 {dpto.nombre}</span>
+                  ) : (
+                    <span className="italic">Sin residente</span>
+                  )}
+                </p>
+                {/* 🔹 Botón de detalles */}
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() =>
+                    setEditState({
+                      view: "detalleDepartamento",
+                      entity: "departamento",
+                      id: dpto.idDepartamento,
+                    })
+                  }
                 >
-                  {dpto.nombre === null ? "Disponible" : "Ocupado"}
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-700">
-                {dpto.nombre ? (
-                  <span>👤 {dpto.nombre}</span>
-                ) : (
-                  <span className="italic text-gray-500">Sin residente</span>
-                )}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
+                  Ver Detalles
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

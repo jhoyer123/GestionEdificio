@@ -45,3 +45,14 @@ export const deletePersonalRol = async (id: number, data: any) => {
     throw error;
   }
 };
+
+//Actualizar un personal
+export const updatePersonal = async (id: number, personalData: any) => {
+  try {
+    const response = await axios.put(`${API_URL}/${id}`, personalData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating personal:", error);
+    throw error;
+  }
+};

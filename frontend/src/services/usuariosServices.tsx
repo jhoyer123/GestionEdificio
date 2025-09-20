@@ -30,10 +30,36 @@ export const changePassword = async (passwordData: any) => {
     //traer id del usuario del localstorage
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const userId = user.id;
-    const response = await axios.put(`${API_URL}/${userId}/cambiar-contrasena`, passwordData);
+    const response = await axios.put(
+      `${API_URL}/${userId}/cambiar-contrasena`,
+      passwordData
+    );
     return response.data;
   } catch (error) {
     console.error("Error cambiando la contraseña:", error);
+    throw error;
+  }
+};
+
+// Actualizar un usuario
+export const updateUsuario = async (id: number, usuarioData: any) => {
+  try {
+    const response = await axios.put(`${API_URL}/${id}`, usuarioData);
+    return response.data;
+  } catch (error) {
+    console.error("Error actualizando usuario:", error);
+    throw error;
+  }
+};
+
+
+// Eliminar un usuario
+export const deleteUsuario = async (id: number) => {
+  try {
+    const response = await axios.delete(`${API_URL}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error eliminando usuario:", error);
     throw error;
   }
 };

@@ -18,7 +18,6 @@ import {
   deletePersonalRol,
 } from "../../../../services/personalServices";
 import { useEffect, useState, useMemo } from "react";
-import { set } from "date-fns";
 import { getDepartamentos } from "@/services/departamentosServices";
 import { createResidente, deleteResidente } from "@/services/residenteServices";
 import type { AxiosError } from "axios";

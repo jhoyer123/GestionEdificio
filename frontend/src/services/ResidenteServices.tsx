@@ -28,10 +28,22 @@ export const createResidente = async (residenteData: any) => {
 //Eliminar un residente quitandole el rol
 export const deleteResidente = async (id: number, data: any) => {
   try {
+    console.log("Data being sent for deletion:", data); // Log the data being sent
     const response = await axios.delete(`${API_URL}/${id}`, { data });
     return response.data;
   } catch (error) {
     console.error("Error deleting residente:", error);
+    throw error;
+  }
+};
+
+//actualizar un residente
+export const updateResidente = async (id: number, residenteData: any) => {
+  try {
+    const response = await axios.put(`${API_URL}/${id}`, residenteData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating residente:", error);
     throw error;
   }
 };

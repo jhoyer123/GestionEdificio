@@ -16,11 +16,12 @@ type Props = {
 export const Personal: React.FC<Props> = ({ setEditState }) => {
   const [personal, setPersonal] = useState<propsPersonal[]>([]);
 
+  const fetchData = async () => {
+    const data = await getPersonales();
+    setPersonal(data);
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getPersonales();
-      setPersonal(data);
-    };
     fetchData();
   }, []);
 
@@ -35,13 +36,7 @@ export const Personal: React.FC<Props> = ({ setEditState }) => {
       >
         Agregar Personal
       </Button> */}
-      <DataTable
-        columns={columns(
-          (id: number) =>setEditState({ view: "edit", entity: "personal", id }),
-          (id: number) =>setEditState({ view: "perfil", entity: "personal", id })
-        )}
-        data={personal}
-      />
+      <DataTable columns={columns(fetchData)} data={personal} />
     </div>
   );
 };

@@ -10,7 +10,7 @@ import {
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { type propsUsuarios } from "../Columns";
+import { type propsResidente } from "../ColumnsR";
 import {
   Dialog,
   DialogClose,
@@ -20,16 +20,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { GestionarRolUsuario } from "./GestionarRolUsuario";
-import EditUsuario from "../EditUsuario";
-import DeleteUser from "../DeleteUser";
+import EditResidente from "../EditResidente";
+import DeleteResidente from "../DeleteResidente";
 
 interface GestionarRolUsuarioProps {
-  data: propsUsuarios;
+  data: propsResidente;
   refresh: () => void;
 }
 
-const ActionsUsuarios = ({ data, refresh }: GestionarRolUsuarioProps) => {
+const ActionsResidentes = ({ data, refresh }: GestionarRolUsuarioProps) => {
   const [openEditRol, setOpenEditRol] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -65,7 +64,7 @@ const ActionsUsuarios = ({ data, refresh }: GestionarRolUsuarioProps) => {
               Aquí puedes gestionar el rol del usuario.
             </DialogDescription>
           </DialogHeader>
-          <GestionarRolUsuario
+          {/* <GestionarRolUsuario
             data={data}
             setOpenEdit={setOpenEditRol}
             refresh={refresh}
@@ -78,7 +77,7 @@ const ActionsUsuarios = ({ data, refresh }: GestionarRolUsuarioProps) => {
               </DialogClose>
               <Button type="submit">Guardar cambios</Button>
             </DialogFooter>
-          </GestionarRolUsuario>
+          </GestionarRolUsuario> */}
         </DialogContent>
       </Dialog>
       {/* Dialog para gestionar el update del usuario */}
@@ -88,7 +87,7 @@ const ActionsUsuarios = ({ data, refresh }: GestionarRolUsuarioProps) => {
             <DialogTitle>Gestionar Datos</DialogTitle>
             <DialogDescription>Actualizar datos del usuario</DialogDescription>
           </DialogHeader>
-          <EditUsuario data={data} setOpenEdit={setOpenEdit} refresh={refresh}>
+          <EditResidente data={data} setOpenEdit={setOpenEdit} refresh={refresh}>
             <DialogFooter>
               <DialogClose asChild>
                 <Button type="button" variant="outline">
@@ -97,7 +96,7 @@ const ActionsUsuarios = ({ data, refresh }: GestionarRolUsuarioProps) => {
               </DialogClose>
               <Button type="submit">Guardar cambios</Button>
             </DialogFooter>
-          </EditUsuario>
+          </EditResidente>
         </DialogContent>
       </Dialog>
       {/* Dialog para gestionar la Eliminacion del usuario*/}
@@ -108,7 +107,7 @@ const ActionsUsuarios = ({ data, refresh }: GestionarRolUsuarioProps) => {
             <DialogDescription></DialogDescription>
           </DialogHeader>
           <DialogHeader></DialogHeader>
-          <DeleteUser
+          <DeleteResidente
             data={data}
             setOpenDelete={setOpenDelete}
             refresh={refresh}
@@ -119,4 +118,4 @@ const ActionsUsuarios = ({ data, refresh }: GestionarRolUsuarioProps) => {
   );
 };
 
-export default ActionsUsuarios;
+export default ActionsResidentes;

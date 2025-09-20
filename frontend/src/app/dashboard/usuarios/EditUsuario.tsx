@@ -2,6 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import type { propsUsuarios } from "./Columns";
+import { updateUsuario } from "@/services/usuariosServices";
+import axios from "axios";
+import { toast } from "sonner";
 
 interface GestionarDatosUsuarioProps {
   data: propsUsuarios;
@@ -27,11 +30,27 @@ export default function EditUsuario({
     formState: { errors },
   } = useForm<FormData>();
 
-  const onSubmit = async (data: FormData) => {
-    console.log("Datos enviados:", data);
-    setOpenEdit(false);
-    refresh();
-    // Aquí mandas al backend
+  const onSubmit = async (defaultValue: FormData) => {
+    try {
+      const response = await updateUsuario(data.idUsuario, defaultValue);
+      const message = response.message;
+      toast.success(message, { duration: 4000, position: "top-left" });
+      setOpenEdit(false);
+      refresh();
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error(
+          "Error cambiando la contraseña:",
+          error.response?.data?.message
+        );
+        toast.error(error.response?.data?.message, {
+          duration: 4000,
+          position: "top-left",
+        });
+      } else {
+        console.error("Error cambiando la contraseña:", error);
+      }
+    }
   };
 
   return (

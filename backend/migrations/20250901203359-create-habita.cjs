@@ -13,6 +13,8 @@ module.exports = {
           model: "usuarios",
           key: "idUsuario",
         },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       departamentoId: {
         type: Sequelize.INTEGER,
@@ -21,6 +23,8 @@ module.exports = {
           model: "departamentos",
           key: "idDepartamento",
         },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       fecha: {
         type: Sequelize.DATE,

@@ -33,6 +33,8 @@ module.exports = {
           model: "administradores", // nombre de la tabla de administradores
           key: "idAdministrador",
         },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       createdAt: {
         allowNull: false,

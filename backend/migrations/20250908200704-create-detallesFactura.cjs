@@ -24,6 +24,8 @@ module.exports = {
           model: "facturas",
           key: "idFactura",
         },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       createdAt: {
         allowNull: false,

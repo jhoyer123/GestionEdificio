@@ -3,41 +3,48 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("administradores", {
-      idAdministrador: {
+    await queryInterface.createTable("pagos", {
+      idPago: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      cedula: {
-        type: Sequelize.STRING,
+      reservaId: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+        references: {
+          model: "reservas",
+          key: "idReserva",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+      },
+      monto: {
+        type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
       },
-      usuarioId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: "usuarios",
-          key: "idUsuario",
-        },
-        onDelete: "CASCADE",
-        onUpdate: "CASCADE",
+      metodoPago: Sequelize.STRING,
+      fechaPago: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW,
+      },
+      estado: {
+        type: Sequelize.ENUM("pendiente", "confirmado", "rechazado"),
+        defaultValue: "pendiente",
       },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
     });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("administradores");
+    await queryInterface.dropTable("pagos");
   },
 };

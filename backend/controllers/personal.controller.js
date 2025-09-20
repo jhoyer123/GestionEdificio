@@ -89,7 +89,8 @@ export const getAllPersonales = async (req, res) => {
           include: {
             model: Rol,
             as: "roles",
-            attributes: { exclude: ["createdAt", "updatedAt"] },
+            through: { attributes: [] }, // Excluir atributos de la tabla intermedia  
+            attributes: ["idRol", "rol"],
           },
         },
         {
@@ -115,7 +116,7 @@ export const getAllPersonales = async (req, res) => {
       nombre: p.usuario.nombre,
       email: p.usuario.email,
       estado: p.usuario.estado,
-      rol: p.usuario.rol, // 👈 aplanado
+      rol: p.usuario.roles, // 👈 aplanado
     }));
 
     res.status(200).json(data);
@@ -129,21 +130,21 @@ export const getAllPersonales = async (req, res) => {
 export const updatePersonal = async (req, res) => {
   try {
     const { id } = req.params;
-    const { telefono, direccion, fechaNacimiento, genero } = req.body;
-    if (!telefono || !direccion || !fechaNacimiento || !genero) {
+    const { telefono, direccion, fechaNacimiento, genero , funcionId} = req.body;
+    if (!telefono || !direccion || !fechaNacimiento || !genero || !funcionId) {
       return res
         .status(400)
         .json({ message: "Todos los campos son obligatorios" });
     }
-    const personal = await Personal.findByPk(id);
+    const personal = await Personal.findOne({ where: { usuarioId: id } });
     if (!personal) {
       return res.status(404).json({ message: "Personal no encontrado (id)" });
     }
 
-    await personal.update({ telefono, direccion, fechaNacimiento, genero });
+    await personal.update({ telefono, direccion, fechaNacimiento, genero, funcionId });
     res.json({
       personal: personal.get({ plain: true }),
-      message: "Personal actualizado exitosamente",
+      message: "Datos de Personal actualizado exitosamente",
     });
   } catch (error) {
     console.error(error);
@@ -190,7 +191,7 @@ export const getPersonalById = async (req, res) => {
       nombre: personal.usuario.nombre,
       email: personal.usuario.email,
       estado: personal.usuario.estado,
-      rol: personal.usuario.rol,
+      rol: personal.usuario.rol, // 👈 aplanado
     });
   } catch (error) {
     console.error(error);

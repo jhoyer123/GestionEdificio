@@ -169,3 +169,32 @@ export const getResidentes = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+//actualizar datos de un usuario residente y en habita tambien
+export const updateResidente = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { telefono, tipoResidencia } = req.body;
+
+    // Verificar si el residente existe
+    const residente = await Residente.findByPk(id);
+    if (!residente) {
+      return res.status(404).json({ error: "Residente no encontrado" });
+    }
+    const t = await sequelize.transaction();
+    // Actualizar los datos del residente
+    await residente.update({ telefono }, { transaction: t });
+    // Actualizar los datos en la tabla Habita
+    const habita = await Habita.findOne({ where: { usuarioId: residente.usuarioId } });
+    if (habita) {
+      await habita.update({ tipoResidencia }, { transaction: t });
+    }
+    await t.commit();
+    res
+      .status(200)
+      .json({ message: "Datos del residente actualizados exitosamente" });
+  } catch (error) {
+    console.error("Error updating residente:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};

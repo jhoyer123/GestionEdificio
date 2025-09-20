@@ -12,28 +12,23 @@ import {
 } from "@/components/ui/select";
 import { getFunciones } from "@/services/funcionServices";
 import { useEffect, useState } from "react";
-import { createUsuario } from "@/services/usuariosServices";
-import type { AxiosError } from "axios";
-import { getPersonalById } from "@/services/personalServices";
+import type { propsPersonal } from "./ColumnsP";
+import axios from "axios";
+import { toast } from "sonner";
+import { updatePersonal } from "@/services/personalServices";
 
 interface EditPersonalProps {
-  setEditState: React.Dispatch<
-    React.SetStateAction<{ view: string; entity: string; id: number | null }>
-  >;
-  personalId: number | null;
+  data: propsPersonal;
+  setOpenEdit: React.Dispatch<React.SetStateAction<boolean>>;
+  refresh: () => void;
 }
 
 type FormData = {
-  nombre: string;
-  email: string;
-  password: string;
   telefono: string;
   direccion: string;
-  fechaNacimiento: Date;
+  fechaNacimiento: string;
   genero: string;
-  rol: string;
   funcionId: number;
-  confirmPassword?: string; // Campo para confirmar la contraseña
 };
 
 interface Funcion {
@@ -43,208 +38,172 @@ interface Funcion {
   salario: string;
 }
 
-interface propsPersonal {
-  idPersonal: number;
-  telefono: string;
-  direccion: string;
-  genero: string;
-  fechaNacimiento: string;
-  funcionId: number;
-  cargo: string;
-  usuarioId: number;
-  nombre: string;
-  email: string;
-  estado: boolean;
-}
-
-const EditPersonal = ({ setEditState, personalId }: EditPersonalProps) => {
+export default function EditPersonal({
+  data,
+  setOpenEdit,
+  refresh,
+}: EditPersonalProps) {
   const {
     control,
     register,
     handleSubmit,
     setValue,
     clearErrors,
-    watch,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm<FormData>({
+    defaultValues: {
+      telefono: data.telefono,
+      direccion: data.direccion,
+      fechaNacimiento: data.fechaNacimiento?.slice(0, 10) || "",
+      genero: data.genero,
+      funcionId: data.funcionId,
+    },
+  });
 
-  const onSubmit = async (data: FormData) => {
-    const { confirmPassword, ...rest } = data;
-    //agregar el dato rolId aqui
-    rest.rol = "personal"; // Asignar un valor de rolId
-    console.log(rest);
-    // Aquí puedes manejar el envío del formulario, como llamar a una API para crear el personal
-    try {
-      const response = await createUsuario(rest);
-      console.log("Personal creado:", response.usuario);
-      console.log("Mensaje:", response.message);
-      // Después de crear el personal, puedes volver a la vista de lista
-      setEditState({ view: "personal", entity: "", id: null });
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      if (err.response) {
-        console.error(
-          "Este es el mensaje del backend:",
-          err.response.data.message
-        ); // <-- tu mensaje del backend
-      }
-    }
-  };
-
-  //Aqui traer las funciones
   const [funciones, setFunciones] = useState<Funcion[]>([]);
-  const [personalData, setPersonalData] = useState<propsPersonal | null>(null);
 
   useEffect(() => {
     const fetchFunciones = async () => {
       try {
         const data = await getFunciones();
         setFunciones(data);
-        const personalData = await getPersonalById(personalId);
-        console.log(personalData);
-        setPersonalData(personalData);
-        // Rellenar los campos del formulario con los datos obtenidos
-        setValue("nombre", personalData.nombre);
-        setValue("email", personalData.email);
-        setValue("telefono", personalData.telefono);
-        setValue("direccion", personalData.direccion);
-        setValue("fechaNacimiento", personalData.fechaNacimiento);
-        setValue("genero", personalData.genero);
-        setValue("funcionId", personalData.funcionId);
       } catch (error) {
         console.error("Error al obtener las funciones:", error);
       }
     };
-
     fetchFunciones();
   }, []);
 
-  return (
-    <div className="max-w-2xl mx-auto bg-white rounded-xl shadow p-8 text-center">
-      <h2 className="text-2xl font-bold mb-6">Editar Datos del Personal</h2>
-      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-        <Input
-          placeholder="Nombre"
-          className="bg-gray-100"
-          type="text"
-          {...register("nombre", {
-            required: "El nombre es obligatorio",
-            minLength: {
-              value: 2,
-              message: "El nombre debe tener al menos 2 caracteres",
-            },
-            maxLength: {
-              value: 50,
-              message: "El nombre no puede exceder los 50 caracteres",
-            },
-            pattern: {
-              value: /^[A-Za-z\s]+$/,
-              message: "El nombre solo puede contener letras y espacios",
-            },
-          })}
-        />
-        {errors.nombre && (
-          <p className="text-red-500 text-sm mt-1">{errors.nombre.message}</p>
-        )}
-        <Input
-          placeholder="Email"
-          className="bg-gray-100"
-          type="email"
-          {...register("email", {
-            required: "El email es obligatorio",
-          })}
-        />
-        {errors.email && (
-          <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-        )}
-        <Input
-          placeholder="telefono"
-          className="bg-gray-100"
-          {...register("telefono", {
-            required: "El teléfono es obligatorio",
-            pattern: {
-              value: /^\+?[0-9\s\-()]{7,15}$/,
-              message: "El teléfono no es válido",
-            },
-          })}
-        />
-        {errors.telefono && (
-          <p className="text-red-500 text-sm mt-1">{errors.telefono.message}</p>
-        )}
-        {/* Opción más simple sin Controller */}
-        <Controller
-          name="genero"
-          control={control}
-          rules={{ required: "Debe seleccionar un género" }}
-          render={({ field }) => (
-            <Select
-              onValueChange={(val) => {
-                field.onChange(val);
-                clearErrors("genero");
-              }}
-              value={field.value || ""} // 👈 RHF controla el valor
-            >
-              <SelectTrigger
-                className={`w-full bg-gray-100 ${
-                  errors.genero ? "border-red-500 focus:border-red-500" : ""
-                }`}
-              >
-                <SelectValue placeholder="Selecciona un género" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="masculino">Masculino</SelectItem>
-                <SelectItem value="femenino">Femenino</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-        />
-        <Input
-          placeholder="Fecha de nacimiento"
-          className="bg-gray-100"
-          type="date"
-          {...register("fechaNacimiento", {
-            required: "La fecha de nacimiento es obligatoria",
-            validate: (value) => {
-              if (!value) return "La fecha es obligatoria";
-              const hoy = new Date();
-              const fecha = new Date(value);
-              if (fecha > hoy) return "La fecha no puede ser en el futuro";
-              return true;
-            },
-          })}
-        />
-        {errors.fechaNacimiento && (
-          <p className="text-red-500 text-sm mt-1">
-            {errors.fechaNacimiento.message}
-          </p>
-        )}
+  const onSubmit = async (formData: FormData) => {
+    try {
+      console.log(formData);
+      console.log(data);
+      const response = await updatePersonal(data.usuarioId, formData);
+      const message = response.message;
+      toast.success(message, {
+        duration: 4000,
+        position: "top-left",
+      });
+      setOpenEdit(false);
+      refresh();
+    } catch (error) {
+      toast.error("Error al actualizar el personal", {
+        duration: 4000,
+        position: "top-left",
+      });
+    }
+  };
 
-        <Input
-          placeholder="direccion"
-          className="bg-gray-100"
-          {...register("direccion", {
-            required: "La dirección es obligatoria",
-            minLength: {
-              value: 5,
-              message: "La dirección debe tener al menos 5 caracteres",
-            },
+  return (
+    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+      <h2 className="text-lg font-medium">Editando datos de: {data.nombre}</h2>
+
+      {/* Teléfono */}
+      <label className="block text-sm font-medium mb-2">Teléfono</label>
+      <Input
+        placeholder="Teléfono"
+        className="bg-gray-100"
+        {...register("telefono", {
+          required: "El teléfono es obligatorio",
+          pattern: {
+            value: /^\+?[0-9\s\-()]{7,15}$/,
+            message: "El teléfono no es válido",
+          },
+        })}
+      />
+      {errors.telefono && (
+        <p className="text-red-500 text-sm mt-1">{errors.telefono.message}</p>
+      )}
+
+      {/* Dirección */}
+      <label className="block text-sm font-medium mb-2">Dirección</label>
+      <Input
+        placeholder="Dirección"
+        className="bg-gray-100"
+        {...register("direccion", {
+          required: "La dirección es obligatoria",
+          minLength: {
+            value: 5,
+            message: "La dirección debe tener al menos 5 caracteres",
+          },
+        })}
+      />
+      {errors.direccion && (
+        <p className="text-red-500 text-sm mt-1">{errors.direccion.message}</p>
+      )}
+
+      {/* Fecha de nacimiento */}
+      <label className="block text-sm font-medium mb-2">Fecha de nacimiento</label>
+      <Input
+        type="date"
+        className="bg-gray-100"
+        {...register("fechaNacimiento", {
+          required: "La fecha de nacimiento es obligatoria",
+          validate: (value) => {
+            if (!value) return "La fecha es obligatoria";
+            const hoy = new Date();
+            const fecha = new Date(value);
+            if (fecha > hoy) return "La fecha no puede ser en el futuro";
+            return true;
+          },
+        })}
+      />
+      {errors.fechaNacimiento && (
+        <p className="text-red-500 text-sm mt-1">
+          {errors.fechaNacimiento.message}
+        </p>
+      )}
+
+      {/* Género */}
+      <div>
+        <label className="block text-sm font-medium mb-2">Género</label>
+        <Select
+          onValueChange={(val) => {
+            setValue("genero", val, { shouldValidate: true });
+            clearErrors("genero");
+          }}
+          defaultValue={data.genero || ""}
+        >
+          <SelectTrigger
+            className={`w-full bg-gray-100 ${
+              errors.genero ? "border-red-500 focus:border-red-500" : ""
+            }`}
+          >
+            <SelectValue placeholder="Selecciona un género" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="masculino">Masculino</SelectItem>
+            <SelectItem value="femenino">Femenino</SelectItem>
+          </SelectContent>
+        </Select>
+        <input
+          type="hidden"
+          {...register("genero", {
+            required: "Debe seleccionar un género",
           })}
         />
-        {errors.direccion && (
-          <p className="text-red-500 text-sm mt-1">
-            {errors.direccion.message}
-          </p>
+        {errors.genero && (
+          <p className="text-red-500 text-sm mt-1">{errors.genero.message}</p>
         )}
+      </div>
+
+      {/* Función */}
+      <div>
+        <label className="block text-sm font-medium mb-2">Cargo</label>
         <Controller
           name="funcionId"
           control={control}
           rules={{ required: "Debes seleccionar un cargo" }}
           render={({ field }) => (
             <Select
-              onValueChange={field.onChange}
+              onValueChange={(val) => field.onChange(Number(val))}
               value={field.value?.toString() ?? ""}
             >
-              <SelectTrigger className="w-fit">
+              <SelectTrigger
+                className={`w-full bg-gray-100 ${
+                  errors.funcionId ? "border-red-500 focus:border-red-500" : ""
+                }`}
+              >
                 <SelectValue placeholder="Selecciona el cargo del personal" />
               </SelectTrigger>
               <SelectContent>
@@ -264,29 +223,28 @@ const EditPersonal = ({ setEditState, personalId }: EditPersonalProps) => {
           )}
         />
         {errors.funcionId && (
-          <p className="text-red-500 text-sm">{errors.funcionId.message}</p>
+          <p className="text-red-500 text-sm mt-1">
+            {errors.funcionId.message}
+          </p>
         )}
-        <div className="flex gap-4 mt-8">
-          <Button
-            type="button"
-            variant="outline"
-            className="flex-1 border-orange-500 text-orange-500 hover:bg-orange-50"
-            onClick={() =>
-              setEditState({ view: "personal", entity: "personal", id: null })
-            }
-          >
-            Cancelar y volver
-          </Button>
-          <Button
-            type="submit"
-            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
-          >
-            Actualizar
-          </Button>
-        </div>
-      </form>
-    </div>
-  );
-};
+      </div>
 
-export default EditPersonal;
+      {/* Botones */}
+      <div className="flex justify-end gap-4 pt-4">
+        <Button
+          type="button"
+          variant="outline"
+          
+          onClick={() => setOpenEdit(false)}
+        >
+          Cancelar
+        </Button>
+        <Button
+          type="submit"
+        >
+          Guardar cambios
+        </Button>
+      </div>
+    </form>
+  );
+}

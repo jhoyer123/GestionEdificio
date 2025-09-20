@@ -4,6 +4,7 @@ import LoginPage from "./app/pages/Login";
 import RegisterPage from "./app/pages/Register";
 import PrivateRoute from "./components/shared/PrivateRoute";
 import { Toaster } from "@/components/ui/sonner";
+import DetalleDepartamento from "./app/dashboard/departamento/DetalleDepartamento";
 
 export const App = () => {
   return (
@@ -21,6 +22,7 @@ export const App = () => {
           }
         />
         {/* <Route path="/dashboard" element={<Layout />} /> */}
+        <Route path="/DetalleDepartamento" element={<DetalleDepartamento />} />
       </Routes>
       <Toaster />
     </>
