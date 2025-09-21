@@ -1,4 +1,11 @@
-import { LayoutDashboard, Users, LogOut, Home, FolderCog, UserCog } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  LogOut,
+  Home,
+  FolderCog,
+  UserCog,
+} from "lucide-react";
 import { logout } from "@/services/authService";
 
 import {
@@ -47,9 +54,13 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
     setActiveView("areasComunes");
   };
 
+  const handleAreasComunesAdminClick = () => {
+    setActiveView("areasComunesAdmin");
+  };
+
   const handlePerfilClick = () => {
     setActiveView("perfil");
-  }
+  };
 
   const navigate = useNavigate();
   const handleCerrarSesionClick = () => {
@@ -119,7 +130,14 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
             >
               <FolderCog className="mr-2 h-4 w-4" />
-              Areas Comunes
+              Reservar Areas Comunes
+            </button>
+            <button
+              onClick={handleAreasComunesAdminClick}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+            >
+              <UserCog className="mr-2 h-4 w-4" />
+              Gestion Areas Comunes
             </button>
           </nav>
         </div>

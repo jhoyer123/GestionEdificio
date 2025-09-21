@@ -27,15 +27,6 @@ export const Personal: React.FC<Props> = ({ setEditState }) => {
 
   return (
     <div className="container mx-auto py-10">
-      {/* <Button
-        className="bg-amber-300 hover:bg-amber-400 cursor-pointer"
-        variant={"outline"}
-        onClick={() =>
-          setEditState({ view: "create", entity: "personal", id: null })
-        }
-      >
-        Agregar Personal
-      </Button> */}
       <DataTable columns={columns(fetchData)} data={personal} />
     </div>
   );

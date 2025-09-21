@@ -27,6 +27,10 @@ module.exports = {
         allowNull: false,
         defaultValue: true,
       },
+      imageUrl: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       two_factor_enabled: {
         type: Sequelize.BOOLEAN,
         allowNull: false,

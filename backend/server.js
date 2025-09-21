@@ -11,6 +11,7 @@ import turnosRoutes from "./routes/turnos.routes.js";
 import reservasRoutes from "./routes/reservas.routes.js";
 import pagosRoutes from "./routes/pagos.routes.js";
 import areasComunesRoutes from "./routes/areasComunes.routes.js";
+import uploadRoutes from "./routes/upload.routes.js";
 
 // importamos asociaciones
 import roleRoutes from "./routes/roles.routes.js";
@@ -44,6 +45,8 @@ app.use(turnosRoutes);
 app.use(reservasRoutes);
 app.use(pagosRoutes);
 app.use(areasComunesRoutes);
+app.use("/uploads", express.static("uploads"));
+app.use(uploadRoutes);
 
 // Iniciar el servidor
 app.listen(process.env.PORT, () => {

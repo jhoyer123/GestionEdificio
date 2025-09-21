@@ -21,7 +21,7 @@ export default function Layout() {
         <Header />
 
         {/* Área de contenido principal con scroll vertical */}
-        <main className="flex-1 overflow-y-auto p-6 h-full">
+        <main className="flex-1 overflow-y-auto p-6 h-full relative">
           <MainContent 
             editState={editState}
             setEditState={setEditState}

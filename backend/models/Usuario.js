@@ -28,6 +28,10 @@ const Usuario = sequelize.define(
       allowNull: false,
       defaultValue: false,
     },
+    imageUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     two_factor_enabled: {
       type: DataTypes.BOOLEAN,
       allowNull: false,

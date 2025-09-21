@@ -36,6 +36,10 @@ const AreaComun = sequelize.define(
       type: DataTypes.BOOLEAN,
       allowNull: false,
     },
+    imageUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     tableName: "Areas_Comunes",

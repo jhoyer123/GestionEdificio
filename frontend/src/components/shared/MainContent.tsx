@@ -1,3 +1,4 @@
+import { AreasComunesGest } from "@/app/dashboard/areasComunes/areaComunAdmin/AreasComunesG";
 import AreaDetailPage from "@/app/dashboard/areasComunes/AreaDetailPage";
 import AreasComunes from "@/app/dashboard/areasComunes/AreasComunes";
 import Departamento from "@/app/dashboard/departamento/Departamento";
@@ -9,6 +10,7 @@ import { Residente } from "@/app/dashboard/residente/Residente";
 import CreateUsuario from "@/app/dashboard/usuarios/CreateUsuario";
 import PerfilUsuario from "@/app/dashboard/usuarios/PerfilUsuario";
 import { Usuarios } from "@/app/dashboard/usuarios/Usuarios";
+import { CrearAreaComun } from "@/app/dashboard/areasComunes/areaComunAdmin/crearAreaComun";
 
 export type EditState = {
   view: string;
@@ -56,6 +58,8 @@ export default function MainContent({
       return (
         <AreaDetailPage setEditState={setEditState} idParams={editState.id} />
       );
+    case "areasComunesAdmin":
+      return <AreasComunesGest setEditState={setEditState} />;
     
     //seccion de creacion y edicion de entidades ***
     case "edit":
@@ -75,6 +79,9 @@ export default function MainContent({
       }
       if (editState.entity === "usuario") {
         return <CreateUsuario setEditState={setEditState} />;
+      }
+      if (editState.entity === "areaComun") {
+        return <CrearAreaComun setEditState={setEditState} />;
       }
       // Aquí puedes agregar otros componentes de edición para otras entidades
       return <p>Selecciona una entidad para editar</p>;

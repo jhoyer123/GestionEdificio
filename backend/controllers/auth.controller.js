@@ -102,7 +102,7 @@ export const generate2FA = async (req, res) => {
   try {
     // 1. Generar secreto TOTP único
     const secret = speakeasy.generateSecret({
-      name: "MiApp (" + req.body.username + ")", // opcional: nombre visible en Google Authenticator
+      name: "Habitat360 (" + req.body.username + ")", // opcional: nombre visible en Google Authenticator
     });
 
     // 2. Generar QR en base64
