@@ -1,4 +1,6 @@
 import express from "express";
+//import para las imagenes
+import path from "path";
 import dotenv from "dotenv";
 // importamos rutas
 import usuarioRoutes from "./routes/usuarios.routes.js"; 
@@ -32,6 +34,8 @@ app.use(cors({
   origin: "http://localhost:5173",// Reemplaza con la URL de tu frontend
   credentials: true,
 }));
+//servir las imagenes
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Rutas
 app.use(usuarioRoutes);

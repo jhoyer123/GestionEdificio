@@ -3,7 +3,7 @@ import upload from "../middlewares/uploads.js";
 
 const router = express.Router();
 
-// Ruta para subir una sola imagen
+// Subir una sola imagen
 router.post("/upload", upload.single("imagen"), (req, res) => {
   res.json({
     mensaje: "Imagen subida con éxito",
@@ -11,7 +11,7 @@ router.post("/upload", upload.single("imagen"), (req, res) => {
   });
 });
 
-// Ruta para subir varias imágenes
+// Subir varias imágenes
 router.post("/uploads", upload.array("imagenes", 5), (req, res) => {
   res.json({
     mensaje: "Imágenes subidas con éxito",
@@ -19,4 +19,4 @@ router.post("/uploads", upload.array("imagenes", 5), (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;

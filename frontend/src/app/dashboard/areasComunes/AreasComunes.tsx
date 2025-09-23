@@ -32,9 +32,7 @@ export default function AreaList({
 
   return (
     <div className="p-6 space-y-6">
-      <Button className="bg-amber-300 text-black hover:bg-amber-400 cursor-pointer">
-        Agregar Área Común
-      </Button>
+      
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Áreas Comunes</h2>
         <Input

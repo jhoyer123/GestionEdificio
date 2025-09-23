@@ -32,7 +32,6 @@ export default function AreaDetailPage({
   const [loading, setLoading] = useState(true);
 
   const fetch = async () => {
-    console.log("Fetching area with ID:", id);
     if (!id) return;
     try {
       const areaResponse = await getAreaById(id);
@@ -57,12 +56,18 @@ export default function AreaDetailPage({
   }, [fecha, todasReservas]);
 
   if (loading) return <Skeleton className="h-64 w-full" />;
-
+  const API_URL = import.meta.env.VITE_API_URL;
   return (
     <>
       <div>
-        <Button className="cursor-pointer"
-        onClick={() => setEditState({ view: "areasComunes ", entity: "", id:null })}>Volver</Button>
+        <Button
+          className="cursor-pointer"
+          onClick={() =>
+            setEditState({ view: "areasComunes", entity: "", id: null })
+          }
+        >
+          Volver atras
+        </Button>
       </div>
       <div className="max-w-4xl mx-auto p-6 space-y-8 relative">
         {/* Botón arriba a la izquierda */}
@@ -70,10 +75,7 @@ export default function AreaDetailPage({
         {/* ---------- ENCABEZADO ---------- */}
         <div className="flex flex-col md:flex-row gap-6">
           <img
-            src={
-              area?.imagenUrl ||
-              "https://i.pinimg.com/736x/c8/c3/2a/c8c32a35a83c485a00079636e4335c80.jpg"
-            }
+            src={`${API_URL}/uploads/${area?.imageUrl}` || "/placeholder.png"}
             alt={area?.nombreAreaComun}
             className="w-full md:w-1/2 h-64 object-cover rounded-xl shadow"
           />

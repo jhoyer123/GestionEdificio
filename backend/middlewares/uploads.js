@@ -3,15 +3,15 @@ import path from "path";
 
 // Configuración de almacenamiento
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // carpeta destino
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // Asegúrate de que la carpeta exista
   },
-  filename: function (req, file, cb) {
+  filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 
-// Filtro de archivos: solo imágenes
+// Filtro de archivos
 const fileFilter = (req, file, cb) => {
   const allowed = /jpeg|jpg|png|gif/;
   const ext = allowed.test(path.extname(file.originalname).toLowerCase());
@@ -25,4 +25,4 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage, fileFilter });
 
-module.exports = upload;
+export default upload;

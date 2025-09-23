@@ -8,7 +8,6 @@ import { createReserva } from "@/services/reservaServices";
 import { type AreaComun } from "@/services/areasServices";
 import { type Reserva } from "@/services/reservaServices";
 import type { EditState } from "@/components/shared/MainContent";
-import { set } from "date-fns";
 
 interface ReservaFormProps {
   setState: React.Dispatch<React.SetStateAction<EditState>>;

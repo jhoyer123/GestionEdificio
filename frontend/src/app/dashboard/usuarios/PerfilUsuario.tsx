@@ -110,7 +110,7 @@ export default function PerfilUsuario() {
   };
 
   return (
-    <div className="flex justify-center items-center bg-stone-100 p-4">
+    <div className="flex justify-center items-center bg-stone-100">
       <Card className="w-full max-w-4xl bg-white border border-stone-300 rounded-xl shadow-md overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-3">
           {/* Columna Izquierda: Perfil */}

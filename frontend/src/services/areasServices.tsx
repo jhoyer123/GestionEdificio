@@ -10,11 +10,22 @@ export interface AreaComun {
   horarioInicio: string;
   horarioFin: string;
   requiereAprobacion: false;
-  imagenUrl?: string;
+  imageUrl?: string;
 }
 
 const API_BASE_URL = "http://localhost:3000/api/areas-comunes"; // Cambia esto por la URL de tu API
 const API_RESERVAS_URL = "http://localhost:3000/api/reservas";
+
+//crear areas comunes
+export const crearAreaComun = async (data: FormData) => {
+  try {
+    const response = await axios.post(API_BASE_URL, data);
+    return response.data;
+  } catch (error) {
+    console.error("Error al crear área común:", error);
+    throw error;
+  }
+};
 
 //Traer areas comunes
 export const getAreasComunes = async () => {
@@ -48,6 +59,32 @@ export const getReservasByFecha = async (areaId: string, fecha: Date) => {
     return response.data; // Array de reservas [{idReserva, horaInicio, horaFin, ...}]
   } catch (error) {
     console.error("Error al obtener reservas:", error);
+    throw error;
+  }
+};
+
+// Actualizar área común
+export const updateAreaComun = async (id: string, data: FormData) => {
+  try {
+    const response = await axios.put(`${API_BASE_URL}/${id}`, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error al actualizar área común:", error);
+    throw error;
+  }
+};
+
+// Eliminar área común
+export const deleteAreaComun = async (id: number) => {
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al eliminar área común:", error);
     throw error;
   }
 };

@@ -11,13 +11,14 @@ interface Props {
   area: AreaComun;
   onReservar: (area: AreaComun) => void;
 }
+const API_URL = import.meta.env.VITE_API_URL;
 
 export function AreaCard({ area, onReservar }: Props) {
   return (
     <Card className="flex flex-col overflow-hidden hover:shadow-lg transition">
       <div className="h-40 bg-gray-200">
         <img
-          src={area.imagenUrl || "https://i.pinimg.com/1200x/d7/16/fe/d716fec0e9f83d68fb9ab6be6f766a66.jpg"}
+          src={`${API_URL}/uploads/${area.imageUrl}`}
           alt={area.nombreAreaComun}
           className="w-full h-full object-cover"
         />

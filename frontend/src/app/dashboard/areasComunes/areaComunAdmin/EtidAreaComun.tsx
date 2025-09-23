@@ -1,20 +1,22 @@
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { crearAreaComun, type AreaComun } from "@/services/areasServices";
+import {
+  type AreaComun,
+  getAreaById,
+  updateAreaComun, // 👉 necesitas crear este service en tu API (PUT/PATCH)
+} from "@/services/areasServices";
 import { type EditState } from "@/components/shared/MainContent";
 import { toast } from "sonner";
-import type { AxiosError } from "axios";
 import axios from "axios";
 
 interface Props {
-  setEditState: React.Dispatch<
-    React.SetStateAction<{ view: string; entity: string; id: number | null }>
-  >;
+  setEditState: React.Dispatch<React.SetStateAction<EditState>>;
+  areaComunId: number | null;
 }
 
-export const CrearAreaComun = ({ setEditState }: Props) => {
+export const EditAreaComun = ({ setEditState, areaComunId }: Props) => {
   const {
     register,
     handleSubmit,
@@ -23,15 +25,57 @@ export const CrearAreaComun = ({ setEditState }: Props) => {
   } = useForm<AreaComun>();
 
   const [preview, setPreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [loadingData, setLoadingData] = useState(true);
+
+  // 👉 Traer datos del área desde el backend
+  const fetchAreaData = async () => {
+    if (!areaComunId) return;
+    try {
+      const areaComun = await getAreaById(areaComunId.toString());
+
+      // ✅ Precargar valores en el formulario
+      setValue("nombreAreaComun", areaComun.nombreAreaComun);
+      setValue("descripcion", areaComun.descripcion || "");
+      setValue("capacidadMaxima", areaComun.capacidadMaxima);
+      setValue("costoPorHora", areaComun.costoPorHora);
+      setValue("horarioInicio", areaComun.horarioInicio);
+      setValue("horarioFin", areaComun.horarioFin);
+      setValue("requiereAprobacion", areaComun.requiereAprobacion);
+
+      // ✅ Mostrar imagen actual si existe
+      if (areaComun.imageUrl) {
+        // Usa tu base de URL del backend (ej. import.meta.env.VITE_API_URL)
+        setPreview(
+          `${import.meta.env.VITE_API_URL}/uploads/${areaComun.imageUrl}`
+        );
+      }
+    } catch (error) {
+      console.error("Error cargando área:", error);
+      toast.error("No se pudo cargar el área común");
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAreaData();
+  }, [areaComunId]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      setPreview(URL.createObjectURL(file));
+      // Si quieres que react-hook-form lo maneje:
+      setValue("imageUrl", file as any);
+    }
+  };
 
   const onSubmit = async (data: AreaComun) => {
-    if (!selectedFile) {
-      alert("Debes seleccionar una imagen");
-      return;
-    }
+    if (!areaComunId) return;
 
     const formData = new FormData();
-    // Campos de texto
     formData.append("nombreAreaComun", data.nombreAreaComun);
     formData.append("descripcion", data.descripcion || "");
     formData.append("capacidadMaxima", data.capacidadMaxima.toString());
@@ -39,47 +83,38 @@ export const CrearAreaComun = ({ setEditState }: Props) => {
     formData.append("horarioInicio", data.horarioInicio);
     formData.append("horarioFin", data.horarioFin);
     formData.append("requiereAprobacion", String(data.requiereAprobacion));
-    // Archivo
-    formData.append("imagen", selectedFile); // 👈 nombre del campo que recibirá el backend
+
+    // ✅ Solo enviar imagen si el usuario seleccionó una nueva
+    if (selectedFile) {
+      formData.append("imagen", selectedFile);
+    }
 
     try {
-      // ⚠️ formData no se puede ver directo en consola (sale vacío).
-      // Para debug, usa:
-      for (const [key, value] of formData.entries()) {
-        console.log(key, value);
-      }
-      const response = await crearAreaComun(formData);
-      const message = response.message || "Área común creada correctamente";
+      const response = await updateAreaComun(areaComunId.toString(), formData);
+      const message =
+        response.message || "Área común actualizada correctamente";
       toast.success(message, { duration: 4000, position: "top-left" });
       setEditState({ view: "areasComunesAdmin", entity: "", id: null });
     } catch (error) {
       toast.error(
         axios.isAxiosError(error)
           ? error.response?.data?.message
-          : "Error en el login",
-        {
-          duration: 4000,
-          position: "bottom-left",
-        }
+          : "Error al actualizar el área común",
+        { duration: 4000, position: "bottom-left" }
       );
       console.log("Error del backend:", error);
     }
   };
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  if (loadingData) {
+    return <p className="text-center p-4">Cargando datos...</p>;
+  }
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setSelectedFile(file);
-      setPreview(URL.createObjectURL(file));
-      // Si quieres que react-hook-form también lo maneje
-      setValue("imageUrl", file as any); // 'imagenUrl' es el nombre del campo en tu DB
-    }
-  };
   return (
     <div>
-      <h2 className="text-2xl font-bold p-4 text-center">Crear Área Común</h2>
+      <h2 className="text-2xl font-bold p-4 text-center">
+        Editar Datos de Área Común
+      </h2>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
@@ -97,7 +132,6 @@ export const CrearAreaComun = ({ setEditState }: Props) => {
               <span className="text-gray-500">Sin imagen</span>
             </div>
           )}
-
           <Input
             type="file"
             accept="image/*"
@@ -116,10 +150,7 @@ export const CrearAreaComun = ({ setEditState }: Props) => {
               className="bg-gray-50 border border-gray-300"
               {...register("nombreAreaComun", {
                 required: "El nombre es obligatorio",
-                minLength: {
-                  value: 3,
-                  message: "El nombre debe tener al menos 3 caracteres",
-                },
+                minLength: { value: 3, message: "Mínimo 3 caracteres" },
               })}
             />
             {errors.nombreAreaComun && (
@@ -139,7 +170,7 @@ export const CrearAreaComun = ({ setEditState }: Props) => {
             />
           </div>
 
-          {/* Capacidad máxima */}
+          {/* Capacidad */}
           <div>
             <Input
               type="number"
@@ -157,7 +188,7 @@ export const CrearAreaComun = ({ setEditState }: Props) => {
             )}
           </div>
 
-          {/* Costo por hora */}
+          {/* Costo */}
           <div>
             <Input
               type="number"

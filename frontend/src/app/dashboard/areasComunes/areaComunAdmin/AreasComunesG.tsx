@@ -35,7 +35,7 @@ export const AreasComunesGest: React.FC<Props> = ({ setEditState }) => {
       >
         Agregar Area Común
       </Button>
-      <DataTable columns={columnsAC(fetchData)} data={areasComunes} />
+      <DataTable columns={columnsAC({refresh: fetchData, setEditState})} data={areasComunes} />
     </div>
   );
 };

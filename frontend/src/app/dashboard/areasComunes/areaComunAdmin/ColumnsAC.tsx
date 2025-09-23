@@ -4,6 +4,7 @@ import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ActionsAreas from "./ActionsAreas";
 import { type AreaComun } from "@/services/areasServices";
+import { type EditState } from "@/components/shared/MainContent"; 
 
 const myCustomFilterFn: FilterFn<AreaComun> = (
   row: Row<AreaComun>,
@@ -20,8 +21,13 @@ const myCustomFilterFn: FilterFn<AreaComun> = (
   return false;
 };
 
+interface ColumnsACProps {
+  refresh: () => void;
+  setEditState: React.Dispatch<React.SetStateAction<EditState>>;
+}
+
 //Columnas de la tabla
-export const columnsAC = (refresh: () => void): ColumnDef<AreaComun>[] => [
+export const columnsAC = ({refresh, setEditState}: ColumnsACProps): ColumnDef<AreaComun>[] => [
   {
     accessorKey: "nombreAreaComun",
     filterFn: myCustomFilterFn,
@@ -84,7 +90,7 @@ export const columnsAC = (refresh: () => void): ColumnDef<AreaComun>[] => [
     id: "actions",
     cell: ({ row }) => {
       const areaComun = row.original;
-      return <ActionsAreas data={areaComun} refresh={refresh} />;
+      return <ActionsAreas data={areaComun} refresh={refresh} setEditState={setEditState} />;
     },
   },
 ];

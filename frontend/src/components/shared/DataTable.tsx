@@ -36,10 +36,12 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
+  const [globalFilter, setGlobalFilter] = React.useState("");
 
   const table = useReactTable({
     data,
     columns,
+    onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -49,19 +51,26 @@ export function DataTable<TData, TValue>({
     state: {
       sorting,
       columnFilters,
+      globalFilter,
     },
   });
 
   return (
     <div>
       <div className="flex items-center py-5 justify-end w-64 inline-block margin auto">
-        <Input
+        {/* <Input
           placeholder="Caja de busqueda..."
           value={(table.getColumn("nombre")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("nombre")?.setFilterValue(event.target.value)
           }
           className="max-w-sm bg-white"
+        /> */}
+        <Input
+          className="max-w-sm bg-white"
+          placeholder="Buscar en toda la tabla..."
+          value={globalFilter ?? ""}
+          onChange={(e) => setGlobalFilter(e.target.value)}
         />
       </div>
       <div className="overflow-hidden rounded-md border">

@@ -107,7 +107,7 @@ export const createReserva = async (req, res) => {
     }
 
     // ---------- comprobar capacidad ----------
-    if ( numAsistentes > area.capacidadMaxima || numAsistentes < 1) {
+    if (numAsistentes > area.capacidadMaxima || numAsistentes < 1) {
       await t.rollback();
       return res.status(400).json({
         message: `El Número de asistentes excede la capacidad (${area.capacidadMaxima})`,
@@ -143,11 +143,10 @@ export const createReserva = async (req, res) => {
       // overlap if: sExist < endMin && eExist > startMin
       if (sExist < endMin && eExist > startMin) {
         await t.rollback();
-        return res
-          .status(400)
-          .json({
-            message: "Ya existe una reserva en este horario PUEDE REVISAR HORARIOS DISPONIBLES ARRIBA",
-          });
+        return res.status(400).json({
+          message:
+            "Ya existe una reserva en este horario PUEDE REVISAR HORARIOS DISPONIBLES ARRIBA",
+        });
       }
     }
 
@@ -187,11 +186,64 @@ export const createReserva = async (req, res) => {
   }
 };
 
-// Obtener todas las reservas
+// Obtener todas las reservas con detalles del área común y residente
 export const getReservas = async (req, res) => {
   try {
-    const reservas = await Reserva.findAll();
-    res.json(reservas);
+    const reservas = await Reserva.findAll({
+      include: [
+        {
+          model: AreaComun,
+          as: "areaComun",
+          attributes: ["idAreaComun", "nombreAreaComun","costoPorHora" ],
+        },
+        {
+          model: Residente,
+          as: "residente",
+          include: [
+            {
+              model: Usuario,
+              as: "usuario",
+              attributes: ["idUsuario", "nombre", "email"],
+            },
+          ],
+          attributes: ["idResidente", "telefono"],
+        },
+      ],
+      attributes: [
+        "idReserva",
+        "fechaReserva",
+        "horaInicio",
+        "horaFin",
+        "motivo",
+        "numAsistentes",
+        "estado",
+        "pagado",
+        // si necesitas costo o pagado los puedes dejar
+      ],
+    });
+
+    // 🔑 Mapear solo los campos que te interesan
+    const reservasLimpias = reservas.map((r) => {
+      const reserva = r.toJSON();
+      return {
+        idReserva: reserva.idReserva,
+        fecha: reserva.fechaReserva,
+        horaInicio: reserva.horaInicio,
+        horaFin: reserva.horaFin,
+        motivo: reserva.motivo,
+        asistentes: reserva.numAsistentes,
+        estado: reserva.estado,
+        idAreaComun: reserva.areaComun?.idAreaComun || null,
+        areaNombre: reserva.areaComun?.nombreAreaComun || "",
+        usuario: reserva.residente?.usuario?.nombre || "",
+        email: reserva.residente?.usuario?.email || "",
+        telefono: reserva.residente?.telefono || "",
+        pagado: reserva.pagado,
+        costoPorHora: reserva.areaComun?.costoPorHora || 0,
+      };
+    });
+
+    res.json(reservasLimpias);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error al obtener las reservas" });
@@ -216,40 +268,166 @@ export const obtenerReservaPorId = async (req, res) => {
 };
 
 // Actualizar reserva
-export const updateReserva = async (req, res) => {
+export const updateReservaAdmin = async (req, res) => {
+  // CORREGIDO: Usamos idReserva para coincidir con tu modelo
+  const { idReserva } = req.params;
+  const t = await sequelize.transaction();
+
   try {
-    const { id } = req.params;
-    const {
-      usuarioId,
-      areaComunId,
-      fechaReserva,
-      horaInicio,
-      horaFin,
-      motivo,
-      numAsistentes,
-    } = req.body;
-
-    const reserva = await Reserva.findByPk(id);
-
+    // 1. Buscar la reserva 
+    const reserva = await Reserva.findByPk(idReserva, { transaction: t });
     if (!reserva) {
-      return res.status(404).json({ message: "Reserva no encontrada" });
+      await t.rollback();
+      return res.status(404).json({ message: "La reserva no existe" });
     }
 
-    // Actualizar los campos de la reserva
-    reserva.usuarioId = usuarioId;
-    reserva.areaComunId = areaComunId;
-    reserva.fechaReserva = fechaReserva;
-    reserva.horaInicio = horaInicio;
-    reserva.horaFin = horaFin;
-    reserva.motivo = motivo;
-    reserva.numAsistentes = numAsistentes;
+    // 2. NUEVO: Validaciones de estado y pago (lógica de negocio crucial)
+    if (reserva.pagado) {
+      await t.rollback();
+      return res.status(403).json({
+        // 403 Forbidden es más adecuado aquí
+        message: "No se puede modificar una reserva que ya ha sido pagada.",
+      });
+    }
 
-    await reserva.save();
+    // Solo se permite modificar si está en estado 'pendiente' o 'confirmada'
+    if (reserva.estado !== "pendiente" && reserva.estado !== "confirmada") {
+      await t.rollback();
+      return res.status(403).json({
+        message: `Una reserva en estado '${reserva.estado}' no puede ser modificada.`,
+      });
+    }
 
-    res.json({ reserva, message: "Reserva actualizada correctamente" });
+    // 3. Obtener los nuevos datos (o mantener los existentes si no se envían)
+    const datosActualizados = {
+      fechaReserva: req.body.fechaReserva || reserva.fechaReserva,
+      horaInicio: req.body.horaInicio || reserva.horaInicio,
+      horaFin: req.body.horaFin || reserva.horaFin,
+      motivo: req.body.motivo || reserva.motivo,
+      numAsistentes: req.body.numAsistentes || reserva.numAsistentes,
+    };
+
+    // 4. Re-validar toda la lógica de negocio con los nuevos datos
+    const toMinutes = (hhmm) => {
+      const [hh, mm] = hhmm.split(":").map(Number);
+      return hh * 60 + mm;
+    };
+
+    const startMin = toMinutes(datosActualizados.horaInicio);
+    const endMin = toMinutes(datosActualizados.horaFin);
+
+    if (startMin >= endMin) {
+      await t.rollback();
+      return res
+        .status(400)
+        .json({
+          message: "La hora de inicio debe ser anterior a la hora de fin",
+        });
+    }
+
+    const [y, m, d] = new Date(datosActualizados.fechaReserva)
+      .toISOString()
+      .slice(0, 10)
+      .split("-")
+      .map(Number);
+    const reservaStartDate = new Date(
+      y,
+      m - 1,
+      d,
+      Math.floor(startMin / 60),
+      startMin % 60
+    );
+    if (reservaStartDate < new Date()) {
+      await t.rollback();
+      return res
+        .status(400)
+        .json({
+          message: "No se puede mover una reserva a una fecha/hora pasada",
+        });
+    }
+
+    const area = await AreaComun.findByPk(reserva.areaComunId, {
+      transaction: t,
+    });
+    const areaStartMin = toMinutes(area.horarioInicio);
+    const areaEndMin = toMinutes(area.horarioFin);
+
+    if (startMin < areaStartMin || endMin > areaEndMin) {
+      await t.rollback();
+      return res
+        .status(400)
+        .json({
+          message: "El horario está fuera del rango permitido por el área",
+        });
+    }
+
+    if (
+      datosActualizados.numAsistentes > area.capacidadMaxima ||
+      datosActualizados.numAsistentes < 1
+    ) {
+      await t.rollback();
+      return res
+        .status(400)
+        .json({
+          message: `El número de asistentes excede la capacidad del área (${area.capacidadMaxima})`,
+        });
+    }
+
+    // 5. Comprobación de solapamiento (excluyendo la reserva actual)
+    const otrasReservas = await Reserva.findAll({
+      where: {
+        areaComunId: reserva.areaComunId,
+        // CORREGIDO: Se usa 'idReserva' y el operador Op.ne (not equal)
+        idReserva: { [Op.ne]: idReserva },
+        estado: { [Op.ne]: "cancelada" }, // No considerar canceladas para solapamiento
+      },
+      transaction: t,
+      lock: t.LOCK.UPDATE,
+    });
+
+    const fechaNuevaStr = new Date(datosActualizados.fechaReserva)
+      .toISOString()
+      .slice(0, 10);
+    const sameDayReservas = otrasReservas.filter(
+      (r) =>
+        new Date(r.fechaReserva).toISOString().slice(0, 10) === fechaNuevaStr
+    );
+
+    for (const r of sameDayReservas) {
+      const sExist = toMinutes(r.horaInicio);
+      const eExist = toMinutes(r.horaFin);
+      if (sExist < endMin && eExist > startMin) {
+        await t.rollback();
+        return res
+          .status(409)
+          .json({
+            message:
+              "Conflicto: El nuevo horario se solapa con otra reserva existente.",
+          }); // 409 Conflict es más adecuado
+      }
+    }
+
+    // 6. Recalcular costo y actualizar
+    const duracionHoras = (endMin - startMin) / 60;
+    datosActualizados.costoTotal = Number(
+      (duracionHoras * Number(area.costoPorHora || 0)).toFixed(2)
+    );
+
+    // Usamos el método 'set' para actualizar los campos
+    reserva.set(datosActualizados);
+
+    await reserva.save({ transaction: t });
+    await t.commit();
+
+    return res
+      .status(200)
+      .json({ reserva, message: "Reserva actualizada exitosamente" });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error al actualizar la reserva" });
+    await t.rollback();
+    console.error("updateReserva error:", error);
+    return res
+      .status(500)
+      .json({ message: "Error interno al actualizar la reserva" });
   }
 };
 

@@ -10,8 +10,9 @@ import { Residente } from "@/app/dashboard/residente/Residente";
 import CreateUsuario from "@/app/dashboard/usuarios/CreateUsuario";
 import PerfilUsuario from "@/app/dashboard/usuarios/PerfilUsuario";
 import { Usuarios } from "@/app/dashboard/usuarios/Usuarios";
-import { CrearAreaComun } from "@/app/dashboard/areasComunes/areaComunAdmin/crearAreaComun";
-
+import { CrearAreaComun } from "@/app/dashboard/areasComunes/areaComunAdmin/CrearAreaComun";
+import { EditAreaComun } from "@/app/dashboard/areasComunes/areaComunAdmin/EtidAreaComun";
+import { Reservas } from "@/app/dashboard/reservas/Reservas";
 export type EditState = {
   view: string;
   entity: string;
@@ -60,9 +61,21 @@ export default function MainContent({
       );
     case "areasComunesAdmin":
       return <AreasComunesGest setEditState={setEditState} />;
-    
+
+    //seccion de reservas admin ***
+    case "reservasAdmin":
+      return <Reservas setEditState={setEditState} />;
+
     //seccion de creacion y edicion de entidades ***
     case "edit":
+      if (editState.entity === "areaComun") {
+        return (
+          <EditAreaComun
+            setEditState={setEditState}
+            areaComunId={editState.id}
+          />
+        );
+      }
       /* if (editState.entity === "personal") {
         return (
           <EditPersonal setEditState={setEditState} personalId={editState.id} />

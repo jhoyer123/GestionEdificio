@@ -31,9 +31,12 @@ export const createAreaComun = async (req, res) => {
       horarioInicio,
       horarioFin,
       requiereAprobacion,
+      imageUrl: req.file ? req.file.filename : null, // 👉 si no se envía imagen queda null
     });
 
-    res.status(201).json({ area: area, message: "Área común creada correctamente" });
+    res
+      .status(201)
+      .json({ area: area, message: "Área común creada correctamente" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error al crear el área común" });
@@ -71,10 +74,18 @@ export const getAreaComun = async (req, res) => {
   }
 };
 
-// Actualizar un área
+// UPDATE AREA COMUN
 export const updateAreaComun = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Buscar el registro
+    const area = await AreaComun.findByPk(id);
+    if (!area) {
+      return res.status(404).json({ message: "Área común no encontrada" });
+    }
+
+    // Campos que pueden actualizarse
     const {
       nombreAreaComun,
       descripcion,
@@ -85,27 +96,32 @@ export const updateAreaComun = async (req, res) => {
       requiereAprobacion,
     } = req.body;
 
-    const area = await AreaComun.findByPk(id);
-
-    if (!area) {
-      return res.status(404).json({ message: "Área no encontrada" });
+    // Actualizar solo los campos enviados
+    area.nombreAreaComun = nombreAreaComun ?? area.nombreAreaComun;
+    area.descripcion = descripcion ?? area.descripcion;
+    area.capacidadMaxima = capacidadMaxima ?? area.capacidadMaxima;
+    area.costoPorHora = costoPorHora ?? area.costoPorHora;
+    area.horarioInicio = horarioInicio ?? area.horarioInicio;
+    area.horarioFin = horarioFin ?? area.horarioFin;
+    // OJO: requiereAprobacion puede ser boolean false, por eso usamos !== undefined
+    if (requiereAprobacion !== undefined) {
+      area.requiereAprobacion = requiereAprobacion;
     }
 
-    // Actualizar los campos del área
-    area.nombreAreaComun = nombreAreaComun;
-    area.descripcion = descripcion;
-    area.capacidadMaxima = capacidadMaxima;
-    area.costoPorHora = costoPorHora;
-    area.horarioInicio = horarioInicio;
-    area.horarioFin = horarioFin;
-    area.requiereAprobacion = requiereAprobacion;
+    // Imagen nueva (si se envía)
+    if (req.file) {
+      area.imageUrl = req.file.filename;
+    }
 
     await area.save();
 
-    res.json({ area: area, message: "Área actualizada correctamente" });
+    res.status(200).json({
+      message: "Área común actualizada correctamente",
+      area,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error al actualizar el área" });
+    res.status(500).json({ message: "Error al actualizar el área común" });
   }
 };
 
