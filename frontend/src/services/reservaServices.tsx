@@ -41,11 +41,33 @@ export const updateReserva = async (
   reservaData: Partial<Reserva>
 ) => {
   try {
-    console.log("Actualizando reserva con IDssssssssssss:", `${API_BASE_URL}/${idReserva}`);
-    const response = await axios.put(`${API_BASE_URL}/${idReserva}`, reservaData);
+    console.log(
+      "Actualizando reserva con IDssssssssssss:",
+      `${API_BASE_URL}/${idReserva}`
+    );
+    const response = await axios.put(
+      `${API_BASE_URL}/${idReserva}`,
+      reservaData
+    );
     return response.data;
   } catch (error) {
     console.error("Error al actualizar la reserva:", error);
+    throw error;
+  }
+};
+
+//actualizar estado de una reserva
+export const updateEstadoReserva = async (
+  id: number,
+  nuevoEstado: string
+) => {
+  try {
+    const response = await axios.patch(`${API_BASE_URL}/estado/${id}`, {
+      estado: nuevoEstado,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error al actualizar el estado de la reserva:", error);
     throw error;
   }
 };

@@ -50,7 +50,7 @@ module.exports = {
       },
       estado: {
         allowNull: false,
-        type: Sequelize.ENUM("pendiente", "confirmada", "cancelada"),
+        type: Sequelize.ENUM("pendiente", "confirmada","rechazada", "cancelada"),
         defaultValue: "pendiente",
       },
       costoTotal: {

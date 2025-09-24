@@ -446,3 +446,30 @@ export const deleteReserva = async (req, res) => {
     res.status(500).json({ message: "Error al eliminar la reserva" });
   }
 };
+
+// Actualizar estado de la reserva (confirmar, rechazar, cancelar)
+export const updateEstadoReserva = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estado } = req.body;
+    console.log(estado);
+    const reserva = await Reserva.findByPk(id);
+    if (!reserva) {
+      return res.status(404).json({ message: "Reserva no encontrada" });
+    }
+
+    // Validar el nuevo estado
+    const estadosValidos = ["pendiente", "confirmada", "rechazada", "cancelada"];
+    if (!estadosValidos.includes(estado)) {
+      return res.status(400).json({ message: "Estado inválido" });
+    }
+
+    reserva.estado = estado;
+    await reserva.save();
+
+    res.json({ reserva, message: "Estado de la reserva actualizado correctamente" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al actualizar el estado de la reserva" });
+  }
+};

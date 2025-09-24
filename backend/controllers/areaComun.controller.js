@@ -140,3 +140,4 @@ export const deleteAreaComun = async (req, res) => {
     res.status(500).json({ message: "Error al eliminar el área" });
   }
 };
+

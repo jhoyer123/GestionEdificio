@@ -42,7 +42,7 @@ const Reserva = sequelize.define(
       type: DataTypes.INTEGER,
     },
     estado: {
-      type: DataTypes.ENUM("pendiente", "confirmada", "cancelada"),
+      type: DataTypes.ENUM("pendiente", "confirmada","rechazada", "cancelada"),
       defaultValue: "pendiente",
     },
     costoTotal: {

@@ -68,7 +68,7 @@ export const columnsAC = ({refresh, setEditState}: ColumnsACProps): ColumnDef<Ar
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Capacidad Máxima
+          Costo por hora
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );

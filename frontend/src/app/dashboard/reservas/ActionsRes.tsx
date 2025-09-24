@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { type Reserva } from "./ColumnsRes";
 import EditReserva from "./EditReserva";
+import GestionEstadoR from "./GestionEstadoR";
 
 interface GestionarRolUsuarioProps {
   data: Reserva;
@@ -28,7 +29,7 @@ interface GestionarRolUsuarioProps {
 }
 
 const ActionsRes = ({ data, refresh }: GestionarRolUsuarioProps) => {
-  const [openEditRol, setOpenEditRol] = useState(false);
+  const [openEditEstado, setOpenEditEstado] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   return (
@@ -43,44 +44,47 @@ const ActionsRes = ({ data, refresh }: GestionarRolUsuarioProps) => {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Acciones</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setOpenEditRol(true)}>
+          <DropdownMenuItem onClick={() => setOpenEditEstado(true)}>
             Gestionar Estado
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setOpenEdit(true)}>
             Editar
           </DropdownMenuItem>
+          {/* 
           <DropdownMenuItem onClick={() => setOpenDelete(true)}>
             Eliminar
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
         </DropdownMenuContent>
       </DropdownMenu>
+      {/* Dialog para gestionar el Estado de la reserva */}
+      <Dialog open={openEditEstado} onOpenChange={setOpenEditEstado}>
+        <DialogContent forceMount={undefined}>
+          <DialogHeader>
+            <DialogTitle>Gestionar Estado</DialogTitle>
+            <DialogDescription>
+            </DialogDescription>
+          </DialogHeader>
+          <GestionEstadoR
+            data={data}
+            setOpenEditEstado={setOpenEditEstado}
+            refresh={refresh}
+          />
+        </DialogContent>
+      </Dialog>
       {/* Dialog para gestionar el update del usuario */}
       <Dialog open={openEdit} onOpenChange={setOpenEdit}>
         <DialogContent forceMount={undefined}>
           <DialogHeader>
             <DialogTitle>Editar</DialogTitle>
-            <DialogDescription>Actualizar datos de la reserva</DialogDescription>
+            <DialogDescription>
+              Actualizar datos de la reserva
+            </DialogDescription>
           </DialogHeader>
           <EditReserva
             data={data}
             setOpenEdit={setOpenEdit}
             refresh={refresh}
           />
-        </DialogContent>
-      </Dialog>
-      {/* Dialog para gestionar la Eliminacion del usuario*/}
-      <Dialog open={openDelete} onOpenChange={setOpenDelete}>
-        <DialogContent forceMount={undefined}>
-          <DialogHeader>
-            <DialogTitle>Eliminar Usuario</DialogTitle>
-            <DialogDescription></DialogDescription>
-          </DialogHeader>
-          <DialogHeader></DialogHeader>
-          {/* <DeleteResidente
-            data={data}
-            setOpenDelete={setOpenDelete}
-            refresh={refresh}
-          /> */}
         </DialogContent>
       </Dialog>
     </>
