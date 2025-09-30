@@ -13,6 +13,7 @@ import { Usuarios } from "@/app/dashboard/usuarios/Usuarios";
 import { CrearAreaComun } from "@/app/dashboard/areasComunes/areaComunAdmin/CrearAreaComun";
 import { EditAreaComun } from "@/app/dashboard/areasComunes/areaComunAdmin/EtidAreaComun";
 import { Reservas } from "@/app/dashboard/reservas/Reservas";
+import ParqueoAdmin from "@/app/dashboard/areasComunes/parqueo/ParqueoAdmin";
 export type EditState = {
   view: string;
   entity: string;
@@ -61,6 +62,8 @@ export default function MainContent({
       );
     case "areasComunesAdmin":
       return <AreasComunesGest setEditState={setEditState} />;
+    case "parqueosAdmins":
+      return <ParqueoAdmin />;
 
     //seccion de reservas admin ***
     case "reservasAdmin":

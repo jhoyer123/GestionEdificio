@@ -16,8 +16,41 @@ import DetalleFactura from "../models/DetallesFactura.js";
 import Reserva from "../models/Reserva.js";
 import Pago from "../models/Pagos.js";
 import AreaComun from "../models/AreaComun.js";
+import Bloqueos from "../models/Bloqueos.js";
+import ParqueoCaja from "../models/ParqueoCaja.js";
 
 //Asociaciones
+
+//reservas y parqueo cajas
+// ParqueoCaja 1---N Reserva
+ParqueoCaja.hasMany(Reserva, {
+  foreignKey: "cajaId",
+  as: "reservas",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+Reserva.belongsTo(ParqueoCaja, {
+  foreignKey: "cajaId",
+  as: "parqueoCaja",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+// AreaComun 1---N Bloqueos
+AreaComun.hasMany(Bloqueos, {
+  foreignKey: "areaComunId",
+  as: "bloqueos",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+Bloqueos.belongsTo(AreaComun, {
+  foreignKey: "areaComunId",
+  as: "areaComun",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
 // Usuario 1---N Reserva
 Residente.hasMany(Reserva, {

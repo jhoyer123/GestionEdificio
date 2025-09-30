@@ -66,6 +66,10 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
     setActiveView("reservasAdmin");
   };
 
+  const handleParqueoAdminClick = () => {
+    setActiveView("parqueosAdmins");
+  };
+
   const navigate = useNavigate();
   const handleCerrarSesionClick = () => {
     logout();
@@ -75,8 +79,8 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
   return (
     <aside className="hidden w-64 flex-col border-r bg-gray-900 text-white sm:flex">
       <div className="flex h-full max-h-screen flex-col gap-2">
-        <div className="flex h-16 items-center border-b border-gray-700 px-6">
-          <h1 className="text-lg font-bold">Skillset</h1>
+        <div className="flex h-16 items-center justify-center border-b border-gray-700 px-6">
+          <h1 className="text-lg font-bold text-center">Habitat360</h1>
         </div>
         <div className="flex-1 overflow-y-auto py-4">
           <nav className="grid items-start px-4 text-sm font-medium">
@@ -149,6 +153,13 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
             >
               <UserCog className="mr-2 h-4 w-4" />
               Gestion de Reservas
+            </button>
+            <button
+              onClick={handleParqueoAdminClick}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+            >
+              <UserCog className="mr-2 h-4 w-4" />
+              Gestion de Parqueos
             </button>
           </nav>
         </div>

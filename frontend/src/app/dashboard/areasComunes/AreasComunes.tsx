@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { EditState } from "@/components/shared/MainContent";
 import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 
 export default function AreaList({
   setEditState,
@@ -32,15 +33,17 @@ export default function AreaList({
 
   return (
     <div className="p-6 space-y-6">
-      
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Áreas Comunes</h2>
-        <Input
-          placeholder="Buscar área..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="max-w-xs"
-        />
+        <div className="flex items-center space-x-2">
+          <Search className="w-4 h-4" />
+          <Input
+            placeholder="Buscar área..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="max-w-xs bg-white w-80"
+          />
+        </div>
       </div>
 
       {loading ? (

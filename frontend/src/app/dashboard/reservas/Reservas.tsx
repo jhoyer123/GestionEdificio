@@ -24,7 +24,7 @@ export const Reservas: React.FC<Props> = ({ setEditState }) => {
 
   return (
     <div className="container mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Gestión de Reservas</h2>
+      <h2 className="text-2xl font-bold mb-1">Gestión de Reservas</h2>
       <DataTable columns={columnsRes(fetchData)} data={reserva} />
     </div>
   );

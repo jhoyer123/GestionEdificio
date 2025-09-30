@@ -30,18 +30,45 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
       },
+      cajaId: {
+        allowNull: true,
+        type: Sequelize.INTEGER,
+        references: {
+          model: "parqueocajas",
+          key: "idParqueoCaja",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+      },
       fechaReserva: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
+      // CAMBIO 1: Hacemos la hora de inicio opcional (NULLABLE)
       horaInicio: {
+        allowNull: true, // ¡ANTES era false!
+        type: Sequelize.TIME,
+      },
+
+      // CAMBIO 2: Hacemos la hora de fin opcional (NULLABLE)
+      horaFin: {
+        allowNull: true, // ¡ANTES era false!
+        type: Sequelize.TIME,
+      },
+
+      // CAMBIO 3: Añadimos la fecha de fin de reserva (Para reservas de varios días)
+      fechaFinReserva: {
+        allowNull: true,
+        type: Sequelize.DATEONLY, // Usar DATEONLY si solo te interesa el día
+      },
+      /* horaInicio: {
         allowNull: false,
         type: Sequelize.TIME,
       },
       horaFin: {
         allowNull: false,
         type: Sequelize.TIME,
-      },
+      }, */
       motivo: {
         type: Sequelize.TEXT,
       },
@@ -50,7 +77,12 @@ module.exports = {
       },
       estado: {
         allowNull: false,
-        type: Sequelize.ENUM("pendiente", "confirmada","rechazada", "cancelada"),
+        type: Sequelize.ENUM(
+          "pendiente",
+          "confirmada",
+          "rechazada",
+          "cancelada"
+        ),
         defaultValue: "pendiente",
       },
       costoTotal: {

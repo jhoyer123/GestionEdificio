@@ -3,12 +3,13 @@ import axios from "axios";
 // src/services/areasService.ts
 export interface AreaComun {
   idAreaComun: number;
+  tipoArea: string;
   nombreAreaComun: string;
   descripcion: string;
   capacidadMaxima: number;
-  costoPorHora: number;
-  horarioInicio: string;
-  horarioFin: string;
+  costoBase: number;
+  horarioApertura: string;
+  horarioCierre: string;
   requiereAprobacion: false;
   imageUrl?: string;
 }

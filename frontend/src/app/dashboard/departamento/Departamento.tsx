@@ -58,7 +58,20 @@ export default function Departamento({ setEditState }: Props) {
 
   return (
     <div className="p-6 space-y-4">
+      <h2 className="text-2xl font-bold">Gestión de Departamentos</h2>
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Search className="w-4 h-4" />
+          <Input
+            type="text"
+            placeholder="Buscar por número o residente..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="sm:w-64 bg-white"
+          />
+        </div>
+
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="bg-amber-300 text-black hover:bg-amber-400 cursor-pointer">
@@ -74,23 +87,13 @@ export default function Departamento({ setEditState }: Props) {
                 Llene todos los datos para registrar un nuevo departamento
               </DialogDescription>
             </DialogHeader>
-            <CreateDepartamento setOpen={setOpen} refresh={fetchDepartamentos} />
+            <CreateDepartamento
+              setOpen={setOpen}
+              refresh={fetchDepartamentos}
+            />
           </DialogContent>
         </Dialog>
-
-        <div className="flex items-center gap-2">
-          <Search className="w-4 h-4" />
-          <Input
-            type="text"
-            placeholder="Buscar por número o residente..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="sm:w-64 bg-white"
-          />
-        </div>
       </div>
-
-      <h2 className="text-2xl font-bold">Departamentos</h2>
 
       {/* Grid de cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

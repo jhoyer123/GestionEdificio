@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_BASE_URL = "http://localhost:3000/api/reservas"; // Cambia esto por la URL de tu API
 
-export interface Reserva {
+ export interface Reserva {
   idReserva?: number;
   usuarioId: number;
   areaComunId: number | null;
@@ -12,9 +12,11 @@ export interface Reserva {
   motivo: string;
   numAsistentes: number;
   // Otros campos relevantes
-}
+} 
+
+
 // Crear una nueva reserva
-export const createReserva = async (reservaData: Reserva) => {
+export const createReserva = async (reservaData: any) => {
   try {
     const response = await axios.post(API_BASE_URL, reservaData);
     return response.data;

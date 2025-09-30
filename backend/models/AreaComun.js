@@ -8,6 +8,7 @@ const AreaComun = sequelize.define(
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
+      allowNull: false,
     },
     nombreAreaComun: {
       type: DataTypes.STRING,
@@ -15,22 +16,34 @@ const AreaComun = sequelize.define(
     },
     descripcion: {
       type: DataTypes.TEXT,
+      allowNull: true,
     },
     capacidadMaxima: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    costoPorHora: {
+    tipoArea: {
+      type: DataTypes.ENUM("salones", "gimnasio", "parqueo", "otros"),
+      allowNull: false,
+      defaultValue: "salones",
+    },
+    // <<< NUEVOS CAMPOS FLEXIBLES >>>
+    costoBase: {
+      defaultValue: 0,
+      type: DataTypes.DECIMAL(10, 2),
+    },
+    // <<< FIN CAMPOS FLEXIBLES >>>
+    /* costoPorHora: {
       type: DataTypes.DECIMAL(10, 2),
       defaultValue: 0,
-    },
-    horarioInicio: {
+    }, */
+    horarioApertura: {
       type: DataTypes.TIME,
-      allowNull: false,
+      allowNull: true,
     },
-    horarioFin: {
+    horarioCierre: {
       type: DataTypes.TIME,
-      allowNull: false,
+      allowNull: true,
     },
     requiereAprobacion: {
       type: DataTypes.BOOLEAN,

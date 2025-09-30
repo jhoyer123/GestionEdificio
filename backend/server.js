@@ -14,6 +14,7 @@ import reservasRoutes from "./routes/reservas.routes.js";
 import pagosRoutes from "./routes/pagos.routes.js";
 import areasComunesRoutes from "./routes/areasComunes.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
+import cajasRoutes from "./routes/parqueoCajas.routes.js";
 
 // importamos asociaciones
 import roleRoutes from "./routes/roles.routes.js";
@@ -51,6 +52,7 @@ app.use(pagosRoutes);
 app.use(areasComunesRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use(uploadRoutes);
+app.use(cajasRoutes);
 
 // Iniciar el servidor
 app.listen(process.env.PORT, () => {
@@ -64,6 +66,8 @@ npx sequelize-cli db:migrate
 npx sequelize-cli db:migrate:undo
 ++++ crea una migracion
 npx sequelize-cli migration:generate --name create-usuarios
+++++ mifrar todos los seders
+npx sequelize-cli db:seed:all
 
 Usuario.hasMany(Producto): Un usuario puede tener muchos productos.
 Producto.belongsTo(Usuario): Un producto pertenece a un solo usuario. 

@@ -33,16 +33,27 @@ export function AreaCard({ area, onReservar }: Props) {
 
       <CardContent className="flex flex-col gap-1 text-sm">
         <div>
-          <span className="font-medium">Costo:</span> {area.costoPorHora} Bs/h
+          {area.tipoArea === "gimnasio" ? (
+            <span className="font-medium">Costo:{area.costoBase} Bs/dia</span>
+          ) : (
+            <span className="font-medium">Costo:{area.costoBase} Bs/hora</span>
+          )}{" "}
         </div>
         <div>
-          <span className="font-medium">Horario:</span> {area.horarioInicio} –{" "}
-          {area.horarioFin}
+          {area.tipoArea === "parqueo" ? (
+            <span className="font-medium">
+              Abierto
+            </span>
+          ) : (
+            <span className="font-medium">
+              Horario:{area.horarioApertura} - {area.horarioCierre}{" "}
+            </span>
+          )}
         </div>
       </CardContent>
 
       <CardFooter className="mt-auto">
-        <Button className="w-full" onClick={() => onReservar(area)}>
+        <Button className="w-full cursor-pointer" onClick={() => onReservar(area)}>
           Reservar
         </Button>
       </CardFooter>

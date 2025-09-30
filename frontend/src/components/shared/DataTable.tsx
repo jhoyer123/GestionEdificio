@@ -22,6 +22,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -57,7 +58,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-5 justify-end w-64 inline-block margin auto">
+      <div className="flex items-center py-2 justify-end w-64 inline-block margin auto">
         {/* <Input
           placeholder="Caja de busqueda..."
           value={(table.getColumn("nombre")?.getFilterValue() as string) ?? ""}
@@ -66,12 +67,15 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-sm bg-white"
         /> */}
-        <Input
-          className="max-w-sm bg-white"
-          placeholder="Buscar en toda la tabla..."
-          value={globalFilter ?? ""}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-        />
+        <div className="flex items-center gap-2">
+          <Input
+            className="max-w-sm bg-white"
+            placeholder="Buscar en toda la tabla..."
+            value={globalFilter ?? ""}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+          />
+          <Search className="w-4 h-4" />
+        </div>
       </div>
       <div className="overflow-hidden rounded-md border">
         <Table className="bg-white font-medium">

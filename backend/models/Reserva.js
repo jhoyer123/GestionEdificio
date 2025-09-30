@@ -8,20 +8,19 @@ const Reserva = sequelize.define(
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
+      allowNull: false,
     },
     usuarioId: {
+      allowNull: false,
       type: DataTypes.INTEGER,
-      references: {
-        model: "usuarios",
-        key: "idUsuario",
-      },
     },
     areaComunId: {
       type: DataTypes.INTEGER,
-      references: {
-        model: "Areas_Comunes",
-        key: "idAreaComun",
-      },
+      allowNull: false,
+    },
+    cajaId: {
+      allowNull: true,
+      type: DataTypes.INTEGER,
     },
     fechaReserva: {
       type: DataTypes.DATE,
@@ -29,11 +28,15 @@ const Reserva = sequelize.define(
     },
     horaInicio: {
       type: DataTypes.TIME,
-      allowNull: false,
+      allowNull: true,
     },
     horaFin: {
       type: DataTypes.TIME,
-      allowNull: false,
+      allowNull: true,
+    },
+    fechaFinReserva: {
+      allowNull: true,
+      type: DataTypes.DATEONLY, // Usar DATEONLY si solo te interesa el día
     },
     motivo: {
       type: DataTypes.TEXT,
@@ -42,7 +45,7 @@ const Reserva = sequelize.define(
       type: DataTypes.INTEGER,
     },
     estado: {
-      type: DataTypes.ENUM("pendiente", "confirmada","rechazada", "cancelada"),
+      type: DataTypes.ENUM("pendiente", "confirmada", "rechazada", "cancelada"),
       defaultValue: "pendiente",
     },
     costoTotal: {

@@ -1,18 +1,21 @@
-//Tabla
-import { type ColumnDef, type FilterFn, type Row } from "@tanstack/react-table";
+// Archivo: ColumnsRes.tsx
+
+import { type ColumnDef, type FilterFn } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import ActionsRes from "./ActionsRes";
 
+// PASO 1: Actualizar la interfaz para reflejar datos opcionales
 export interface Reserva {
   idReserva: number;
-  fecha: string;
-  horaInicio: string;
-  horaFin: string;
+  fechaInicio: string;
+  fechaFin: string | null; // Añadido para reservas de varios días
+  horaInicio: string | null; // Convertido a opcional
+  horaFin: string | null; // Convertido a opcional
   motivo: string;
   asistentes: number;
-  estado: string;
+  estado: "confirmada" | "pendiente" | "cancelada" | string; // Tipado más específico
   idAreaComun: number;
   areaNombre: string;
   usuario: string;
@@ -22,101 +25,116 @@ export interface Reserva {
   costoPorHora: number;
 }
 
-const myCustomFilterFn: FilterFn<Reserva> = (
-  row: Row<Reserva>,
-  columnId: string,
-  filterValue: string,
-  addMeta: (meta: any) => void
-) => {
-  if (row.original.areaNombre.includes(filterValue)) {
-    return true;
-  }
-  if (row.original.telefono.includes(filterValue)) {
-    return true;
-  }
-  if (row.original.fecha.toString().includes(filterValue)) {
-    return true;
-  }
-  return false;
+// --- Funciones de Formateo para mantener el código limpio ---
+const formatDate = (dateString: string | null) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  // Usamos toLocaleDateString para un formato amigable (ej: 29/9/2025)
+  return date.toLocaleDateString("es-BO", { timeZone: "UTC" });
 };
 
-//Columnas de la tabla
+const formatTime = (timeString: string | null) => {
+  if (!timeString) return "";
+  // Quita los segundos si existen
+  const [hours, minutes] = timeString.split(":");
+  return `${hours}:${minutes}`;
+};
+
+// --- Columnas de la tabla ---
 export const columnsRes = (refresh: () => void): ColumnDef<Reserva>[] => [
   {
     accessorKey: "areaNombre",
-    filterFn: myCustomFilterFn,
-    header: ({ column }) => {
-      return (
-        <Button
-          className="text-right m-auto"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Nombre Area Común
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Área Común
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
   },
   {
     accessorKey: "usuario",
-    header: "Nombre Residente",
-    filterFn: myCustomFilterFn,
+    header: "Residente",
   },
+  // PASO 2: La nueva columna unificada que reemplaza a fecha y horas
   {
-    accessorKey: "fecha",
-    header: "Fecha de Reserva",
-    filterFn: myCustomFilterFn,
+    id: "periodo",
+    header: "Periodo de Reserva",
     cell: ({ row }) => {
-      const fecha = row.original.fecha;
-      return fecha ? fecha.split("T")[0] : "";
+      const { fechaInicio, fechaFin, horaInicio, horaFin } = row.original;
+
+      // Caso 1: Reserva por horas en un día específico
+      if (horaInicio && horaFin) {
+        return (
+          <div className="flex flex-col">
+            <span className="font-semibold">{formatDate(fechaInicio)}</span>
+            <span className="text-sm text-gray-600">
+              {formatTime(horaInicio)} - {formatTime(horaFin)}
+            </span>
+          </div>
+        );
+      }
+
+      // Caso 2: Reserva por varios días
+      if (fechaFin && fechaFin !== fechaInicio) {
+        return (
+          <div className="flex flex-col">
+            <span className="font-semibold">Del {formatDate(fechaInicio)}</span>
+            <span className="font-semibold">Al {formatDate(fechaFin)}</span>
+          </div>
+        );
+      }
+
+      // Caso 3: Reserva de un día completo
+      return (
+        <div className="flex flex-col">
+          <span className="font-semibold">{formatDate(fechaInicio)}</span>
+          <span className="text-sm text-gray-600">(Todo el día)</span>
+        </div>
+      );
     },
-  },
-  {
-    accessorKey: "horaInicio",
-    header: "Hora de Inicio",
-    filterFn: myCustomFilterFn,
-  },
-  {
-    accessorKey: "horaFin",
-    header: "Hora de Fin",
-    filterFn: myCustomFilterFn,
   },
   {
     accessorKey: "estado",
     header: "Estado",
-    filterFn: myCustomFilterFn,
     cell: ({ row }) => {
       const estado = row.original.estado;
-      let color = "gray";
-      if (estado === "confirmada") {
-        color = "green";
-      } else if (estado === "pendiente") {
-        color = "yellow";
-      } else if (estado === "cancelada") {
-        color = "red";
-      }
-      return <Badge className={`bg-${color}-500`}>{estado}</Badge>;
+
+      // PASO 3: Forma más robusta de asignar colores a los badges
+      const styleMap = {
+        confirmada: "bg-green-500 hover:bg-green-600",
+        pendiente: "bg-yellow-500 hover:bg-yellow-600",
+        cancelada: "bg-red-500 hover:bg-red-600",
+      };
+
+      const badgeClass =
+        styleMap[estado as keyof typeof styleMap] || "bg-gray-500";
+
+      return <Badge className={`${badgeClass} text-white`}>{estado}</Badge>;
     },
   },
   {
     accessorKey: "pagado",
-    //como este valor es de tipo bolean, mostrar pagado si es true y no pagado si es false
     header: "Pago",
     cell: ({ row }) => {
-      return row.original.pagado === true ? (
-        <Badge className="bg-green-500">Pagado</Badge>
+      return row.original.pagado ? (
+        <Badge className="bg-green-500 text-white hover:bg-green-600">
+          Pagado
+        </Badge>
       ) : (
-        <Badge className="bg-red-500">No Pagado</Badge>
+        <Badge className="bg-orange-500 text-white hover:bg-orange-600">
+          No Pagado
+        </Badge>
       );
     },
-    filterFn: myCustomFilterFn,
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const personal = row.original;
-      return <ActionsRes data={personal} refresh={refresh} />;
+      const reserva = row.original;
+      return <ActionsRes data={reserva} refresh={refresh} />;
     },
   },
 ];

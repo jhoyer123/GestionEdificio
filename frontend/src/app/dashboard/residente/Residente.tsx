@@ -24,7 +24,9 @@ export const Residente: React.FC<Props> = ({ setEditState }) => {
   }, []);
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto py-1">
+      <h2 className="text-3xl font-bold">Gestión de Residentes</h2>
+      <h3 className="mt-3 border-l">Lista de Residentes</h3>
       <DataTable columns={columns(fetchData)} data={residente} />
     </div>
   );

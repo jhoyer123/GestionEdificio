@@ -42,6 +42,45 @@ const Usuario = sequelize.define(
       allowNull: true,
       defaultValue: null,
     },
+          // 🔒 Gestión de intentos fallidos (fuerza bruta)
+      failedLoginAttempts: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0, // número de intentos fallidos consecutivos
+      },
+      lastFailedAt: {
+        type: DataTypes.DATE,
+        allowNull: true, // fecha/hora del último intento fallido
+      },
+      blockedUntil: {
+        type: DataTypes.DATE,
+        allowNull: true, // hasta cuándo la cuenta está bloqueada
+      },
+
+      // 📧 Verificación de correo
+      isVerified: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false, // false hasta que confirme el correo
+      },
+      verificationToken: {
+        type: DataTypes.STRING,
+        allowNull: true, // token único para validar el correo
+      },
+      verificationTokenExpires: {
+        type: DataTypes.DATE,
+        allowNull: true, // fecha de expiración del token de verificación
+      },
+
+      // 🔑 Recuperación de contraseña
+      resetPasswordToken: {
+        type: DataTypes.STRING,
+        allowNull: true, // token único para resetear la contraseña
+      },
+      resetPasswordExpires: {
+        type: DataTypes.DATE,
+        allowNull: true, // fecha de expiración de ese token
+      },
   },
   {
     tableName: "usuarios",

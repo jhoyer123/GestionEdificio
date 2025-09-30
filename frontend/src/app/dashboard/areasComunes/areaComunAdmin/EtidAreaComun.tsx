@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   type AreaComun,
   getAreaById,
-  updateAreaComun, // 👉 necesitas crear este service en tu API (PUT/PATCH)
+  updateAreaComun,
 } from "@/services/areasServices";
 import { type EditState } from "@/components/shared/MainContent";
 import { toast } from "sonner";
@@ -21,6 +21,7 @@ export const EditAreaComun = ({ setEditState, areaComunId }: Props) => {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<AreaComun>();
 
@@ -28,24 +29,24 @@ export const EditAreaComun = ({ setEditState, areaComunId }: Props) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loadingData, setLoadingData] = useState(true);
 
-  // 👉 Traer datos del área desde el backend
+  // 👀 Observar tipoArea para ocultar horarios en parqueo
+  const tipoArea = watch("tipoArea");
+
   const fetchAreaData = async () => {
     if (!areaComunId) return;
     try {
       const areaComun = await getAreaById(areaComunId.toString());
 
-      // ✅ Precargar valores en el formulario
       setValue("nombreAreaComun", areaComun.nombreAreaComun);
       setValue("descripcion", areaComun.descripcion || "");
       setValue("capacidadMaxima", areaComun.capacidadMaxima);
-      setValue("costoPorHora", areaComun.costoPorHora);
-      setValue("horarioInicio", areaComun.horarioInicio);
-      setValue("horarioFin", areaComun.horarioFin);
+      setValue("costoBase", areaComun.costoBase);
+      setValue("tipoArea", areaComun.tipoArea); // ✅ cargamos el tipo
+      setValue("horarioApertura", areaComun.horarioApertura);
+      setValue("horarioCierre", areaComun.horarioCierre);
       setValue("requiereAprobacion", areaComun.requiereAprobacion);
 
-      // ✅ Mostrar imagen actual si existe
       if (areaComun.imageUrl) {
-        // Usa tu base de URL del backend (ej. import.meta.env.VITE_API_URL)
         setPreview(
           `${import.meta.env.VITE_API_URL}/uploads/${areaComun.imageUrl}`
         );
@@ -67,7 +68,6 @@ export const EditAreaComun = ({ setEditState, areaComunId }: Props) => {
       const file = e.target.files[0];
       setSelectedFile(file);
       setPreview(URL.createObjectURL(file));
-      // Si quieres que react-hook-form lo maneje:
       setValue("imageUrl", file as any);
     }
   };
@@ -79,21 +79,27 @@ export const EditAreaComun = ({ setEditState, areaComunId }: Props) => {
     formData.append("nombreAreaComun", data.nombreAreaComun);
     formData.append("descripcion", data.descripcion || "");
     formData.append("capacidadMaxima", data.capacidadMaxima.toString());
-    formData.append("costoPorHora", data.costoPorHora.toString());
-    formData.append("horarioInicio", data.horarioInicio);
-    formData.append("horarioFin", data.horarioFin);
+    formData.append("costoBase", data.costoBase.toString());
+    formData.append("tipoArea", data.tipoArea); // ✅ enviar tipo
+    if (data.tipoArea !== "parqueo") {
+      formData.append("horarioApertura", data.horarioApertura);
+      formData.append("horarioCierre", data.horarioCierre);
+    }
     formData.append("requiereAprobacion", String(data.requiereAprobacion));
 
-    // ✅ Solo enviar imagen si el usuario seleccionó una nueva
     if (selectedFile) {
       formData.append("imagen", selectedFile);
     }
 
     try {
       const response = await updateAreaComun(areaComunId.toString(), formData);
-      const message =
-        response.message || "Área común actualizada correctamente";
-      toast.success(message, { duration: 4000, position: "top-left" });
+      toast.success(
+        response.message || "Área común actualizada correctamente",
+        {
+          duration: 4000,
+          position: "top-left",
+        }
+      );
       setEditState({ view: "areasComunesAdmin", entity: "", id: null });
     } catch (error) {
       toast.error(
@@ -147,7 +153,6 @@ export const EditAreaComun = ({ setEditState, areaComunId }: Props) => {
             <Input
               type="text"
               placeholder="Nombre del área común"
-              className="bg-gray-50 border border-gray-300"
               {...register("nombreAreaComun", {
                 required: "El nombre es obligatorio",
                 minLength: { value: 3, message: "Mínimo 3 caracteres" },
@@ -165,7 +170,6 @@ export const EditAreaComun = ({ setEditState, areaComunId }: Props) => {
             <Input
               type="text"
               placeholder="Descripción (opcional)"
-              className="bg-gray-50 border border-gray-300"
               {...register("descripcion")}
             />
           </div>
@@ -175,7 +179,6 @@ export const EditAreaComun = ({ setEditState, areaComunId }: Props) => {
             <Input
               type="number"
               placeholder="Capacidad máxima"
-              className="bg-gray-50 border border-gray-300"
               {...register("capacidadMaxima", {
                 required: "La capacidad es obligatoria",
                 min: { value: 1, message: "Debe ser al menos 1 persona" },
@@ -188,56 +191,71 @@ export const EditAreaComun = ({ setEditState, areaComunId }: Props) => {
             )}
           </div>
 
+          {/* Tipo de área */}
+          <div>
+            <select
+              {...register("tipoArea", {
+                required: "Debes seleccionar un tipo de área",
+              })}
+              className="bg-gray-50 border border-gray-300 w-full p-2 rounded"
+            >
+              <option value="">Seleccione...</option>
+              <option value="salones">Salón</option>
+              <option value="gimnasio">Gimnasio</option>
+              <option value="parqueo">Parqueo</option>
+            </select>
+            {errors.tipoArea && (
+              <p className="text-red-500 text-sm">{errors.tipoArea.message}</p>
+            )}
+          </div>
+
           {/* Costo */}
           <div>
             <Input
               type="number"
               step="0.01"
-              placeholder="Costo por hora"
-              className="bg-gray-50 border border-gray-300"
-              {...register("costoPorHora", {
-                required: "El costo por hora es obligatorio",
+              placeholder="Costo base"
+              {...register("costoBase", {
+                required: "El costo base es obligatorio",
                 min: { value: 0, message: "No puede ser negativo" },
               })}
             />
-            {errors.costoPorHora && (
-              <p className="text-red-500 text-sm">
-                {errors.costoPorHora.message}
-              </p>
+            {errors.costoBase && (
+              <p className="text-red-500 text-sm">{errors.costoBase.message}</p>
             )}
           </div>
 
-          {/* Horario inicio */}
-          <div>
-            <Input
-              type="time"
-              className="bg-gray-50 border border-gray-300"
-              {...register("horarioInicio", {
-                required: "El horario de inicio es obligatorio",
-              })}
-            />
-            {errors.horarioInicio && (
-              <p className="text-red-500 text-sm">
-                {errors.horarioInicio.message}
-              </p>
-            )}
-          </div>
-
-          {/* Horario fin */}
-          <div>
-            <Input
-              type="time"
-              className="bg-gray-50 border border-gray-300"
-              {...register("horarioFin", {
-                required: "El horario de fin es obligatorio",
-              })}
-            />
-            {errors.horarioFin && (
-              <p className="text-red-500 text-sm">
-                {errors.horarioFin.message}
-              </p>
-            )}
-          </div>
+          {/* Horarios - solo si no es parqueo */}
+          {tipoArea !== "parqueo" && (
+            <>
+              <div>
+                <Input
+                  type="time"
+                  {...register("horarioApertura", {
+                    required: "El horario de apertura es obligatorio",
+                  })}
+                />
+                {errors.horarioApertura && (
+                  <p className="text-red-500 text-sm">
+                    {errors.horarioApertura.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Input
+                  type="time"
+                  {...register("horarioCierre", {
+                    required: "El horario de cierre es obligatorio",
+                  })}
+                />
+                {errors.horarioCierre && (
+                  <p className="text-red-500 text-sm">
+                    {errors.horarioCierre.message}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
 
           {/* Requiere aprobación */}
           <div className="flex items-center gap-2">
