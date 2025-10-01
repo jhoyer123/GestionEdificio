@@ -2,20 +2,15 @@ import axios from "axios";
 
 const API_URL = "http://localhost:3000/api";
 
-interface AuthCredentials {
-  email: string;
-  password: string;
-}
-
-// INICIAR SESION
-export const login = async (AuthCredentials: AuthCredentials) => {
+// INICIAR SESION — acepta payload flexible (email/password, token, recaptchaToken...)
+export const login = async (payload: Record<string, any>) => {
   try {
-    const { data } = await axios.post(`${API_URL}/login`, AuthCredentials, {
+    const { data } = await axios.post(`${API_URL}/login`, payload, {
       withCredentials: true,
     });
     return data;
   } catch (error) {
-    console.error("Error al iniciar sesión:", error);
+    console.error("Error al crear área común:", error);
     throw error;
   }
 };

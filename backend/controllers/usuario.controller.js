@@ -9,6 +9,9 @@ import Departamento from "../models/Departamento.js";
 import Funcion from "../models/Funcion.js";
 import { QueryTypes } from "sequelize";
 import Administrador from "../models/Administrador.js";
+import { transporter } from "./helpers/mails.js";
+import crypto from "crypto";
+import { Op } from "sequelize";
 
 //***** Crear un usuario *****//
 export const createUsuario = async (req, res) => {
@@ -47,6 +50,9 @@ export const createUsuario = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    const verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
+
     // Creamos el nuevo usuario
     let nuevoUsuario = await Usuario.create(
       {
@@ -54,6 +60,8 @@ export const createUsuario = async (req, res) => {
         email,
         password: hashedPassword,
         estado: true,
+        verificationTokenExpires,
+        verificationToken,
       },
       { transaction: t }
     );
@@ -202,6 +210,19 @@ export const createUsuario = async (req, res) => {
       };
     }
 
+    try {
+      await transporter.sendMail({
+        from: `"Gestión Edificio (Habitat360)" <${process.env.SMTP_USER}>`,
+        to: nuevoUsuario.email,
+        subject: "Verifica tu correo",
+        html: `<p>Hola ${nuevoUsuario.nombre},</p>
+           <p>Para activar tu cuenta haz clic <a href="http://localhost:5173/verify-email?token=${verificationToken}">aquí</a></p>`,
+      });
+    } catch (mailError) {
+      console.error("Error enviando correo de verificación:", mailError);
+      // No rompemos la creación del usuario
+    }
+
     // Limpiar campos sensibles
     delete nuevoUsuario.password;
     delete nuevoUsuario.createdAt;
@@ -210,12 +231,63 @@ export const createUsuario = async (req, res) => {
     await t.commit();
     res.status(201).json({
       usuario: nuevoUsuario,
-      message: "Usuario creado exitosamente",
+      message:
+        "Usuario creado exitosamente. El mail de verificación fue enviado.",
     });
   } catch (error) {
     await t.rollback();
     console.error("Error creating usuario:", error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+//**** Verificar correo electrónico *****/
+export const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.query; // recibimos el token como query
+
+    if (!token) {
+      return res
+        .status(400)
+        .json({ message: "Token de verificación faltante." });
+    }
+
+    // Buscar usuario con ese token y que no haya expirado
+    const usuario1 = await Usuario.findOne({
+      where: {
+        verificationToken: token,
+      },
+    });
+
+    if (!usuario1) {
+      //esto significa que el usuario ya verifico su correo
+      return res
+        .status(200)
+        .json({ message: "Ya has verificado tu correo puedes iniciar sesión." });
+    }
+
+    // Buscar usuario con ese token y que no haya expirado
+    const usuario = await Usuario.findOne({
+      where: {
+        verificationToken: token,
+        verificationTokenExpires: { [Op.gt]: new Date() },
+      },
+    });
+
+    if (!usuario) {
+      return res.status(400).json({ message: "Token inválido o expirado." });
+    }
+
+    // Activar la cuenta
+    usuario.isVerified = true;
+    usuario.verificationToken = null;
+    usuario.verificationTokenExpires = null;
+    await usuario.save();
+
+    res.json({ message: "Cuenta verificada correctamente." });
+  } catch (error) {
+    console.error("Error verificando correo:", error);
+    res.status(500).json({ message: "Error interno del servidor." });
   }
 };
 
@@ -376,4 +448,3 @@ export const deleteUsuario = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-

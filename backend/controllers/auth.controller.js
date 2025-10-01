@@ -4,12 +4,13 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import speakeasy from "speakeasy";
 import qrcode from "qrcode";
+import fetch from "node-fetch";
 
 // Controlador de autenticación Login
 const JWT_SECRET = process.env.JWT_SECRET || "tu_secreto";
 
 // Función para generar un token JWT
-export const login = async (req, res) => {
+/* export const login = async (req, res) => {
   const { email, password, token } = req.body; // token opcional, solo si 2FA activado
 
   try {
@@ -54,6 +55,151 @@ export const login = async (req, res) => {
     // Generar token JWT
     const jwtToken = jwt.sign(
       { id: usuario.id, email: usuario.email },
+      JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    res.cookie("token", jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 60 * 60 * 1000,
+    });
+
+    const usuarioParaCliente = {
+      id: usuario.idUsuario,
+      nombre: usuario.nombre,
+      email: usuario.email,
+      rol: usuario.roles,
+      two_factor_enabled: usuario.two_factor_enabled,
+    };
+
+    res.json({
+      token: jwtToken,
+      usuario: usuarioParaCliente,
+      message: "Inicio de sesión exitoso",
+    });
+  } catch (error) {
+    console.error("Error en el login:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}; */
+
+// Función para validar token de reCAPTCHA
+async function verifyCaptcha() {
+  const secret = process.env.RECAPTCHA_SECRET_KEY;
+  const params = new URLSearchParams();
+  params.append("secret", secret);
+  params.append("response", token);
+
+  const response = await fetch(
+    "https://www.google.com/recaptcha/api/siteverify",
+    { method: "POST", body: params }
+  );
+  const data = await response.json();
+  return data.success;
+}
+
+export const login = async (req, res) => {
+  const { email, password, token, recaptchaToken } = req.body; // token opcional 2FA, recaptchaToken opcional
+
+  try {
+    const usuario = await Usuario.findOne({
+      where: { email },
+      attributes: { exclude: ["createdAt", "updatedAt"] },
+      include: { model: Rol, as: "roles", attributes: ["rol"] },
+    });
+
+    if (!usuario) {
+      return res.status(401).json({ message: "Credenciales inválidas" });
+    }
+
+    //verificar si el usuario verifico su correo
+    if (!usuario.isVerified) {
+      return res
+        .status(403)
+        .json({
+          message: "Por favor verifica tu correo antes de iniciar sesión.",
+        });
+    }
+
+    const ahora = new Date();
+
+    // Bloqueo por intentos fallidos
+    if (usuario.blockedUntil && new Date(usuario.blockedUntil) > ahora) {
+      const minutosRestantes = Math.ceil(
+        (new Date(usuario.blockedUntil).getTime() - ahora.getTime()) / 60000
+      );
+      return res.status(423).json({
+        message: `Cuenta bloqueada. Intente de nuevo en ${minutosRestantes} minutos.`,
+      });
+    }
+
+    // ReCAPTCHA obligatorio si hay >3 intentos fallidos
+    if (usuario.failedLoginAttempts >= 3) {
+      if (!recaptchaToken) {
+        return res.status(400).json({ message: "Se requiere reCAPTCHA" });
+      }
+
+      const captchaValid = await verifyCaptcha(recaptchaToken);
+      if (!captchaValid) {
+        return res.status(400).json({ message: "reCAPTCHA inválido" });
+      }
+    }
+
+    // Verificar contraseña
+    const isMatch = await bcrypt.compare(password, usuario.password);
+    if (!isMatch) {
+      usuario.failedLoginAttempts = (usuario.failedLoginAttempts || 0) + 1;
+      usuario.lastFailedAt = ahora;
+
+      if (usuario.failedLoginAttempts >= 5) {
+        usuario.blockedUntil = new Date(ahora.getTime() + 15 * 60 * 1000);
+        usuario.failedLoginAttempts = 0;
+        await usuario.save();
+        return res.status(423).json({
+          message:
+            "Cuenta bloqueada temporalmente por múltiples intentos fallidos.",
+        });
+      }
+
+      await usuario.save();
+      return res.status(401).json({
+        message: "Credenciales inválidas",
+        intentosRestantes: 5 - usuario.failedLoginAttempts,
+      });
+    }
+
+    // Resetear contadores si login exitoso
+    usuario.failedLoginAttempts = 0;
+    usuario.lastFailedAt = null;
+    usuario.blockedUntil = null;
+    await usuario.save();
+
+    // Verificar 2FA
+    if (usuario.two_factor_enabled) {
+      if (!token) {
+        return res.status(200).json({
+          message: "Se requiere código 2FA",
+          twoFactorRequired: true,
+        });
+      }
+
+      const verified = speakeasy.totp.verify({
+        secret: usuario.two_factor_secret,
+        encoding: "base32",
+        token,
+        window: 1,
+      });
+
+      if (!verified) {
+        return res.status(401).json({ message: "Código 2FA inválido" });
+      }
+    }
+
+    // Generar JWT
+    const jwtToken = jwt.sign(
+      { id: usuario.idUsuario, email: usuario.email },
       JWT_SECRET,
       { expiresIn: "1h" }
     );

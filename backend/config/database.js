@@ -13,6 +13,15 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST,
     dialect: "mysql", // O 'postgres', 'sqlite', etc.
     logging: false, // Deshabilita los logs de SQL en la consola
+    timezone: "+00:00", // Ajusta la zona horaria según sea necesario
+    // !!! CONFIGURACIÓN ADICIONAL CRUCIAL PARA MYSQL !!!
+    dialectOptions: {
+      // Evita que el cliente MySQL haga conversiones de zona horaria
+      // y asume que los valores de DATETIME/TIMESTAMP ya están en UTC.
+      dateStrings: true,
+      typeCast: true,
+      timezone: "Z", // Opcional, forzando la conexión a usar UTC
+    },
   }
 );
 

@@ -17,6 +17,8 @@ import { createUsuario } from "@/services/usuariosServices";
 import type { AxiosError } from "axios";
 
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
+import axios from "axios";
 
 type FormData = {
   nombre: string;
@@ -83,17 +85,29 @@ export default function CreateUsuario({ setEditState }: createUserProps) {
     // Aquí puedes manejar el envío del formulario, como llamar a una API para crear el personal
     try {
       const response = await createUsuario(data);
-      console.log("mensage del backend:", response.message);
+      const message = response.message || "Usuario creado exitosamente";
+      toast.success(message, {
+        duration: 4000,
+        position: "bottom-left",
+      });
+      // Aquí puedes manejar la redirección a la vista de usuarios
+      toast.success(message, {
+        duration: 4000,
+        position: "bottom-left",
+      });
       //Aqui redigir a la vista de usuarios
       setEditState({ view: "usuarios", entity: "", id: null });
     } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      if (err.response) {
-        console.error(
-          "Este es el mensaje del backend:",
-          err.response.data.message
-        ); // <-- tu mensaje del backend
-      }
+      toast.error(
+        axios.isAxiosError(error)
+          ? error.response?.data?.message
+          : "Error en el login",
+        {
+          duration: 4000,
+          position: "bottom-left",
+        }
+      );
+      console.log("Error del backend:", error);
     }
   };
 

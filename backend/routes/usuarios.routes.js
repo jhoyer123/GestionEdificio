@@ -5,10 +5,13 @@ import {
   updateUsuario,
   deleteUsuario,
   getUsuario,
-  cambiarContrasena
+  cambiarContrasena,
+  verifyEmail,
 } from "../controllers/usuario.controller.js";
 
 const router = Router();
+
+router.get("/api/usuarios/verify-email", verifyEmail);
 
 router.get("/api/usuarios", getUsuarios);
 router.get("/api/usuarios/:id", getUsuario);
