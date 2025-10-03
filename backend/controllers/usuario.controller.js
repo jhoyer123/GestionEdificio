@@ -211,12 +211,14 @@ export const createUsuario = async (req, res) => {
     }
 
     try {
+      // El objeto 'nuevoUsuario' ya tiene el 'idUsuario' después de ser creado
       await transporter.sendMail({
         from: `"Gestión Edificio (Habitat360)" <${process.env.SMTP_USER}>`,
         to: nuevoUsuario.email,
         subject: "Verifica tu correo",
+        // <<--- ¡CAMBIO AQUÍ! Añadimos el userId a la URL
         html: `<p>Hola ${nuevoUsuario.nombre},</p>
-           <p>Para activar tu cuenta haz clic <a href="http://localhost:5173/verify-email?token=${verificationToken}">aquí</a></p>`,
+               <p>Para activar tu cuenta haz clic <a href="http://localhost:5173/verify-email?token=${verificationToken}&userId=${nuevoUsuario.idUsuario}">aquí</a></p>`,
       });
     } catch (mailError) {
       console.error("Error enviando correo de verificación:", mailError);
@@ -244,26 +246,20 @@ export const createUsuario = async (req, res) => {
 //**** Verificar correo electrónico *****/
 export const verifyEmail = async (req, res) => {
   try {
-    const { token } = req.query; // recibimos el token como query
+    const { userId, token } = req.query; // recibimos el token como query
 
-    if (!token) {
+    if (!token || !userId) {
       return res
         .status(400)
-        .json({ message: "Token de verificación faltante." });
+        .json({ message: "Token de verificación o ID de usuario faltante." });
     }
 
     // Buscar usuario con ese token y que no haya expirado
-    const usuario1 = await Usuario.findOne({
-      where: {
-        verificationToken: token,
-      },
-    });
-
-    if (!usuario1) {
-      //esto significa que el usuario ya verifico su correo
-      return res
-        .status(200)
-        .json({ message: "Ya has verificado tu correo puedes iniciar sesión." });
+    const usuario1 = await Usuario.findByPk(userId);
+    if (usuario1.isVerified) {
+      return res.status(200).json({
+        message: "Ya has verificado tu correo puedes iniciar sesión.",
+      });
     }
 
     // Buscar usuario con ese token y que no haya expirado
@@ -288,6 +284,59 @@ export const verifyEmail = async (req, res) => {
   } catch (error) {
     console.error("Error verificando correo:", error);
     res.status(500).json({ message: "Error interno del servidor." });
+  }
+};
+
+//***** Reenvío de correo electrónico *****//
+export const resendVerifyEmail = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ message: "El ID de usuario es obligatorio." });
+    }
+
+    // Buscar al usuario
+    const usuario = await Usuario.findByPk(userId);
+
+    if (!usuario) {
+      return res.status(200).json({
+        message:
+          "Si existe una cuenta con este usuario, se ha enviado un enlace de verificación.",
+      });
+    }
+
+    if (usuario.isVerified) {
+      return res.status(200).json({
+        message: "Esta cuenta ya ha sido verificada. Puedes iniciar sesión.",
+      });
+    }
+
+    const newVerificationToken = crypto.randomBytes(32).toString("hex");
+    const newVerificationTokenExpires = new Date(
+      Date.now() + 24 * 60 * 60 * 1000
+    );
+
+    usuario.verificationToken = newVerificationToken;
+    usuario.verificationTokenExpires = newVerificationTokenExpires;
+    await usuario.save();
+
+    await transporter.sendMail({
+      from: `"Gestión Edificio (Habitat360)" <${process.env.SMTP_USER}>`,
+      to: usuario.email, // el correo que ya tiene asignado
+      subject: "Verifica tu correo (Nuevo Intento)",
+      html: `<p>Hola ${usuario.nombre},</p>
+             <p>Has solicitado un nuevo enlace de verificación. Para activar tu cuenta haz clic <a href="http://localhost:5173/verify-email?token=${newVerificationToken}&userId=${usuario.idUsuario}">aquí</a></p>`,
+    });
+
+    res.status(200).json({
+      message: "Se ha reenviado un nuevo enlace de verificación a tu correo.",
+    });
+  } catch (error) {
+    console.error("Error en resendVerifyEmail:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 

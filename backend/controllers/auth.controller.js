@@ -5,7 +5,6 @@ import bcrypt from "bcrypt";
 import speakeasy from "speakeasy";
 import qrcode from "qrcode";
 import fetch from "node-fetch";
-
 // Controlador de autenticación Login
 const JWT_SECRET = process.env.JWT_SECRET || "tu_secreto";
 
@@ -86,16 +85,17 @@ const JWT_SECRET = process.env.JWT_SECRET || "tu_secreto";
 }; */
 
 // Función para validar token de reCAPTCHA
-async function verifyCaptcha() {
+async function verifyCaptcha(recaptchaToken) {
   const secret = process.env.RECAPTCHA_SECRET_KEY;
   const params = new URLSearchParams();
   params.append("secret", secret);
-  params.append("response", token);
+  params.append("response", recaptchaToken);
 
   const response = await fetch(
     "https://www.google.com/recaptcha/api/siteverify",
     { method: "POST", body: params }
   );
+
   const data = await response.json();
   return data.success;
 }
@@ -104,6 +104,13 @@ export const login = async (req, res) => {
   const { email, password, token, recaptchaToken } = req.body; // token opcional 2FA, recaptchaToken opcional
 
   try {
+    //validar que se envien datos obligatorios
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Complete todos los campos por favor" });
+    }
+
     const usuario = await Usuario.findOne({
       where: { email },
       attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -116,31 +123,39 @@ export const login = async (req, res) => {
 
     //verificar si el usuario verifico su correo
     if (!usuario.isVerified) {
-      return res
-        .status(403)
-        .json({
-          message: "Por favor verifica tu correo antes de iniciar sesión.",
-        });
+      return res.status(403).json({
+        message: "Por favor verifica tu correo antes de iniciar sesión.",
+      });
     }
 
-    const ahora = new Date();
+    const ahora = new Date(); // siempre está en UTC internamente
+    const blockedUntilDate = usuario.blockedUntil
+      ? new Date(usuario.blockedUntil.replace(" ", "T") + "Z")
+      : null;
+    // Bloqueo
+    if (usuario.blockedUntil && blockedUntilDate > ahora) {
+      //console.log("Usuario bloqueado hasta:", blockedUntilDate);
+      //console.log("ahora:", ahora);
 
-    // Bloqueo por intentos fallidos
-    if (usuario.blockedUntil && new Date(usuario.blockedUntil) > ahora) {
       const minutosRestantes = Math.ceil(
-        (new Date(usuario.blockedUntil).getTime() - ahora.getTime()) / 60000
+        (blockedUntilDate.getTime() - ahora.getTime()) / 60000
       );
+
       return res.status(423).json({
         message: `Cuenta bloqueada. Intente de nuevo en ${minutosRestantes} minutos.`,
       });
     }
 
-    // ReCAPTCHA obligatorio si hay >3 intentos fallidos
     if (usuario.failedLoginAttempts >= 3) {
+      // Requiere reCAPTCHA
       if (!recaptchaToken) {
-        return res.status(400).json({ message: "Se requiere reCAPTCHA" });
+        return res.status(401).json({
+          message: "Es necesario completar el reCAPTCHA por seguridad",
+          intentosRestantes: 5 - usuario.failedLoginAttempts,
+        });
       }
 
+      // Verificar reCAPTCHA si se proporciona el token
       const captchaValid = await verifyCaptcha(recaptchaToken);
       if (!captchaValid) {
         return res.status(400).json({ message: "reCAPTCHA inválido" });
@@ -151,10 +166,12 @@ export const login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, usuario.password);
     if (!isMatch) {
       usuario.failedLoginAttempts = (usuario.failedLoginAttempts || 0) + 1;
-      usuario.lastFailedAt = ahora;
+      usuario.lastFailedAt = ahora.toISOString(); // <<< Guardar como UTC
 
       if (usuario.failedLoginAttempts >= 5) {
-        usuario.blockedUntil = new Date(ahora.getTime() + 15 * 60 * 1000);
+        usuario.blockedUntil = new Date(
+          ahora.getTime() + 2 * 60 * 1000
+        ).toISOString();
         usuario.failedLoginAttempts = 0;
         await usuario.save();
         return res.status(423).json({

@@ -7,11 +7,13 @@ import {
   getUsuario,
   cambiarContrasena,
   verifyEmail,
+  resendVerifyEmail,
 } from "../controllers/usuario.controller.js";
 
 const router = Router();
 
 router.get("/api/usuarios/verify-email", verifyEmail);
+router.post("/api/usuarios/resend-verify-email", resendVerifyEmail);
 
 router.get("/api/usuarios", getUsuarios);
 router.get("/api/usuarios/:id", getUsuario);
