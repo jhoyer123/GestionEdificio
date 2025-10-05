@@ -70,6 +70,10 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
     setActiveView("parqueosAdmins");
   };
 
+  const handleMisReservasClick = () => {
+    setActiveView("misReservas");
+  }
+
   const navigate = useNavigate();
   const handleCerrarSesionClick = () => {
     logout();
@@ -160,6 +164,13 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
             >
               <UserCog className="mr-2 h-4 w-4" />
               Gestion de Parqueos
+            </button>
+            <button
+              onClick={handleMisReservasClick}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+            >
+              <UserCog className="mr-2 h-4 w-4" />
+              Mis reservas
             </button>
           </nav>
         </div>

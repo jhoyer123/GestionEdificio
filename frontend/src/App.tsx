@@ -5,6 +5,8 @@ import RegisterPage from "./app/pages/Register";
 import PrivateRoute from "./components/shared/PrivateRoute";
 import { Toaster } from "@/components/ui/sonner";
 import { VerifyEmail } from "./app/pages/VerifyEmail";
+import { ResetPassword } from "./app/pages/ResetPassword";
+import { ForgotPassword } from "./app/pages/ForgotPassword";
 //import DetalleDepartamento from "./app/dashboard/departamento/DetalleDepartamento";
 
 export const App = () => {
@@ -25,6 +27,8 @@ export const App = () => {
         {/* <Route path="/dashboard" element={<Layout />} /> */}
         {/* <Route path="/DetalleDepartamento" element={<DetalleDepartamento />} /> */}
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Routes>
       <Toaster />
     </>

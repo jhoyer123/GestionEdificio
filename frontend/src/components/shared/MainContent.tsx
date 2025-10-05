@@ -14,6 +14,8 @@ import { CrearAreaComun } from "@/app/dashboard/areasComunes/areaComunAdmin/Crea
 import { EditAreaComun } from "@/app/dashboard/areasComunes/areaComunAdmin/EtidAreaComun";
 import { Reservas } from "@/app/dashboard/reservas/Reservas";
 import ParqueoAdmin from "@/app/dashboard/areasComunes/parqueo/ParqueoAdmin";
+import { MisReservasView } from "@/app/dashboard/reservas/reservasUser/MisReservasView";
+import EditarReservaAdmin from "@/app/dashboard/reservas/EditReservaAdmin";
 export type EditState = {
   view: string;
   entity: string;
@@ -68,6 +70,8 @@ export default function MainContent({
     //seccion de reservas admin ***
     case "reservasAdmin":
       return <Reservas setEditState={setEditState} />;
+    case "misReservas":
+      return <MisReservasView />;
 
     //seccion de creacion y edicion de entidades ***
     case "edit":
@@ -77,6 +81,11 @@ export default function MainContent({
             setEditState={setEditState}
             areaComunId={editState.id}
           />
+        );
+      }
+      if (editState.entity === "reserva") {
+        return (
+          <EditarReservaAdmin setEditState={setEditState} reservaId={editState.id} />
         );
       }
       /* if (editState.entity === "personal") {

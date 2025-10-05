@@ -53,7 +53,19 @@ Bloqueos.belongsTo(AreaComun, {
 });
 
 // Usuario 1---N Reserva
-Residente.hasMany(Reserva, {
+Usuario.hasMany(Reserva, {
+  foreignKey: "usuarioId",
+  as: "reservas",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+Reserva.belongsTo(Usuario, {
+  foreignKey: "usuarioId",
+  as: "usuario",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+/* Residente.hasMany(Reserva, {
   foreignKey: "usuarioId",
   as: "reservas",
   onDelete: "CASCADE",
@@ -64,7 +76,7 @@ Reserva.belongsTo(Residente, {
   as: "residente",
   onDelete: "CASCADE",
   onUpdate: "CASCADE",
-});
+}); */
 
 // AreaComun 1---N Reserva
 AreaComun.hasMany(Reserva, {

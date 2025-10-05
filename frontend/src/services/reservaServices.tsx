@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_BASE_URL = "http://localhost:3000/api/reservas"; // Cambia esto por la URL de tu API
 
- export interface Reserva {
+export interface Reserva {
   idReserva?: number;
   usuarioId: number;
   areaComunId: number | null;
@@ -12,8 +12,7 @@ const API_BASE_URL = "http://localhost:3000/api/reservas"; // Cambia esto por la
   motivo: string;
   numAsistentes: number;
   // Otros campos relevantes
-} 
-
+}
 
 // Crear una nueva reserva
 export const createReserva = async (reservaData: any) => {
@@ -59,10 +58,7 @@ export const updateReserva = async (
 };
 
 //actualizar estado de una reserva
-export const updateEstadoReserva = async (
-  id: number,
-  nuevoEstado: string
-) => {
+export const updateEstadoReserva = async (id: number, nuevoEstado: string) => {
   try {
     const response = await axios.patch(`${API_BASE_URL}/estado/${id}`, {
       estado: nuevoEstado,
@@ -70,6 +66,29 @@ export const updateEstadoReserva = async (
     return response.data;
   } catch (error) {
     console.error("Error al actualizar el estado de la reserva:", error);
+    throw error;
+  }
+};
+
+//traer las reservas de un usuario especifico
+export const UserReservas = async (idUsuario: number) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/usuario/${idUsuario}`);
+    //console.log("Response from UserReservas:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener las reservas del usuario:", error);
+    throw error;
+  }
+};
+
+//obtener reserva por id
+export const getReservaById = async (id: number) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener la reserva por ID:", error);
     throw error;
   }
 };

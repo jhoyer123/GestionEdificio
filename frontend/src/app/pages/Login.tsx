@@ -6,10 +6,11 @@ import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { login } from "@/services/authService";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useRef } from "react"; // Importa useRef de react
 import axios from "axios";
 import ReCAPTCHA from "react-google-recaptcha";
-import { useRef } from "react";
+// NUEVAS IMPORTACIONES: Iconos para la UI
+import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 
 type FormData = {
   email: string;
@@ -24,6 +25,9 @@ export default function Login() {
   const [showRecaptcha, setShowRecaptcha] = useState(false);
   const recaptchaRef = useRef<any>(null);
 
+  // --- NUEVO ESTADO PARA VISIBILIDAD DE CONTRASEÑA ---
+  const [showPassword, setShowPassword] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -32,6 +36,7 @@ export default function Login() {
   } = useForm<FormData>();
   const navigate = useNavigate();
 
+  // TU LÓGICA onSubmit NO SE TOCA, SE MANTIENE INTACTA
   const onSubmit = async (data: FormData) => {
     try {
       const payload = {
@@ -50,20 +55,16 @@ export default function Login() {
       toast.success(response.message, { duration: 4000, position: "top-left" });
       navigate("/dashboard");
     } catch (error) {
-      // Si es un error de credenciales
       if (
         axios.isAxiosError(error) &&
         error.response?.data?.intentosRestantes !== undefined
       ) {
         const intentosRestantes = error.response.data.intentosRestantes;
-
-        // Mostrar captcha si quedaban menos de 2 intentos (3er fallo)
         if (intentosRestantes <= 2) {
           setShowRecaptcha(true);
         }
       }
       recaptchaRef.current?.reset();
-      // Limpiar el token en el form
       setValue("recaptchaToken", "", { shouldValidate: false });
       toast.error(
         axios.isAxiosError(error)
@@ -74,116 +75,124 @@ export default function Login() {
     }
   };
 
+  // --- NUEVA ESTRUCTURA JSX PARA EL DISEÑO MEJORADO ---
   return (
-    <div className="flex h-screen bg-gray-950 text-white">
-      {/* Formulario */}
-      <div className="w-full md:w-2/5 flex items-center justify-center p-6 md:p-12">
-        <Card className="w-full max-w-md border-none bg-gray-900 text-white shadow-lg rounded-2xl">
-          <CardHeader className="text-center pb-4">
-            <div className="flex justify-center mb-4">
-              <img
-                src="https://i.pinimg.com/736x/92/fd/b0/92fdb00d64061d527d71235ac42712bf.jpg"
-                alt="Logo"
-                className="rounded-full w-16 h-16 shadow-md"
-              />
-            </div>
-            <CardTitle className="text-2xl font-bold">
-              Bienvenido de nuevo
-            </CardTitle>
-            <p className="text-gray-400 mt-1">Inicia sesión para acceder</p>
-          </CardHeader>
+    <div
+      className="flex min-h-screen w-full items-center justify-center bg-cover bg-center p-4"
+      style={{
+        backgroundImage:
+          "url('https://i.pinimg.com/736x/8e/ff/86/8eff8648a0340025ebb66660b3fdc6ce.jpg')",
+      }}
+    >
+      <Card className="w-full max-w-md rounded-2xl border-none bg-black/50 text-white shadow-2xl backdrop-blur-lg">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-800/80">
+            <img
+              src="https://i.pinimg.com/736x/92/fd/b0/92fdb00d64061d527d71235ac42712bf.jpg"
+              alt="Logo"
+              className="h-14 w-14 rounded-full"
+            />
+          </div>
+          <CardTitle className="text-3xl font-bold">
+            Bienvenido de nuevo
+          </CardTitle>
+          <p className="mt-1 text-gray-300">Inicia sesión para acceder</p>
+        </CardHeader>
 
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {/* Email */}
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* --- Email con Icono --- */}
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
               <Input
                 type="email"
                 placeholder="Email"
-                className="bg-gray-800 border border-gray-700 text-white placeholder:text-gray-500"
+                className="bg-gray-800/80 py-6 pl-10 border border-gray-700 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500"
                 {...register("email", { required: "El email es obligatorio" })}
               />
-              {errors.email && (
-                <p className="text-red-500 text-sm">{errors.email.message}</p>
-              )}
+            </div>
+            {errors.email && (
+              <p className="text-red-400 text-sm -mt-4">
+                {errors.email.message}
+              </p>
+            )}
 
-              {/* Password */}
+            {/* --- Password con Icono y "Ojito" --- */}
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
               <Input
-                type="password"
+                type={showPassword ? "text" : "password"} // Tipo dinámico
                 placeholder="Contraseña"
-                className="bg-gray-800 border border-gray-700 text-white placeholder:text-gray-500"
+                className="bg-gray-800/80 py-6 pl-10 pr-10 border border-gray-700 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500"
                 {...register("password", {
                   required: "La contraseña es obligatoria",
                   minLength: { value: 3, message: "Mínimo 3 caracteres" },
                 })}
               />
-              {errors.password && (
-                <p className="text-red-500 text-sm">
-                  {errors.password.message}
-                </p>
-              )}
-
-              {showRecaptcha && import.meta.env.VITE_RECAPTCHA_SITE_KEY && (
-                <div className="mt-2 flex justify-center">
-                  <ReCAPTCHA
-                    ref={recaptchaRef}
-                    sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY as string}
-                    onChange={(token: string | null) =>
-                      setValue("recaptchaToken", token ?? "", {
-                        shouldValidate: true,
-                      })
-                    }
-                  />
-                  {errors.recaptchaToken && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.recaptchaToken.message}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* 2FA */}
-              {twoFactorRequired && (
-                <Input
-                  type="text"
-                  placeholder="Código 2FA"
-                  maxLength={6}
-                  value={twoFAToken}
-                  onChange={(e) => setTwoFAToken(e.target.value)}
-                  className="bg-gray-800 border border-gray-700 text-white placeholder:text-gray-500 mt-2"
-                />
-              )}
-
-              <Button
-                type="submit"
-                size="custom"
-                className="w-full py-2 mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
               >
-                Iniciar sesión
-              </Button>
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+            {errors.password && (
+              <p className="text-red-400 text-sm -mt-4">
+                {errors.password.message}
+              </p>
+            )}
 
-              {/* Recuperar contraseña */}
-              <div className="text-center mt-4">
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-blue-400 hover:underline"
-                >
-                  ¿Olvidaste tu contraseña?
-                </Link>
+            {showRecaptcha && import.meta.env.VITE_RECAPTCHA_SITE_KEY && (
+              <div className="flex justify-center pt-2">
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY as string}
+                  onChange={(token: string | null) =>
+                    setValue("recaptchaToken", token ?? "", {
+                      shouldValidate: true,
+                    })
+                  }
+                  theme="dark" // Añadido para que combine con el diseño
+                />
+                {errors.recaptchaToken && (
+                  <p className="text-red-400 text-sm mt-1">
+                    {errors.recaptchaToken.message}
+                  </p>
+                )}
               </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+            )}
 
-      {/* Imagen */}
-      <div className="hidden md:block md:w-3/5 relative">
-        <img
-          src="https://i.pinimg.com/736x/28/2b/2f/282b2f988040ffd5dd30544b0f946880.jpg"
-          alt="Imagen decorativa"
-          className="h-full w-full object-cover brightness-75"
-        />
-        {/* capa semitransparente para que no opaque */}
-      </div>
+            {twoFactorRequired && (
+              <Input
+                type="text"
+                placeholder="Código 2FA"
+                maxLength={6}
+                value={twoFAToken}
+                onChange={(e) => setTwoFAToken(e.target.value)}
+                className="bg-gray-800/80 py-6 border border-gray-700 text-white placeholder:text-gray-400 mt-2"
+              />
+            )}
+
+            <Button
+              type="submit"
+              size="custom"
+              className="w-full rounded-lg bg-blue-600 py-3 text-base font-semibold text-white transition-all hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+            >
+              Iniciar sesión
+            </Button>
+
+            <div className="text-center">
+              <Link
+                to="/forgot-password"
+                className="text-sm text-blue-400 hover:underline"
+              >
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

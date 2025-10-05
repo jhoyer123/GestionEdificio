@@ -3,8 +3,10 @@ import AreaComun from "../models/AreaComun.js";
 import Usuario from "../models/Usuario.js"; // Asegúrate de tener el modelo Usuario
 import sequelize from "../config/database.js";
 import Residente from "../models/Residente.js"; // si no lo tienes ya
+import Rol from "../models/Rol.js"; // importa el modelo Rol si no lo tienes ya
 // arriba del archivo (si no lo tienes ya)
 import { Op } from "sequelize";
+import ParqueoCaja from "../models/ParqueoCaja.js";
 
 //Crear un reserva
 /* export const createReserva = async (req, res) => {
@@ -213,11 +215,25 @@ export const createReserva = async (req, res) => {
       await t.rollback();
       return res.status(404).json({ message: "El área común no existe" });
     }
+    //solo residentes pueden reservar
+    const residente = await Residente.findOne({
+      where: { usuarioId: usuarioId },
+      transaction: t,
+    });
+    const usuario = await Usuario.findByPk(usuarioId, {
+      include: [{ model: Rol, as: "roles" }],
+      transaction: t,
+    });
 
-    const residente = await Residente.findByPk(usuarioId, { transaction: t });
-    if (!residente) {
+    const tieneRolAdmin = usuario.roles.some(
+      (r) => r.rol === "administrador"
+    );
+    console.log("tieneRolAdmin:", tieneRolAdmin);
+    if (!residente && !tieneRolAdmin) {
       await t.rollback();
-      return res.status(404).json({ message: "El residente no existe" });
+      return res
+        .status(404)
+        .json({ message: "Solo un usuario residente puede reservar" });
     }
 
     /*const [year, month, day] = fechaReserva.split("-").map(Number);
@@ -538,9 +554,10 @@ export const getReservas = async (req, res) => {
             "costoBase",
             "horarioApertura",
             "horarioCierre",
+            "tipoArea",
           ],
         },
-        {
+        /* {
           model: Residente,
           as: "residente",
           include: [
@@ -551,6 +568,23 @@ export const getReservas = async (req, res) => {
             },
           ],
           attributes: ["idResidente", "telefono"],
+        }, */
+        {
+          model: Usuario,
+          as: "usuario",
+          attributes: ["idUsuario", "nombre", "email"],
+          include: [
+            {
+              model: Residente,
+              as: "residente",
+              attributes: ["idResidente", "telefono"],
+            },
+          ],
+        },
+        {
+          model: ParqueoCaja,
+          as: "parqueoCaja",
+          attributes: ["idParqueoCaja", "numeroCaja"],
         },
       ],
       attributes: [
@@ -585,9 +619,13 @@ export const getReservas = async (req, res) => {
         estado: reserva.estado,
         idAreaComun: reserva.areaComun?.idAreaComun || null,
         areaNombre: reserva.areaComun?.nombreAreaComun || "",
-        usuario: reserva.residente?.usuario?.nombre || "",
-        email: reserva.residente?.usuario?.email || "",
-        telefono: reserva.residente?.telefono || "",
+        tipoAreaComun: reserva.areaComun?.tipoArea || "",
+        //usuario: reserva.residente?.usuario?.nombre || "",
+        usuario: reserva.usuario?.nombre || "",
+        //email: reserva.residente?.usuario?.email || "",
+        email: reserva.usuario?.email || "",
+        //telefono: reserva.residente?.telefono || "",
+        telefono: reserva.usuario?.residente?.telefono || "",
         pagado: reserva.pagado,
         costoTotal: reserva.costoTotal || 0,
         horarioApertura: reserva.areaComun?.horarioApertura || "00:00",
@@ -776,7 +814,6 @@ export const obtenerReservaPorId = async (req, res) => {
 export const updateReservaAdmin = async (req, res) => {
   const { idReserva } = req.params;
   const t = await sequelize.transaction();
-  const { Op } = require("sequelize");
 
   try {
     const reserva = await Reserva.findByPk(idReserva, { transaction: t });
@@ -807,197 +844,210 @@ export const updateReservaAdmin = async (req, res) => {
       return res.status(404).json({ message: "El área no existe" });
     }
 
-    const esGimnasio = area.tipo === "gimnasio";
+    // -----------------
+    // NUEVOS DATOS
+    // -----------------
+    const {
+      fechaReserva,
+      fechaFinReserva,
+      horaInicio,
+      horaFin,
+      motivo,
+      numAsistentes,
+      cajaId,
+    } = req.body;
 
+    // Si no se manda algo, se mantiene lo anterior
     const datosActualizados = {
-      fechaReserva: req.body.fechaReserva || reserva.fechaReserva,
-      fechaFinReserva: esGimnasio
-        ? null
-        : req.body.fechaFinReserva || reserva.fechaFinReserva,
-      horaInicio: req.body.horaInicio ?? reserva.horaInicio,
-      horaFin: req.body.horaFin ?? reserva.horaFin,
-      motivo: req.body.motivo || reserva.motivo,
-      numAsistentes: req.body.numAsistentes || reserva.numAsistentes,
+      fechaReserva: fechaReserva || reserva.fechaReserva,
+      fechaFinReserva: fechaFinReserva || reserva.fechaFinReserva,
+      horaInicio: horaInicio ?? reserva.horaInicio,
+      horaFin: horaFin ?? reserva.horaFin,
+      motivo: motivo || reserva.motivo,
+      numAsistentes: numAsistentes || reserva.numAsistentes,
+      cajaId: cajaId || reserva.cajaId,
     };
 
-    if (
-      esGimnasio &&
-      (!datosActualizados.horaInicio || !datosActualizados.horaFin)
-    ) {
-      await t.rollback();
-      return res.status(400).json({
-        message: "Para el gimnasio, la reserva debe ser por horas",
-      });
-    }
-
-    const toMinutes = (hhmm) => {
-      if (!hhmm) return null;
-      const [hh, mm] = hhmm.split(":").map(Number);
-      return hh * 60 + mm;
-    };
-
+    // -----------------
+    // LÓGICA DE TIPOS
+    // -----------------
+    const esGimnasio = area.tipoArea === "gimnasio";
+    const esParqueo = area.tipoArea === "parqueo";
     const esPorHoras =
       !!datosActualizados.horaInicio && !!datosActualizados.horaFin;
-    const esPorDias = !!datosActualizados.fechaFinReserva && !esPorHoras;
+    const esPorDias =
+      !!datosActualizados.fechaFinReserva &&
+      !datosActualizados.horaInicio &&
+      !datosActualizados.horaFin;
 
-    // ---------- Validación de fechas y horas en el pasado ----------
-    const ahora = new Date();
-    const fechaInicioReserva = new Date(datosActualizados.fechaReserva);
-
-    if (esPorHoras) {
-      const [hIni, mIni] = datosActualizados.horaInicio.split(":").map(Number);
-      const [hFin, mFin] = datosActualizados.horaFin.split(":").map(Number);
-
-      fechaInicioReserva.setHours(hIni, mIni, 0, 0);
-      const fechaFinReservaHora = new Date(datosActualizados.fechaReserva);
-      fechaFinReservaHora.setHours(hFin, mFin, 0, 0);
-
-      if (fechaInicioReserva < ahora) {
-        await t.rollback();
-        return res
-          .status(400)
-          .json({ message: "No se puede reservar en el pasado" });
-      }
-
-      if (fechaFinReservaHora < fechaInicioReserva) {
-        await t.rollback();
-        return res.status(400).json({
-          message: "La hora de fin no puede ser anterior a la hora de inicio",
-        });
-      }
+    if (esGimnasio && !esPorHoras) {
+      await t.rollback();
+      return res.status(400).json({
+        message: "Para el gimnasio la reserva debe ser por horas",
+      });
+    }
+    if (!esPorHoras && !esPorDias) {
+      await t.rollback();
+      return res
+        .status(400)
+        .json({ message: "Debe elegir reserva por horas o por días" });
     }
 
-    if (esPorDias && !esGimnasio) {
-      const fechaFin = new Date(datosActualizados.fechaFinReserva);
-      if (fechaInicioReserva < ahora || fechaFin < ahora) {
-        await t.rollback();
-        return res
-          .status(400)
-          .json({ message: "No se puede reservar en el pasado" });
-      }
-      if (fechaFin < fechaInicioReserva) {
-        await t.rollback();
-        return res.status(400).json({
-          message: "La fecha de fin no puede ser anterior a la fecha de inicio",
-        });
-      }
-    }
-
-    const otrasReservas = await Reserva.findAll({
-      where: {
-        areaComunId: reserva.areaComunId,
-        idReserva: { [Op.ne]: idReserva },
-        estado: { [Op.ne]: "cancelada" },
-      },
-      transaction: t,
-      lock: t.LOCK.UPDATE,
-    });
-
-    // ---------- Reserva por horas ----------
-    if (esPorHoras) {
-      const startMin = toMinutes(datosActualizados.horaInicio);
-      const endMin = toMinutes(datosActualizados.horaFin);
-
-      if (startMin >= endMin) {
-        await t.rollback();
-        return res.status(400).json({
-          message: "La hora de inicio debe ser anterior a la hora de fin",
-        });
-      }
-
-      const areaStartMin = toMinutes(area.horarioApertura);
-      const areaEndMin = toMinutes(area.horarioCierre);
-      if (startMin < areaStartMin || endMin > areaEndMin) {
-        await t.rollback();
-        return res.status(400).json({
-          message: "El horario está fuera del rango permitido por el área",
-        });
-      }
-
-      for (const r of otrasReservas) {
-        const rInicio = new Date(r.fechaReserva);
-        const rFin = r.fechaFinReserva ? new Date(r.fechaFinReserva) : rInicio;
-        const nuevaFecha = new Date(datosActualizados.fechaReserva);
-
-        if (nuevaFecha <= rFin && nuevaFecha >= rInicio) {
-          if (r.horaInicio && r.horaFin) {
-            const sExist = toMinutes(r.horaInicio);
-            const eExist = toMinutes(r.horaFin);
-            if (sExist < endMin && eExist > startMin) {
-              await t.rollback();
-              return res.status(409).json({
-                message:
-                  "Conflicto: el horario se solapa con otra reserva existente",
-              });
-            }
-          } else if (!esGimnasio) {
-            await t.rollback();
-            return res.status(409).json({
-              message: "Conflicto: ya hay una reserva que ocupa todo el día",
-            });
-          }
-        }
-      }
-
-      datosActualizados.costoTotal = esGimnasio
-        ? Number(area.costoBase)
-        : Number(
-            (((endMin - startMin) / 60) * Number(area.costoBase || 0)).toFixed(
-              2
-            )
-          );
-    }
-
-    // ---------- Reserva por días solo para áreas distintas al gimnasio ----------
-    if (esPorDias && !esGimnasio) {
-      const inicio = new Date(datosActualizados.fechaReserva);
-      const fin = new Date(datosActualizados.fechaFinReserva);
-
-      for (const r of otrasReservas) {
-        const rInicio = new Date(r.fechaReserva);
-        const rFin = r.fechaFinReserva ? new Date(r.fechaFinReserva) : rInicio;
-
-        if (r.horaInicio && r.horaFin) {
-          let currentDate = new Date(inicio);
-          while (currentDate <= fin) {
-            if (currentDate >= rInicio && currentDate <= rFin) {
-              await t.rollback();
-              return res.status(409).json({
-                message: "Conflicto: hay una reserva por horas en estas fechas",
-              });
-            }
-            currentDate.setDate(currentDate.getDate() + 1);
-          }
-        } else {
-          if (inicio <= rFin && fin >= rInicio) {
-            await t.rollback();
-            return res.status(409).json({
-              message:
-                "Conflicto: el rango de fechas se solapa con otra reserva existente",
-            });
-          }
-        }
-      }
-
-      const horasPorDia =
-        toMinutes(area.horarioCierre) - toMinutes(area.horarioApertura);
-      const numDias = Math.ceil((fin - inicio) / (1000 * 60 * 60 * 24)) + 1;
-      datosActualizados.costoTotal = Number(
-        (numDias * horasPorDia * Number(area.costoBase || 0)).toFixed(2)
-      );
-    }
-
-    // Validación de capacidad
     if (
       datosActualizados.numAsistentes > area.capacidadMaxima ||
       datosActualizados.numAsistentes < 1
     ) {
       await t.rollback();
       return res.status(400).json({
-        message: `El número de asistentes excede la capacidad del área (${area.capacidadMaxima})`,
+        message: `Número de asistentes inválido (min 1, máx ${area.capacidadMaxima})`,
       });
     }
+    if (esParqueo && !datosActualizados.cajaId) {
+      await t.rollback();
+      return res
+        .status(400)
+        .json({ message: "Debe seleccionar un cajón de parqueo." });
+    }
 
+    // -----------------
+    // HELPERS
+    // -----------------
+    const parseDateLocal = (dateStr) => {
+      const [year, month, day] = dateStr.split("-").map(Number);
+      return new Date(year, month - 1, day);
+    };
+    const toMinutes = (hhmm) => {
+      if (!hhmm) return 0;
+      const [hh, mm] = hhmm.split(":").map(Number);
+      return hh * 60 + mm;
+    };
+    const toHours = (hhmm) => {
+      if (!hhmm) return 0;
+      const [hh, mm] = hhmm.split(":").map(Number);
+      return hh + mm / 60;
+    };
+
+    // -----------------
+    // VALIDACIÓN DE SOLAPAMIENTO
+    // -----------------
+    const otrasReservas = await Reserva.findAll({
+      where: {
+        areaComunId: reserva.areaComunId,
+        idReserva: { [Op.ne]: idReserva },
+        estado: { [Op.notIn]: ["cancelada", "rechazada"] },
+      },
+      transaction: t,
+      lock: t.LOCK.UPDATE,
+    });
+
+    if (esGimnasio) {
+      const startMinNueva = toMinutes(datosActualizados.horaInicio);
+      const endMinNueva = toMinutes(datosActualizados.horaFin);
+      let asistentesEnHorario = Number(datosActualizados.numAsistentes);
+
+      for (const r of otrasReservas) {
+        if (
+          r.fechaReserva === datosActualizados.fechaReserva &&
+          r.horaInicio &&
+          r.horaFin
+        ) {
+          const startMinExistente = toMinutes(r.horaInicio);
+          const endMinExistente = toMinutes(r.horaFin);
+          if (
+            startMinExistente < endMinNueva &&
+            endMinExistente > startMinNueva
+          ) {
+            asistentesEnHorario += r.numAsistentes || 0;
+          }
+        }
+      }
+
+      if (asistentesEnHorario > area.capacidadMaxima) {
+        await t.rollback();
+        return res.status(400).json({
+          message: `Capacidad excedida. Máximo ${area.capacidadMaxima}, en este horario quedarían ${asistentesEnHorario}.`,
+        });
+      }
+    } else {
+      for (const r of otrasReservas) {
+        if (esParqueo && r.cajaId != datosActualizados.cajaId) {
+          continue;
+        }
+
+        const inicioExistDias = parseDateLocal(r.fechaReserva);
+        const finExistDias = r.fechaFinReserva
+          ? parseDateLocal(r.fechaFinReserva)
+          : inicioExistDias;
+        const inicioNuevaDias = parseDateLocal(datosActualizados.fechaReserva);
+        const finNuevaDias = esPorDias
+          ? parseDateLocal(datosActualizados.fechaFinReserva)
+          : inicioNuevaDias;
+
+        if (
+          inicioNuevaDias <= finExistDias &&
+          finNuevaDias >= inicioExistDias
+        ) {
+          if (esPorHoras && r.horaInicio) {
+            const startMinNueva = toMinutes(datosActualizados.horaInicio);
+            const endMinNueva = toMinutes(datosActualizados.horaFin);
+            const startMinExistente = toMinutes(r.horaInicio);
+            const endMinExistente = toMinutes(r.horaFin);
+
+            if (
+              startMinExistente < endMinNueva &&
+              endMinExistente > startMinNueva
+            ) {
+              await t.rollback();
+              return res.status(400).json({
+                message: "Ya existe una reserva en este horario. (REVISAR DISPONIBILIDAD ARRIBA)",
+              });
+            }
+          } else {
+            await t.rollback();
+            return res.status(400).json({
+              message:
+                "Ya existe una reserva en este rango de fechas. (REVISAR DISPONIBILIDAD ARRIBA)",
+            });
+          }
+        }
+      }
+    }
+
+    // -----------------
+    // COSTO TOTAL
+    // -----------------
+    let costoCalculado = 0;
+    if (esGimnasio) {
+      costoCalculado = parseFloat(area.costoBase);
+    } else {
+      if (esPorHoras) {
+        const duracionEnHoras =
+          toHours(datosActualizados.horaFin) -
+          toHours(datosActualizados.horaInicio);
+        if (duracionEnHoras > 0) {
+          costoCalculado = duracionEnHoras * parseFloat(area.costoBase);
+        }
+      } else if (esPorDias) {
+        const fechaInicio = parseDateLocal(datosActualizados.fechaReserva);
+        const fechaFin = parseDateLocal(datosActualizados.fechaFinReserva);
+        const diffTime = Math.abs(fechaFin - fechaInicio);
+        const numeroDeDias = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        let horasAbiertoPorDia =
+          toHours(area.horarioCierre) - toHours(area.horarioApertura);
+
+        if (horasAbiertoPorDia === 0) {
+          horasAbiertoPorDia = 24;
+        }
+
+        costoCalculado =
+          numeroDeDias * horasAbiertoPorDia * parseFloat(area.costoBase);
+      }
+    }
+    datosActualizados.costoTotal = costoCalculado.toFixed(2);
+
+    // -----------------
+    // ACTUALIZAR
+    // -----------------
     reserva.set(datosActualizados);
     await reserva.save({ transaction: t });
     await t.commit();
@@ -1007,10 +1057,8 @@ export const updateReservaAdmin = async (req, res) => {
       .json({ reserva, message: "Reserva actualizada exitosamente" });
   } catch (error) {
     await t.rollback();
-    console.error("updateReserva error:", error);
-    return res
-      .status(500)
-      .json({ message: "Error interno al actualizar la reserva" });
+    console.error("updateReservaAdmin error:", error);
+    return res.status(500).json({ message: "Error al actualizar la reserva" });
   }
 };
 
@@ -1079,7 +1127,7 @@ export const getMisReservas = async (req, res) => {
         {
           model: AreaComun,
           as: "areaComun", // nombre del alias en tu asociación
-          attributes: ["idAreaComun", "nombreAreaComun"], // solo campos que necesitas
+          attributes: ["idAreaComun", "nombreAreaComun", "tipoAreaComun"], // solo campos que necesitas
         },
       ],
       order: [
@@ -1092,5 +1140,101 @@ export const getMisReservas = async (req, res) => {
   } catch (error) {
     console.error("Error al traer las reservas del usuario:", error);
     res.status(500).json({ message: "Error al obtener tus reservas" });
+  }
+};
+
+//TRAER RESERVAS DE UN USUARIO ESPECIFICO
+export const getReservasUser = async (req, res) => {
+  try {
+    const { idUsuario } = req.params;
+    const reservas = await Reserva.findAll({
+      where: { usuarioId: idUsuario },
+      include: [
+        {
+          model: AreaComun,
+          as: "areaComun",
+          attributes: [
+            "idAreaComun",
+            "nombreAreaComun",
+            "costoBase",
+            "horarioApertura",
+            "horarioCierre",
+          ],
+        },
+        /* {
+          model: Residente,
+          as: "residente",
+          include: [
+            {
+              model: Usuario,
+              as: "usuario",
+              attributes: ["idUsuario", "nombre", "email"],
+            },
+          ],
+          attributes: ["idResidente", "telefono"],
+        }, */
+        {
+          model: Usuario,
+          as: "usuario",
+          attributes: ["idUsuario", "nombre", "email"],
+          include: [
+            {
+              model: Residente,
+              as: "residente",
+              attributes: ["idResidente", "telefono"],
+            },
+          ],
+        },
+      ],
+      attributes: [
+        "idReserva",
+        "fechaReserva",
+        "fechaFinReserva",
+        "horaInicio",
+        "horaFin",
+        "motivo",
+        "numAsistentes",
+        "estado",
+        "pagado",
+        "costoTotal",
+      ],
+    });
+
+    const reservasLimpias = reservas.map((r) => {
+      const reserva = r.toJSON();
+      const esPorHoras = !!reserva.horaInicio && !!reserva.horaFin;
+      const esPorDias = !!reserva.fechaFinReserva && !esPorHoras;
+
+      return {
+        idReserva: reserva.idReserva,
+        fechaInicio: reserva.fechaReserva,
+        fechaFin: reserva.fechaFinReserva || reserva.fechaReserva,
+        horaInicio: reserva.horaInicio,
+        horaFin: reserva.horaFin,
+        esPorHoras,
+        esPorDias,
+        motivo: reserva.motivo,
+        asistentes: reserva.numAsistentes,
+        estado: reserva.estado,
+        idAreaComun: reserva.areaComun?.idAreaComun || null,
+        areaNombre: reserva.areaComun?.nombreAreaComun || "",
+        //usuario: reserva.residente?.usuario?.nombre || "",
+        usuario: reserva.usuario?.nombre || "",
+        //email: reserva.residente?.usuario?.email || "",
+        email: reserva.usuario?.email || "",
+        //telefono: reserva.residente?.telefono || "",
+        telefono: reserva.usuario?.residente?.telefono || "",
+        pagado: reserva.pagado,
+        costoTotal: reserva.costoTotal || 0,
+        horarioApertura: reserva.areaComun?.horarioApertura || "00:00",
+        horarioCierre: reserva.areaComun?.horarioCierre || "23:59",
+        costoBase: reserva.areaComun?.costoBase || 0,
+      };
+    });
+
+    res.json(reservasLimpias);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al obtener las reservas" });
   }
 };

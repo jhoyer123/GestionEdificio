@@ -79,7 +79,35 @@ export default function CreateUsuario({ setEditState }: createUserProps) {
     fetchFunciones();
   }, []);
 
+  const [loading, setLoading] = useState(false); // 👈 nuevo estado
+
   const onSubmit = async (data: FormData) => {
+    console.log("Datos enviados:", data);
+    try {
+      setLoading(true); // 👈 activar loading
+      const response = await createUsuario(data);
+      const message = response.message || "Usuario creado exitosamente";
+      toast.success(message, {
+        duration: 4000,
+        position: "bottom-left",
+      });
+      setEditState({ view: "usuarios", entity: "", id: null });
+    } catch (error) {
+      toast.error(
+        axios.isAxiosError(error)
+          ? error.response?.data?.message
+          : "Error en el login",
+        {
+          duration: 4000,
+          position: "bottom-left",
+        }
+      );
+      console.log("Error del backend:", error);
+    } finally {
+      setLoading(false); // 👈 quitar loading siempre
+    }
+  };
+  /* const onSubmit = async (data: FormData) => {
     console.log("Datos enviados:", data);
     // Aquí mandas al backend
     // Aquí puedes manejar el envío del formulario, como llamar a una API para crear el personal
@@ -109,7 +137,7 @@ export default function CreateUsuario({ setEditState }: createUserProps) {
       );
       console.log("Error del backend:", error);
     }
-  };
+  }; */
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -206,7 +234,7 @@ export default function CreateUsuario({ setEditState }: createUserProps) {
           <SelectContent>
             <SelectItem value="personal">Personal</SelectItem>
             <SelectItem value="residente">Residente</SelectItem>
-            <SelectItem value="administrador">Administrador</SelectItem>
+            {/*  <SelectItem value="administrador">Administrador</SelectItem> */}
           </SelectContent>
         </Select>
         <input
@@ -391,7 +419,7 @@ export default function CreateUsuario({ setEditState }: createUserProps) {
             </p>
           </>
         )}
-        <div className="flex gap-x-40 mt-8">
+        {/* <div className="flex gap-x-40 mt-8">
           <Button
             type="button"
             className="flex-1 cursor-pointer"
@@ -406,6 +434,26 @@ export default function CreateUsuario({ setEditState }: createUserProps) {
             className="cursor-pointer flex-1 bg-blue-600 hover:bg-blue-700 text-white"
           >
             Crear Usuario
+          </Button>
+        </div> */}
+        <div className="flex gap-x-40 mt-8">
+          <Button
+            type="button"
+            className="flex-1 cursor-pointer"
+            onClick={() =>
+              setEditState({ view: "usuarios", entity: "", id: null })
+            }
+            disabled={loading} // 👈 no dejar cancelar si está cargando
+          >
+            Cancelar y volver
+          </Button>
+          <Button
+            type="submit"
+            disabled={loading} // 👈 deshabilitar si está cargando
+            className="cursor-pointer flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            {loading ? "Creando..." : "Crear Usuario"}{" "}
+            {/* 👈 feedback visual */}
           </Button>
         </div>
       </form>

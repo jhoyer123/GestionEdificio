@@ -10,6 +10,7 @@ import {
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { type EditState } from "@/components/shared/MainContent";
 import {
   Dialog,
   DialogClose,
@@ -20,18 +21,30 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { type Reserva } from "./ColumnsRes";
-import EditReserva from "./EditReserva";
+//import EditReserva from "./EditReserva";
 import GestionEstadoR from "./GestionEstadoR";
+//pruebas
+import { useNavigate } from "react-router-dom";
+import { set } from "date-fns";
 
 interface GestionarRolUsuarioProps {
   data: Reserva;
   refresh: () => void;
+  //reservas: any[];
+  setEditState: React.Dispatch<
+    React.SetStateAction<{ view: string; entity: string; id: number | null }>
+  >;
 }
 
-const ActionsRes = ({ data, refresh }: GestionarRolUsuarioProps) => {
+const ActionsRes = ({
+  data,
+  refresh,
+  setEditState,
+}: GestionarRolUsuarioProps) => {
   const [openEditEstado, setOpenEditEstado] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
+  const navigate = useNavigate();
   return (
     <>
       <DropdownMenu>
@@ -47,7 +60,15 @@ const ActionsRes = ({ data, refresh }: GestionarRolUsuarioProps) => {
           <DropdownMenuItem onClick={() => setOpenEditEstado(true)}>
             Gestionar Estado
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setOpenEdit(true)}>
+          <DropdownMenuItem
+            onClick={() =>
+              setEditState({
+                view: "edit",
+                entity: "reserva",
+                id: data.idReserva,
+              })
+            }
+          >
             Editar
           </DropdownMenuItem>
           {/* 
@@ -61,28 +82,11 @@ const ActionsRes = ({ data, refresh }: GestionarRolUsuarioProps) => {
         <DialogContent forceMount={undefined}>
           <DialogHeader>
             <DialogTitle>Gestionar Estado</DialogTitle>
-            <DialogDescription>
-            </DialogDescription>
+            <DialogDescription></DialogDescription>
           </DialogHeader>
           <GestionEstadoR
             data={data}
             setOpenEditEstado={setOpenEditEstado}
-            refresh={refresh}
-          />
-        </DialogContent>
-      </Dialog>
-      {/* Dialog para gestionar el update del usuario */}
-      <Dialog open={openEdit} onOpenChange={setOpenEdit}>
-        <DialogContent forceMount={undefined}>
-          <DialogHeader>
-            <DialogTitle>Editar</DialogTitle>
-            <DialogDescription>
-              Actualizar datos de la reserva
-            </DialogDescription>
-          </DialogHeader>
-          <EditReserva
-            data={data}
-            setOpenEdit={setOpenEdit}
             refresh={refresh}
           />
         </DialogContent>

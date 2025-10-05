@@ -479,8 +479,8 @@ export const toggleUsuarioEstado = async (req, res) => {
 };
 
 //Aqui user el cambio de contraseña del helper de usuario.js
-import { cambiarContrasena } from "./helpers/usuario.js";
-export { cambiarContrasena };
+import { cambiarContrasena, resetPassword, sendResetPasswordEmail } from "./helpers/usuario.js";
+export { cambiarContrasena, resetPassword, sendResetPasswordEmail };
 
 // Eliminar un usuario probando el ondelete cascade
 export const deleteUsuario = async (req, res) => {

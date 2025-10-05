@@ -17,12 +17,15 @@ export interface Reserva {
   asistentes: number;
   estado: "confirmada" | "pendiente" | "cancelada" | string; // Tipado más específico
   idAreaComun: number;
+  tipoAreaComun: string;
   areaNombre: string;
   usuario: string;
   email: string;
   telefono: string;
   pagado: boolean;
   costoPorHora: number;
+  cajaId?: number | null;
+  cajonNumero?: string | null;
 }
 
 // --- Funciones de Formateo para mantener el código limpio ---
@@ -41,7 +44,12 @@ const formatTime = (timeString: string | null) => {
 };
 
 // --- Columnas de la tabla ---
-export const columnsRes = (refresh: () => void): ColumnDef<Reserva>[] => [
+export const columnsRes = (
+  refresh: () => void,
+  setEditState: React.Dispatch<
+    React.SetStateAction<{ view: string; entity: string; id: number | null }>
+  >
+): ColumnDef<Reserva>[] => [
   {
     accessorKey: "areaNombre",
     header: ({ column }) => (
@@ -97,6 +105,10 @@ export const columnsRes = (refresh: () => void): ColumnDef<Reserva>[] => [
     },
   },
   {
+    accessorKey: "costoTotal",
+    header: "Costo Total",
+  },
+  {
     accessorKey: "estado",
     header: "Estado",
     cell: ({ row }) => {
@@ -134,7 +146,7 @@ export const columnsRes = (refresh: () => void): ColumnDef<Reserva>[] => [
     id: "actions",
     cell: ({ row }) => {
       const reserva = row.original;
-      return <ActionsRes data={reserva} refresh={refresh} />;
+      return <ActionsRes data={reserva} refresh={refresh} setEditState={setEditState} />;
     },
   },
 ];

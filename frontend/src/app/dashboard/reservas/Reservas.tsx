@@ -2,6 +2,7 @@ import { DataTable } from "../../../components/shared/DataTable";
 import { useEffect, useState } from "react";
 import { getReservas } from "@/services/reservaServices";
 import { columnsRes, type Reserva } from "./ColumnsRes";
+import { set } from "date-fns";
 
 type Props = {
   setEditState: React.Dispatch<
@@ -25,7 +26,7 @@ export const Reservas: React.FC<Props> = ({ setEditState }) => {
   return (
     <div className="container mx-auto">
       <h2 className="text-2xl font-bold mb-1">Gestión de Reservas</h2>
-      <DataTable columns={columnsRes(fetchData)} data={reserva} />
+      <DataTable columns={columnsRes(fetchData, setEditState)} data={reserva} />
     </div>
   );
 };

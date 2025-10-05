@@ -157,8 +157,11 @@ export const getResidentes = async (req, res) => {
         ? {
             numero: r.usuario.departamentos[0].numero,
             fecha: r.usuario.departamentos[0].Habita.fecha
+              ? new Date(r.usuario.departamentos[0].Habita.fecha).toLocaleDateString("es-ES")
+              : null,
+            /* fecha: r.usuario.departamentos[0].Habita.fecha
               .toISOString()
-              .split("T")[0],
+              .split("T")[0], */
             tipoResidencia: r.usuario.departamentos[0].Habita.tipoResidencia,
           }
         : null,
@@ -185,7 +188,9 @@ export const updateResidente = async (req, res) => {
     // Actualizar los datos del residente
     await residente.update({ telefono }, { transaction: t });
     // Actualizar los datos en la tabla Habita
-    const habita = await Habita.findOne({ where: { usuarioId: residente.usuarioId } });
+    const habita = await Habita.findOne({
+      where: { usuarioId: residente.usuarioId },
+    });
     if (habita) {
       await habita.update({ tipoResidencia }, { transaction: t });
     }
