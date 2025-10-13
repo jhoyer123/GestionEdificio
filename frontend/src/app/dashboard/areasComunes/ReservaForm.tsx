@@ -325,7 +325,7 @@ export default function ReservaForm({
               </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full cursor-pointer" disabled={loading}>
               {loading ? "Reservando..." : "Confirmar Reserva"}
             </Button>
           </form>

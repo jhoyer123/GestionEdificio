@@ -56,7 +56,7 @@ const ActionsPersonal = ({ data, refresh }: ActionsPersonalProps) => {
         <DialogContent forceMount={undefined}>
           <DialogHeader>
             <DialogTitle>Editar Personal</DialogTitle>
-            <DialogDescription>Actualizar datos del personal</DialogDescription>
+            <DialogDescription></DialogDescription>
           </DialogHeader>
           <EditPersonal data={data} setOpenEdit={setOpenEdit} refresh={refresh} />
         </DialogContent>

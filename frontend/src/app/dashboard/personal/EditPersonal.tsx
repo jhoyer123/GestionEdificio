@@ -96,7 +96,7 @@ export default function EditPersonal({
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-      <h2 className="text-lg font-medium">Editando datos de: {data.nombre}</h2>
+      <h2 className="text-lg font-medium">Actualizar datos de: {data.nombre}</h2>
 
       {/* Teléfono */}
       <label className="block text-sm font-medium mb-2">Teléfono</label>
@@ -234,13 +234,14 @@ export default function EditPersonal({
         <Button
           type="button"
           variant="outline"
-          
+          className="cursor-pointer"
           onClick={() => setOpenEdit(false)}
         >
           Cancelar
         </Button>
         <Button
           type="submit"
+          className="cursor-pointer"
         >
           Guardar cambios
         </Button>

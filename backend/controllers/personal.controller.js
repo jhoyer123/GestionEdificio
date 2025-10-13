@@ -107,7 +107,7 @@ export const getAllPersonales = async (req, res) => {
       telefono: p.telefono,
       direccion: p.direccion,
       genero: p.genero,
-      fechaNacimiento: p.fechaNacimiento.toISOString().split("T")[0],
+      fechaNacimiento: p.fechaNacimiento,
 
       funcionId: p.funcionId,
       cargo: p.funcion.cargo,

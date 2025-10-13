@@ -5,6 +5,11 @@ import {
   Home,
   FolderCog,
   UserCog,
+  CalendarCheck,
+  Building2,
+  ClipboardList,
+  CarFront,
+  CalendarDays,
 } from "lucide-react";
 import { logout } from "@/services/authService";
 
@@ -72,7 +77,7 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
 
   const handleMisReservasClick = () => {
     setActiveView("misReservas");
-  }
+  };
 
   const navigate = useNavigate();
   const handleCerrarSesionClick = () => {
@@ -141,35 +146,35 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
               onClick={handleAreaComunClick}
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
             >
-              <FolderCog className="mr-2 h-4 w-4" />
+              <CalendarCheck className="mr-2 h-4 w-4" />
               Reservar Areas Comunes
             </button>
             <button
               onClick={handleAreasComunesAdminClick}
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
             >
-              <UserCog className="mr-2 h-4 w-4" />
+              <Building2 className="mr-2 h-4 w-4" />
               Gestion Areas Comunes
             </button>
             <button
               onClick={handleReservasClick}
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
             >
-              <UserCog className="mr-2 h-4 w-4" />
+              <ClipboardList className="mr-2 h-4 w-4" />
               Gestion de Reservas
             </button>
             <button
               onClick={handleParqueoAdminClick}
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
             >
-              <UserCog className="mr-2 h-4 w-4" />
+              <CarFront className="mr-2 h-4 w-4" />
               Gestion de Parqueos
             </button>
             <button
               onClick={handleMisReservasClick}
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
             >
-              <UserCog className="mr-2 h-4 w-4" />
+              <CalendarDays className="mr-2 h-4 w-4" />
               Mis reservas
             </button>
           </nav>

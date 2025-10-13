@@ -166,7 +166,7 @@ export default function AreaDetailPage({
     return bloques;
   };
 
-  // Lógica para Gimnasio: Mantiene los bloques de 1 hora pero calcula la ocupación
+  /* // Lógica para Gimnasio: Mantiene los bloques de 1 hora pero calcula la ocupación
   const generarBloquesGimnasio = () => {
     if (!area || !esGimnasio) return [];
     const bloques: { hora: string; ocupacion: number }[] = [];
@@ -189,6 +189,44 @@ export default function AreaDetailPage({
       });
       bloques.push({ hora: `${bloqueInicio} - ${bloqueFin}`, ocupacion });
     }
+    return bloques;
+  };
+
+   */
+
+  const toMinutes = (h: string) => {
+    const [hh, mm] = h.split(":").map(Number);
+    return hh * 60 + mm;
+  };
+
+  const generarBloquesGimnasio = () => {
+    if (!area || !esGimnasio) return [];
+    const bloques: { hora: string; ocupacion: number }[] = [];
+    const abrir = parseInt(area.horarioApertura.split(":")[0]);
+    const cerrar = parseInt(area.horarioCierre.split(":")[0]);
+
+    for (let h = abrir; h < cerrar; h++) {
+      const bloqueInicio = `${String(h).padStart(2, "0")}:00`;
+      const bloqueFin = `${String(h + 1).padStart(2, "0")}:00`;
+      let ocupacion = 0;
+
+      reservas.forEach((r) => {
+        if (!r.horaInicio || !r.horaFin) return;
+
+        const inicioReserva = toMinutes(r.horaInicio);
+        const finReserva = toMinutes(r.horaFin);
+        const inicioBloque = toMinutes(bloqueInicio);
+        const finBloque = toMinutes(bloqueFin);
+
+        // ✅ Comparación corregida: estrictamente menor y mayor
+        if (inicioReserva < finBloque && finReserva > inicioBloque) {
+          ocupacion += r.numAsistentes;
+        }
+      });
+
+      bloques.push({ hora: `${bloqueInicio} - ${bloqueFin}`, ocupacion });
+    }
+
     return bloques;
   };
 
