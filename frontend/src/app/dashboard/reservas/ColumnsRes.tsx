@@ -24,8 +24,11 @@ export interface Reserva {
   telefono: string;
   pagado: boolean;
   costoPorHora: number;
+  costoTotal: number;
   cajaId?: number | null;
   cajonNumero?: string | null;
+  idDepartamento: number;
+  numeroDepartamento: number;
 }
 
 // --- Funciones de Formateo para mantener el código limpio ---
@@ -66,6 +69,11 @@ export const columnsRes = (
     accessorKey: "usuario",
     header: "Residente",
   },
+  {
+    accessorKey: "telefono",
+    header: "Teléfono",
+  },
+  { accessorKey: "numeroDepartamento", header: "Departamento" },
   // PASO 2: La nueva columna unificada que reemplaza a fecha y horas
   {
     id: "periodo",
@@ -146,7 +154,13 @@ export const columnsRes = (
     id: "actions",
     cell: ({ row }) => {
       const reserva = row.original;
-      return <ActionsRes data={reserva} refresh={refresh} setEditState={setEditState} />;
+      return (
+        <ActionsRes
+          data={reserva}
+          refresh={refresh}
+          setEditState={setEditState}
+        />
+      );
     },
   },
 ];

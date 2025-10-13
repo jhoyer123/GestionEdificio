@@ -10,8 +10,30 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      id_unico_pago: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      usuarioId: {
+        allowNull: true,
+        type: Sequelize.INTEGER,
+        references: {
+          model: "usuarios",
+          key: "idUsuario",
+        },
+      },
+      facturaId: {
+        allowNull: true,
+        type: Sequelize.INTEGER,
+        references: {
+          model: "facturas",
+          key: "idFactura",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+      },
       reservaId: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.INTEGER,
         references: {
           model: "reservas",
@@ -24,7 +46,11 @@ module.exports = {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
       },
-      metodoPago: Sequelize.STRING,
+      metodoPago: {
+        type: Sequelize.ENUM("transferencia", "QR", "efectivo"),
+        allowNull: false,
+        defaultValue: "QR",
+      },
       fechaPago: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,

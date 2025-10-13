@@ -46,7 +46,7 @@ export function AreaCard({ area, onReservar }: Props) {
             </span>
           ) : (
             <span className="font-medium">
-              Horario:{area.horarioApertura} - {area.horarioCierre}{" "}
+              Horario:{area.horarioApertura.slice(0, 5)} - {area.horarioCierre.slice(0, 5)}{" "}
             </span>
           )}
         </div>

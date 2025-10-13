@@ -232,10 +232,16 @@ export default function AreaDetailPage({
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
               {esGimnasio && (
-                <div>
-                  <span className="font-semibold">Capacidad máxima:</span>{" "}
-                  {area?.capacidadMaxima} personas
-                </div>
+                <>
+                  <div>
+                    <span className="font-semibold">Capacidad máxima:</span>{" "}
+                    {area?.capacidadMaxima} personas
+                  </div>
+                  <div>
+                    <span className="font-semibold">Costo:</span>{" "}
+                    {area?.costoBase} Bs
+                  </div>
+                </>
               )}
               {esParqueo && (
                 <div>
@@ -243,7 +249,7 @@ export default function AreaDetailPage({
                   {cajones.length}
                 </div>
               )}
-              {!esGimnasio && !esParqueo && (
+              {!esGimnasio && (
                 <div>
                   <span className="font-semibold">Costo por hora:</span>{" "}
                   {area?.costoBase} Bs

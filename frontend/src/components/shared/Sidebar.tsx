@@ -72,7 +72,19 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
 
   const handleMisReservasClick = () => {
     setActiveView("misReservas");
-  }
+  };
+
+  const handleConceptosClick = () => {
+    setActiveView("conceptos");
+  };
+
+  const handleFacturasClick = () => {
+    setActiveView("facturas");
+  };
+
+  const handleFacturasUserClick = () => {
+    setActiveView("facturasUser");
+  };
 
   const navigate = useNavigate();
   const handleCerrarSesionClick = () => {
@@ -172,6 +184,29 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
               <UserCog className="mr-2 h-4 w-4" />
               Mis reservas
             </button>
+            <button
+              onClick={handleFacturasUserClick}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+            >
+              <UserCog className="mr-2 h-4 w-4" />
+              Mis facturas
+            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+              >
+                <Users className="mr-2 h-4 w-4" />
+                Gestion de Facturas
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={handleConceptosClick}>
+                  Conceptos de Facturación
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleFacturasClick}>
+                  Facturas
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
         </div>
         <div className="mt-auto p-4">

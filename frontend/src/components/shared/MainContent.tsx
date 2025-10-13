@@ -16,10 +16,14 @@ import { Reservas } from "@/app/dashboard/reservas/Reservas";
 import ParqueoAdmin from "@/app/dashboard/areasComunes/parqueo/ParqueoAdmin";
 import { MisReservasView } from "@/app/dashboard/reservas/reservasUser/MisReservasView";
 import EditarReservaAdmin from "@/app/dashboard/reservas/EditReservaAdmin";
+import { Concepto } from "@/app/dashboard/facturas/facturasadmin/Conceptos";
+import { Facturas } from "@/app/dashboard/facturas/gestiondeFacturasAdmin/Facturas";
+import { FacturaPage } from "@/app/dashboard/facturas/genFactMant/FacturaMantDetalle";
+import FacturasUser from "@/app/dashboard/facturas/gestionFacturasUser/FacturasUser";
 export type EditState = {
   view: string;
   entity: string;
-  id: number | null;
+  id: number  | null;
 };
 
 type MainContentProps = {
@@ -73,6 +77,16 @@ export default function MainContent({
     case "misReservas":
       return <MisReservasView />;
 
+    //facturas mantenimiento
+    case "conceptos":
+      return <Concepto setEditState={setEditState} />;
+    case "facturas":
+      return <Facturas setEditState={setEditState} />;
+    case "facturasUser":
+      return (
+        <FacturasUser />
+      ); 
+
     //seccion de creacion y edicion de entidades ***
     case "edit":
       if (editState.entity === "areaComun") {
@@ -85,7 +99,10 @@ export default function MainContent({
       }
       if (editState.entity === "reserva") {
         return (
-          <EditarReservaAdmin setEditState={setEditState} reservaId={editState.id} />
+          <EditarReservaAdmin
+            setEditState={setEditState}
+            reservaId={editState.id}
+          />
         );
       }
       /* if (editState.entity === "personal") {

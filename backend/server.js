@@ -3,7 +3,7 @@ import express from "express";
 import path from "path";
 import dotenv from "dotenv";
 // importamos rutas
-import usuarioRoutes from "./routes/usuarios.routes.js"; 
+import usuarioRoutes from "./routes/usuarios.routes.js";
 import funcionesRoutes from "./routes/funciones.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import personalRoutes from "./routes/personal.routes.js";
@@ -15,6 +15,8 @@ import pagosRoutes from "./routes/pagos.routes.js";
 import areasComunesRoutes from "./routes/areasComunes.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
 import cajasRoutes from "./routes/parqueoCajas.routes.js";
+import ConceptoMantenimiento from "./routes/conceptosMantenimiento.routes.js";
+import Factura from "./routes/factura.routes.js";
 
 // importamos asociaciones
 import roleRoutes from "./routes/roles.routes.js";
@@ -24,17 +26,19 @@ import cors from "cors";
 //import './tasks/generarFacturas.js';
 
 import cookieParser from "cookie-parser";
-import "./asociaciones/asociaciones.js"; 
+import "./asociaciones/asociaciones.js";
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
-  origin: "http://localhost:5173",// Reemplaza con la URL de tu frontend
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Reemplaza con la URL de tu frontend
+    credentials: true,
+  })
+);
 //servir las imagenes
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
@@ -53,6 +57,8 @@ app.use(areasComunesRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use(uploadRoutes);
 app.use(cajasRoutes);
+app.use(ConceptoMantenimiento);
+app.use(Factura);
 
 // Iniciar el servidor
 app.listen(process.env.PORT, () => {

@@ -97,12 +97,8 @@ export default function CreateUsuario({ setEditState }: createUserProps) {
         axios.isAxiosError(error)
           ? error.response?.data?.message
           : "Error en el login",
-        {
-          duration: 4000,
-          position: "bottom-left",
-        }
+        { duration: 4000, position: "bottom-left" }
       );
-      console.log("Error del backend:", error);
     } finally {
       setLoading(false); // 👈 quitar loading siempre
     }
