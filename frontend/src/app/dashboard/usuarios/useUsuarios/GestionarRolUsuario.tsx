@@ -21,6 +21,8 @@ import { useEffect, useState, useMemo } from "react";
 import { getDepartamentos } from "@/services/departamentosServices";
 import { createResidente, deleteResidente } from "@/services/residenteServices";
 import type { AxiosError } from "axios";
+import { toast } from "sonner";
+import axios from "axios";
 
 interface GestionarRolUsuarioProps {
   data: propsUsuarios;
@@ -148,14 +150,19 @@ export function GestionarRolUsuario({
         if (values.rol === "personal") {
           const response = await createPersonal(values);
           const message = response.message;
-          console.log("Respuesta del servidor:", message);
+          toast.success(message || "Rol de personal agregado", {
+            duration: 4000,
+            position: "bottom-left",
+          });
         }
         if (values.rol === "residente") {
           // Lógica para agregar rol
           const response = await createResidente(values);
           const message = response.message;
-          console.log("Respuesta del servidor:", message);
-          //console.log("Datos del form:", values);
+          toast.success(message || "Rol de residente agregado", {
+            duration: 4000,
+            position: "bottom-left",
+          });
         }
       }
       if (values.accion === "quitar") {
@@ -165,31 +172,31 @@ export function GestionarRolUsuario({
             idRol: values.idRol,
           });
           const message = response.message;
-          console.log("Respuesta del servidor:", message);
-          //console.log("Datos del form:", values);
+          toast.success(message || "Rol de personal eliminado", {
+            duration: 4000,
+            position: "bottom-left",
+          });
         }
         if (values.rol === "residente") {
           const response = await deleteResidente(data.idUsuario, {
             idRol: values.idRol,
           });
           const message = response.message;
-          console.log("Respuesta del servidor:", message);
-          //console.log("Datos del form:", values);
+          toast.success(message || "Rol de residente eliminado", {
+            duration: 4000,
+            position: "bottom-left",
+          });
         }
       }
-      //console.log("Usuario:", data);
-      //console.log("Acción:", values.accion);
-      //console.log("Datos del form:", values);
       setOpenEdit(false);
       refresh();
     } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      if (err.response) {
-        console.error(
-          "Este es el mensaje del backend:",
-          err.response.data.message
-        ); // <-- tu mensaje del backend
-      }
+      toast.error(
+        axios.isAxiosError(error)
+          ? error.response?.data?.message
+          : "Error en el login",
+        { duration: 4000, position: "bottom-left" }
+      );
     }
   };
 
@@ -198,7 +205,9 @@ export function GestionarRolUsuario({
       {/* Nombre */}
       <div className="grid gap-3">
         <Label className="text-center">Nombre</Label>
-        <span className="font-medium bg-cyan-200 rounded-2xl text-center">{data.nombre}</span>
+        <span className="font-medium bg-cyan-200 rounded-2xl text-center">
+          {data.nombre}
+        </span>
       </div>
 
       {/* Acción */}

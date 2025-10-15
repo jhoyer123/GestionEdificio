@@ -9,21 +9,30 @@ const Pago = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
+    id_unico_pago : {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    usuarioId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    facturaId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     reservaId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: "reservas",
-        key: "idReserva",
-      },
+      allowNull: true,
     },
     monto: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
     metodoPago: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM("transferencia", "QR", "efectivo"),
       allowNull: false,
+      defaultValue: "QR",
     },
     fechaPago: {
       type: DataTypes.DATE,

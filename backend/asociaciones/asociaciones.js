@@ -18,8 +18,89 @@ import Pago from "../models/Pagos.js";
 import AreaComun from "../models/AreaComun.js";
 import Bloqueos from "../models/Bloqueos.js";
 import ParqueoCaja from "../models/ParqueoCaja.js";
-
+//Mantenimientos
+import ConceptoMantenimiento from "../models/ConceptoMantenimiento.js";
+import Notificacion from "../models/Notificaciones.js";
 //Asociaciones
+
+//Asociar reserva con factura
+Reserva.hasOne(Factura, {
+  foreignKey: "reservaId",
+  as: "factura",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+Factura.belongsTo(Reserva, {
+  foreignKey: "reservaId",
+  as: "reserva",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+//Asociacion usuario - pago de 1:N
+Usuario.hasMany(Pago, {
+  foreignKey: "usuarioId",
+  as: "pagos",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+Pago.belongsTo(Usuario, {
+  foreignKey: "usuarioId",
+  as: "usuario",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+//Asociacion factura - pago de 1:1
+Factura.hasOne(Pago, {
+  foreignKey: "facturaId",
+  as: "pago",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+Pago.belongsTo(Factura, {
+  foreignKey: "facturaId",
+  as: "factura",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+// factura se relaciona con concepto de mantenimiento de n:m a traves de factura_concepto
+Factura.belongsToMany(ConceptoMantenimiento, {
+  through: "factura_concepto",
+  foreignKey: "facturaId",
+  otherKey: "conceptoMantenimientoId",
+  as: "conceptosMantenimiento",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+ConceptoMantenimiento.belongsToMany(Factura, {
+  through: "factura_concepto",
+  foreignKey: "conceptoMantenimientoId",
+  otherKey: "facturaId",
+  as: "facturas",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+// Usuario 1---N Notificacion
+Usuario.hasMany(Notificacion, {
+  foreignKey: "usuarioId",
+  as: "notificaciones",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+Notificacion.belongsTo(Usuario, {
+  foreignKey: "usuarioId",
+  as: "usuario",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
 //reservas y parqueo cajas
 // ParqueoCaja 1---N Reserva
@@ -93,7 +174,7 @@ Reserva.belongsTo(AreaComun, {
 });
 
 // Reserva 1---1 Pago (ficticio)
-Reserva.hasOne(Pago, {
+/* Reserva.hasOne(Pago, {
   foreignKey: "reservaId",
   as: "pago",
   onDelete: "CASCADE",
@@ -104,7 +185,7 @@ Pago.belongsTo(Reserva, {
   as: "reserva",
   onDelete: "CASCADE",
   onUpdate: "CASCADE",
-});
+}); */
 
 /* //Asociacion 1:N Rol - Usuario
 Rol.hasMany(Usuario, { foreignKey: "rolId", as: "usuarios" });

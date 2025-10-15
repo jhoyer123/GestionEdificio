@@ -9,7 +9,7 @@ const Factura = sequelize.define(
       autoIncrement: true,
       primaryKey: true,
     },
-    nroFactura:{
+    nroFactura: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
@@ -20,7 +20,7 @@ const Factura = sequelize.define(
     },
     fechaVencimiento: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
     },
     montoTotal: {
       type: DataTypes.DECIMAL(10, 2),
@@ -33,7 +33,11 @@ const Factura = sequelize.define(
     },
     departamentoId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
+    },
+    reservaId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
     },
   },
   {

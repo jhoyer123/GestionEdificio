@@ -3,43 +3,36 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("facturas", {
-      idFactura: {
+    await queryInterface.createTable("conceptos_mantenimiento", {
+      idConcepto: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      nroFactura: {
+      titulo: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true,
       },
-      fechaEmision: {
-        type: Sequelize.DATE,
-        allowNull: false,
+      descripcion: {
+        type: Sequelize.TEXT,
       },
-      fechaVencimiento: {
-        type: Sequelize.DATE,
-        allowNull: false,
-      },
-      montoTotal: {
+      monto: {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
       },
-      estado: {
-        type: Sequelize.ENUM("pendiente", "pagada", "vencida"),
+      frecuencia: {
+        type: Sequelize.ENUM("mensual", "anual", "unico"),
         allowNull: false,
-        defaultValue: "pendiente",
+        defaultValue: "mensual",
       },
-      departamentoId: {
-        type: Sequelize.INTEGER,
+      usado: {
+        type: Sequelize.BOOLEAN,
         allowNull: false,
-        references: {
-          model: "departamentos", // nombre de la tabla referenciada
-          key: "idDepartamento", // columna referenciada
-        },
-        onDelete: "CASCADE",
-        onUpdate: "CASCADE",
+        defaultValue: false,
+      },
+      ultimaFechaUso: {
+        type: Sequelize.DATE,
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,
@@ -55,6 +48,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("facturas");
+    await queryInterface.dropTable("conceptos_mantenimiento");
   },
 };

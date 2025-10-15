@@ -8,82 +8,6 @@ import fetch from "node-fetch";
 // Controlador de autenticación Login
 const JWT_SECRET = process.env.JWT_SECRET || "tu_secreto";
 
-// Función para generar un token JWT
-/* export const login = async (req, res) => {
-  const { email, password, token } = req.body; // token opcional, solo si 2FA activado
-
-  try {
-    const usuario = await Usuario.findOne({
-      where: { email },
-      attributes: { exclude: ["createdAt", "updatedAt"] },
-      include: { model: Rol, as: "roles", attributes: ["rol"] },
-    });
-
-    if (!usuario) {
-      return res.status(401).json({ message: "Credenciales inválidas" });
-    }
-
-    const isMatch = await bcrypt.compare(password, usuario.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Credenciales inválidas" });
-    }
-
-    // Si usuario tiene 2FA activado
-    if (usuario.two_factor_enabled) {
-      // Si no envía token, pedimos que lo ingrese
-      if (!token) {
-        return res.status(200).json({
-          message: "Se requiere código 2FA",
-          twoFactorRequired: true,
-        });
-      }
-
-      // Verificar token TOTP
-      const verified = speakeasy.totp.verify({
-        secret: usuario.two_factor_secret,
-        encoding: "base32",
-        token,
-        window: 1,
-      });
-
-      if (!verified) {
-        return res.status(401).json({ message: "Código 2FA inválido" });
-      }
-    }
-
-    // Generar token JWT
-    const jwtToken = jwt.sign(
-      { id: usuario.id, email: usuario.email },
-      JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-
-    res.cookie("token", jwtToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-      maxAge: 60 * 60 * 1000,
-    });
-
-    const usuarioParaCliente = {
-      id: usuario.idUsuario,
-      nombre: usuario.nombre,
-      email: usuario.email,
-      rol: usuario.roles,
-      two_factor_enabled: usuario.two_factor_enabled,
-    };
-
-    res.json({
-      token: jwtToken,
-      usuario: usuarioParaCliente,
-      message: "Inicio de sesión exitoso",
-    });
-  } catch (error) {
-    console.error("Error en el login:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-}; */
-
 // Función para validar token de reCAPTCHA
 async function verifyCaptcha(recaptchaToken) {
   const secret = process.env.RECAPTCHA_SECRET_KEY;
@@ -100,7 +24,7 @@ async function verifyCaptcha(recaptchaToken) {
   return data.success;
 }
 
-export const login = async (req, res) => {
+/* export const login = async (req, res) => {
   const { email, password, token, recaptchaToken } = req.body; // token opcional 2FA, recaptchaToken opcional
 
   try {
@@ -120,6 +44,7 @@ export const login = async (req, res) => {
     if (!usuario) {
       return res.status(401).json({ message: "Credenciales inválidas" });
     }
+
 
     //verificar si el usuario verifico su correo
     if (!usuario.isVerified) {
@@ -227,6 +152,57 @@ export const login = async (req, res) => {
       sameSite: "Strict",
       maxAge: 60 * 60 * 1000,
     });
+
+    const usuarioParaCliente = {
+      id: usuario.idUsuario,
+      nombre: usuario.nombre,
+      email: usuario.email,
+      rol: usuario.roles,
+      two_factor_enabled: usuario.two_factor_enabled,
+    };
+
+    res.json({
+      token: jwtToken,
+      usuario: usuarioParaCliente,
+      message: "Inicio de sesión exitoso",
+    });
+  } catch (error) {
+    console.error("Error en el login:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}; */
+
+//login normal sin ninguna verificaion para pruebas
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Complete todos los campos por favor" });
+    }
+    const usuario = await Usuario.findOne({
+      where: { email },
+      attributes: { exclude: ["createdAt", "updatedAt"] },
+      include: { model: Rol, as: "roles", attributes: ["rol"] },
+    });
+
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    // Verificar contraseña
+    const isMatch = await bcrypt.compare(password, usuario.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Credenciales inválidas" });
+    }
+
+    // Generar JWT
+    const jwtToken = jwt.sign(
+      { id: usuario.idUsuario, email: usuario.email },
+      JWT_SECRET,
+      { expiresIn: "1h" }
+    );
 
     const usuarioParaCliente = {
       id: usuario.idUsuario,

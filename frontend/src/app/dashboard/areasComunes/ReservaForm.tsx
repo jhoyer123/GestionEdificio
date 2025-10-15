@@ -6,6 +6,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { createReserva } from "@/services/reservaServices";
 import type { EditState } from "@/components/shared/MainContent";
+//pago
+import PagoQR from "@/app/dashboard/pagos/PagoQRReserva";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 // <-- CAMBIO: Importamos los componentes de Select de shadcn/ui
 import {
   Select,
@@ -14,6 +27,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import PagoQRReserva from "@/app/dashboard/pagos/PagoQRReserva";
+
+import { createFacturaForReserva } from "@/services/facturas.services";
 
 interface ReservaFormProps {
   setState: React.Dispatch<React.SetStateAction<EditState>>;
@@ -59,8 +75,16 @@ export default function ReservaForm({
 
   const usuarioComoString = localStorage.getItem("user");
   const usuarioId = usuarioComoString ? JSON.parse(usuarioComoString).id : null;
+  const [costoAprox, setCostoAprox] = useState<number>(0);
+  const [reservaId, setReservaId] = useState<number>(0);
+  const [facturaId, setFacturaId] = useState<number>(0);
 
-  // <-- CAMBIO CLAVE: useEffect para filtrar los cajones dinámicamente
+  const [open, setOpen] = useState(false);
+  const usuarioString = localStorage.getItem("user");
+  const usuario = usuarioString ? JSON.parse(usuarioString) : null;
+  const id = usuario ? usuario.id : null;
+
+  //useEffect para filtrar los cajones dinámicamente
   useEffect(() => {
     // Si no es un parqueo, no hacemos nada
     if (area.tipoArea !== "parqueo") return;
@@ -180,9 +204,17 @@ export default function ReservaForm({
         reservaData.numAsistentes = 1;
       }
 
-      console.log("Datos de reserva a enviar:", reservaData);
-      await createReserva(reservaData);
-      toast.success("Reserva creada correctamente ✅");
+      //console.log("Datos de reserva a enviar:", reservaData);
+      const response = await createReserva(reservaData);
+      setReservaId(response.reserva.idReserva);
+      // Crear la factura inmediatamente después de crear la reserva
+      const facturaResponse = await createFacturaForReserva(
+        costoAprox,
+        response.reserva.idReserva
+      );
+      setFacturaId(facturaResponse.factura.idFactura);
+      toast.success(response.message || "Reserva creada exitosamente");
+      setOpen(true); // Abrir el diálogo de pago
 
       // Reset
       if (refresh) refresh();
@@ -197,6 +229,79 @@ export default function ReservaForm({
     }
   };
 
+  // useEffect para el cálculo del costo
+  useEffect(() => {
+    // 1. Validar el costo base del área
+    // Si no hay costo, o no es un número válido, el costo es 0.
+    const costoPorHora = Number(area.costoBase);
+    //console.log("Costo por hora base:", costoPorHora);
+    if (!area.costoBase || isNaN(costoPorHora) || costoPorHora <= 0) {
+      setCostoAprox(0);
+      return;
+    }
+
+    let costoCalculado = 0;
+
+    // 2. Lógica para modalidad "por horas"
+    if (modalidad === "horas") {
+      const inicioMin = toMinutes(horaInicio);
+      const finMin = toMinutes(horaFin);
+
+      // Solo calcular si tenemos un rango de tiempo válido
+      if (horaInicio && horaFin && finMin > inicioMin) {
+        if (area.tipoArea === "gimnasio") {
+          costoCalculado = costoPorHora; // Costo fijo para el gimnasio
+        } else {
+          const duracionHoras = (finMin - inicioMin) / 60;
+          costoCalculado = Math.ceil(duracionHoras) * costoPorHora;
+        }
+      }
+    }
+    // 3. Lógica para modalidad "por días"
+    else if (modalidad === "dias") {
+      const fechaIni = new Date(fecha);
+      const fechaFinReserva = new Date(fechaFin);
+
+      // Solo calcular si tenemos un rango de fechas válido
+      if (fecha && fechaFin && fechaFinReserva >= fechaIni) {
+        if (area.tipoArea === "gimnasio") {
+          costoCalculado = costoPorHora; // Costo fijo sin importar los días
+        } else {
+          // Días inclusivos (ej: del 10 al 11 son 2 días)
+          const dias =
+            Math.round(
+              (fechaFinReserva.getTime() - fechaIni.getTime()) /
+                (1000 * 60 * 60 * 24)
+            ) + 1;
+
+          // Horas de operación (con valores por defecto si no existen)
+          const aperturaMin = toMinutes(area.horarioApertura); // Devuelve 0 si es nulo
+          const cierreMin = toMinutes(area.horarioCierre); // Devuelve 0 si es nulo
+
+          // Si los horarios son inválidos (0 o ilógicos), asumimos 24h para el parqueo
+          let horasOperacion = 24;
+          if (cierreMin > aperturaMin) {
+            horasOperacion = (cierreMin - aperturaMin) / 60;
+          }
+
+          costoCalculado = dias * horasOperacion * costoPorHora;
+
+          /* // <-- ¡AÑADE ESTO PARA DEPURAR!
+          console.log({
+            dias: dias,
+            horasOperacion: horasOperacion,
+            costoPorHora: costoPorHora,
+            total: costoCalculado,
+          }); */
+        }
+      }
+    }
+
+    // 4. Actualizar el estado final
+    // Nos aseguramos de que el resultado sea un número válido y no negativo.
+    setCostoAprox(isNaN(costoCalculado) ? 0 : Math.max(0, costoCalculado));
+  }, [modalidad, horaInicio, horaFin, fecha, fechaFin, area]);
+
   return (
     <div className="max-w-2xl mx-auto p-4">
       <Card>
@@ -205,8 +310,12 @@ export default function ReservaForm({
           <p className="text-sm text-muted-foreground">
             {area.tipoArea === "parqueo"
               ? "Disponible 24 horas"
-              : `Horario: ${area.horarioApertura} - ${area.horarioCierre}`}
+              : `Horario: ${area.horarioApertura.slice(
+                  0,
+                  5
+                )} - ${area.horarioCierre.slice(0, 5)}`}
           </p>
+          <p>Capacidad Maxima: {area.capacidadMaxima}</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -229,7 +338,6 @@ export default function ReservaForm({
                 </Button>
               </div>
             )}
-
             <div>
               <Label>Fecha inicio</Label>
               <Input
@@ -238,7 +346,6 @@ export default function ReservaForm({
                 onChange={(e) => setFecha(e.target.value)}
               />
             </div>
-
             {modalidad === "dias" && (
               <div>
                 <Label>Fecha fin</Label>
@@ -249,7 +356,6 @@ export default function ReservaForm({
                 />
               </div>
             )}
-
             {(modalidad === "horas" || area.tipoArea === "gimnasio") && (
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -270,7 +376,6 @@ export default function ReservaForm({
                 </div>
               </div>
             )}
-
             {/* ... (código de motivo y asistentes igual que antes) ... */}
             {area.tipoArea !== "gimnasio" && area.tipoArea !== "parqueo" && (
               <>
@@ -292,7 +397,6 @@ export default function ReservaForm({
                 </div>
               </>
             )}
-
             {area.tipoArea === "parqueo" && (
               <div>
                 <Label>Selecciona un cajón disponible</Label>
@@ -325,12 +429,78 @@ export default function ReservaForm({
               </div>
             )}
 
-            <Button type="submit" className="w-full cursor-pointer" disabled={loading}>
+            {/* <Button
+              type="submit"
+              className="w-full cursor-pointer"
+              disabled={loading}
+            >
+              {loading ? "Reservando..." : "Confirmar Reserva"}
+            </Button> */}
+
+            <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50 space-y-1">
+              <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Costo Aproximado de la Reserva
+              </Label>
+              <p className="text-2xl font-bold text-primary">
+                {costoAprox !== null ? (
+                  // Mostrar el monto formateado
+                  costoAprox.toLocaleString("es-BO", {
+                    style: "currency",
+                    currency: "BOB", // Reemplazar con su moneda si no es Boliviano
+                  })
+                ) : (
+                  // Mostrar mensaje cuando faltan datos
+                  <span className="text-base font-normal text-muted-foreground">
+                    {area.tipoArea === "gimnasio"
+                      ? "Costo fijo por sesión."
+                      : modalidad === "horas"
+                      ? "Seleccione hora de inicio y fin."
+                      : "Seleccione fecha de inicio y fin."}
+                  </span>
+                )}
+              </p>
+            </div>
+            <Button
+              type="submit"
+              className="w-full cursor-pointer"
+              disabled={loading}
+            >
               {loading ? "Reservando..." : "Confirmar Reserva"}
             </Button>
           </form>
         </CardContent>
       </Card>
+      {/* Renderizamos el componente de pago solo si el costo es mayor a 0 */}
+      {/* Diálogo de confirmación para cancelar */}
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Pago por QR</AlertDialogTitle>
+            <AlertDialogDescription>
+              Completa el proceso para realizar el pago.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <PagoQRReserva
+            usuarioId={id}
+            reservaId={reservaId}
+            facturaId={facturaId}
+            monto={costoAprox}
+            nombreAreaComun={area.nombreAreaComun}
+            //setFacturas={setFacturas}
+          />
+          <AlertDialogFooter>
+            <AlertDialogCancel className="cursor-pointer">
+              Volver
+            </AlertDialogCancel>
+            {/* <AlertDialogAction
+              onClick={handlePagar}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 text-white cursor-pointer"
+            >
+              Realizar Pago
+            </AlertDialogAction> */}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import Rol from "../models/Rol.js"; // importa el modelo Rol si no lo tienes ya
 // arriba del archivo (si no lo tienes ya)
 import { Op } from "sequelize";
 import ParqueoCaja from "../models/ParqueoCaja.js";
+import Departamento from "../models/Departamento.js";
 
 //Crear un reserva
 /* export const createReserva = async (req, res) => {
@@ -225,10 +226,8 @@ export const createReserva = async (req, res) => {
       transaction: t,
     });
 
-    const tieneRolAdmin = usuario.roles.some(
-      (r) => r.rol === "administrador"
-    );
-    console.log("tieneRolAdmin:", tieneRolAdmin);
+    const tieneRolAdmin = usuario.roles.some((r) => r.rol === "administrador");
+    //console.log("tieneRolAdmin:", tieneRolAdmin);
     if (!residente && !tieneRolAdmin) {
       await t.rollback();
       return res
@@ -557,18 +556,6 @@ export const getReservas = async (req, res) => {
             "tipoArea",
           ],
         },
-        /* {
-          model: Residente,
-          as: "residente",
-          include: [
-            {
-              model: Usuario,
-              as: "usuario",
-              attributes: ["idUsuario", "nombre", "email"],
-            },
-          ],
-          attributes: ["idResidente", "telefono"],
-        }, */
         {
           model: Usuario,
           as: "usuario",
@@ -578,6 +565,11 @@ export const getReservas = async (req, res) => {
               model: Residente,
               as: "residente",
               attributes: ["idResidente", "telefono"],
+            },
+            {
+              model: Departamento,
+              as: "departamentos",
+              attributes: ["idDepartamento", "numero"],
             },
           ],
         },
@@ -631,6 +623,9 @@ export const getReservas = async (req, res) => {
         horarioApertura: reserva.areaComun?.horarioApertura || "00:00",
         horarioCierre: reserva.areaComun?.horarioCierre || "23:59",
         costoBase: reserva.areaComun?.costoBase || 0,
+        idDepartamento:
+          reserva.usuario?.departamentos?.[0]?.idDepartamento || null,
+        numeroDepartamento: reserva.usuario?.departamentos?.[0]?.numero || "",
       };
     });
 
@@ -645,7 +640,20 @@ export const getReservas = async (req, res) => {
 export const obtenerReservaPorId = async (req, res) => {
   try {
     const { id } = req.params;
-    const reserva = await Reserva.findByPk(id);
+    const reserva = await Reserva.findByPk(id, {
+      include: [
+        {
+          model: AreaComun,
+          as: "areaComun",
+          attributes: [
+            "idAreaComun",
+            "nombreAreaComun",
+            "costoBase",
+            "tipoArea",
+          ],
+        },
+      ],
+    });
 
     if (!reserva) {
       return res.status(404).json({ message: "Reserva no encontrada" });
@@ -999,7 +1007,8 @@ export const updateReservaAdmin = async (req, res) => {
             ) {
               await t.rollback();
               return res.status(400).json({
-                message: "Ya existe una reserva en este horario. (REVISAR DISPONIBILIDAD ARRIBA)",
+                message:
+                  "Ya existe una reserva en este horario. (REVISAR DISPONIBILIDAD ARRIBA)",
               });
             }
           } else {
