@@ -56,3 +56,20 @@ export const updatePersonal = async (id: number, personalData: any) => {
     throw error;
   }
 };
+
+//subir qr
+export const uploadQR = async (id: number, qrFile: File) => {
+  try {
+    const formData = new FormData();
+    formData.append("qr", qrFile);
+
+    const response = await axios.post(`${API_URL}/${id}/upload-qr`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error uploading QR code:", error);
+    throw error;
+  }
+};

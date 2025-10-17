@@ -42,6 +42,16 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
       },
+      planillaId: {
+        allowNull: true,
+        type: Sequelize.INTEGER,
+        references: {
+          model: "planillas",
+          key: "idPlanilla",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+      },
       monto: {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,

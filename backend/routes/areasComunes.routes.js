@@ -6,7 +6,7 @@ import {
   updateAreaComun,
   deleteAreaComun,
 } from "../controllers/areaComun.controller.js";
-import upload from "../middlewares/uploads.js";
+import { upload } from "../middlewares/uploads.js";
 
 const router = Router();
 

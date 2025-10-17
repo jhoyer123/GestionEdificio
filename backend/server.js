@@ -17,6 +17,7 @@ import uploadRoutes from "./routes/upload.routes.js";
 import cajasRoutes from "./routes/parqueoCajas.routes.js";
 import ConceptoMantenimiento from "./routes/conceptosMantenimiento.routes.js";
 import Factura from "./routes/factura.routes.js";
+import Planilla from "./routes/planilla.routes.js";
 
 // importamos asociaciones
 import roleRoutes from "./routes/roles.routes.js";
@@ -59,6 +60,7 @@ app.use(uploadRoutes);
 app.use(cajasRoutes);
 app.use(ConceptoMantenimiento);
 app.use(Factura);
+app.use(Planilla);
 
 // Iniciar el servidor
 app.listen(process.env.PORT, () => {

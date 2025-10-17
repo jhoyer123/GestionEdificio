@@ -9,18 +9,6 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
-      mes: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      anio: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      salario: {
-        type: Sequelize.DECIMAL(10, 2),
-        allowNull: false,
-      },
       personalId: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -30,6 +18,22 @@ module.exports = {
         },
         onDelete: "CASCADE",
         onUpdate: "CASCADE",
+      },
+      mes: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      anio: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      tipo: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      reciboUrl: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,

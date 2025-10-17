@@ -33,6 +33,10 @@ const Personal = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    urlQR: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    }
   },
   {
     tableName: "personales",

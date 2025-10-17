@@ -1,6 +1,5 @@
 //Tabla
 import { type ColumnDef, type FilterFn, type Row } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
 import { ArrowUpDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";

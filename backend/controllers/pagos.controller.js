@@ -1,9 +1,10 @@
 import Pagos from "../models/Pagos.js";
 import Usuario from "../models/Usuario.js";
 import Factura from "../models/Factura.js";
-import Reserva from "../models/Reserva.js"; 
+import Reserva from "../models/Reserva.js";
 import qrcode from "qrcode";
 import { v4 as uuidv4 } from "uuid";
+import Planilla from "../models/Planilla.js";
 
 // Registrar un pago ficticio
 export const registrarPago = async (req, res) => {
@@ -62,6 +63,45 @@ export const registrarPago = async (req, res) => {
   }
 };
 
+//registrar pagos para planillas
+export const registrarPagoPlanilla = async (req, res) => {
+  try {
+    const { usuarioId, monto, planillaId } = req.body;
+
+    if (!usuarioId || !monto || !planillaId) {
+      return res.status(400).json({ message: "Faltan datos obligatorios" });
+    }
+    const usuario = await Usuario.findByPk(usuarioId);
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    const planilla = await Planilla.findByPk(planillaId);
+    if (!planilla) {
+      return res.status(404).json({ message: "Planilla no encontrada" });
+    }
+
+    const fecha = new Date();
+
+    // Crear el pago
+    const pago = await Pagos.create({
+      usuarioId,
+      planillaId,
+      monto,
+      metodoPago: "QR",
+      fechaPago: fecha,
+    });
+
+    res.status(201).json({
+      message: "Pago de planilla registrado exitosamente",
+      pago,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al registrar el pago" });
+  }
+};
+
 //actuaizar estado del pago a pagado
 export const confirmarPago = async (req, res) => {
   try {
@@ -96,6 +136,36 @@ export const confirmarPago = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error al actualizar el estado del pago" });
+  }
+};
+
+//confirmar pago para pagoplanilla
+export const confirmarPagoPlanilla = async (req, res) => {
+  try {
+    const { idPago } = req.params;
+    const pago = await Pagos.findByPk(idPago);
+    if (!pago) {
+      return res.status(404).json({ message: "Pago no encontrado" });
+    }
+    pago.estado = "confirmado";
+    pago.fechaPago = new Date();
+    await pago.save();
+
+    //añadir url de comproabnte a la plainlla
+    const planilla = await Planilla.findByPk(pago.planillaId);
+    if (planilla) {
+      // Guardar la ruta del archivo en la BD
+      planilla.reciboUrl = req.file.path;
+      await planilla.save();
+    }
+
+    res.status(200).json({
+      message: "Se ha realizado el pago de la planilla con exito",
+      pago,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al realizar el pago" });
   }
 };
 

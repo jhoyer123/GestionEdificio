@@ -1,7 +1,7 @@
 import Usuario from "../models/Usuario.js";
 import Rol from "../models/Rol.js";
 import Personal from "../models/Personal.js";
-import Funcion from "../models/funcion.js";
+import Funcion from "../models/Funcion.js";
 import Planilla from "../models/Planilla.js";
 import Habita from "../models/Habita.js";
 import Departamento from "../models/Departamento.js";
@@ -22,6 +22,21 @@ import ParqueoCaja from "../models/ParqueoCaja.js";
 import ConceptoMantenimiento from "../models/ConceptoMantenimiento.js";
 import Notificacion from "../models/Notificaciones.js";
 //Asociaciones
+
+//Asoiar planilla con pago 1 : 1
+Planilla.hasOne(Pago, {
+  foreignKey: "planillaId",
+  as: "pago",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+Pago.belongsTo(Planilla, {
+  foreignKey: "planillaId",
+  as: "planilla",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
 //Asociar reserva con factura
 Reserva.hasOne(Factura, {

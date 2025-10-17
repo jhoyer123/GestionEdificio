@@ -23,3 +23,46 @@ export const obtenerPagoPorId = async (idPago: number | undefined) => {
     throw error;
   }
 };
+
+//crear pago de planilla
+export const pagarPlanilla = async (
+  usuarioId: number,
+  monto: number,
+  planillaId: number
+) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/pagos/planilla`, {
+      usuarioId,
+      monto,
+      planillaId,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error al crear el pago de planilla:", error);
+    throw error;
+  }
+};
+
+//confirmar pago de planilla subiendo el comprobante
+export const confirmarPagoPlanilla = async (
+  idPago: number,
+  comprobante: File
+) => {
+  try {
+    const formData = new FormData();
+    formData.append("comprobante", comprobante);
+    const response = await axios.put(
+      `${API_URL}/api/pagos/confirmar/planilla/${idPago}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error al confirmar el pago de planilla:", error);
+    throw error;
+  }
+};

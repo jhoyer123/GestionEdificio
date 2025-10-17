@@ -9,6 +9,10 @@ const Planilla = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
+    personalId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     mes: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -17,13 +21,13 @@ const Planilla = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    salario: {
-      type: DataTypes.DECIMAL(10, 2),
+    tipo: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
-    personalId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+    reciboUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

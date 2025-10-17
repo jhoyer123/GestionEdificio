@@ -9,7 +9,7 @@ const Pago = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    id_unico_pago : {
+    id_unico_pago: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -22,6 +22,10 @@ const Pago = sequelize.define(
       allowNull: true,
     },
     reservaId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    planillaId: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },

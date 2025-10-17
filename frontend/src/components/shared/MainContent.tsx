@@ -20,10 +20,12 @@ import { Concepto } from "@/app/dashboard/facturas/facturasadmin/Conceptos";
 import { Facturas } from "@/app/dashboard/facturas/gestiondeFacturasAdmin/Facturas";
 import { FacturaPage } from "@/app/dashboard/facturas/genFactMant/FacturaMantDetalle";
 import FacturasUser from "@/app/dashboard/facturas/gestionFacturasUser/FacturasUser";
+import { Planillas } from "@/app/dashboard/planillasPago/Planillas";
+import PlanillasUser from "@/app/dashboard/planillasPago/planillasUser/PlanillasUser";
 export type EditState = {
   view: string;
   entity: string;
-  id: number  | null;
+  id: number | null;
 };
 
 type MainContentProps = {
@@ -83,10 +85,13 @@ export default function MainContent({
     case "facturas":
       return <Facturas setEditState={setEditState} />;
     case "facturasUser":
-      return (
-        <FacturasUser />
-      ); 
+      return <FacturasUser />;
 
+    //planillas
+    case "planillasAdmin":
+      return <Planillas />;
+    case "planillasUser":
+      return <PlanillasUser />;
     //seccion de creacion y edicion de entidades ***
     case "edit":
       if (editState.entity === "areaComun") {

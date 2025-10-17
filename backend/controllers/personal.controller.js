@@ -89,7 +89,7 @@ export const getAllPersonales = async (req, res) => {
           include: {
             model: Rol,
             as: "roles",
-            through: { attributes: [] }, // Excluir atributos de la tabla intermedia  
+            through: { attributes: [] }, // Excluir atributos de la tabla intermedia
             attributes: ["idRol", "rol"],
           },
         },
@@ -130,7 +130,8 @@ export const getAllPersonales = async (req, res) => {
 export const updatePersonal = async (req, res) => {
   try {
     const { id } = req.params;
-    const { telefono, direccion, fechaNacimiento, genero , funcionId} = req.body;
+    const { telefono, direccion, fechaNacimiento, genero, funcionId } =
+      req.body;
     if (!telefono || !direccion || !fechaNacimiento || !genero || !funcionId) {
       return res
         .status(400)
@@ -141,7 +142,13 @@ export const updatePersonal = async (req, res) => {
       return res.status(404).json({ message: "Personal no encontrado (id)" });
     }
 
-    await personal.update({ telefono, direccion, fechaNacimiento, genero, funcionId });
+    await personal.update({
+      telefono,
+      direccion,
+      fechaNacimiento,
+      genero,
+      funcionId,
+    });
     res.json({
       personal: personal.get({ plain: true }),
       message: "Datos de Personal actualizado exitosamente",
@@ -211,7 +218,7 @@ export const deletePersonal = async (req, res) => {
     if (!personal) {
       return res.status(404).json({ message: "Personal no encontrado" });
     }
-    const t = await sequelize.transaction(); 
+    const t = await sequelize.transaction();
     await personal.destroy({ transaction: t });
 
     //Tambien eliminar la relacion en rolesUsuario
@@ -223,5 +230,32 @@ export const deletePersonal = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error al eliminar el personal" });
+  }
+};
+
+export const uploadQRPersonal = async (req, res) => {
+  try {
+    const { id } = req.params; // Buscar el personal por usuarioId
+    const personal = await Personal.findOne({ where: { usuarioId: id } });
+    if (!personal) {
+      return res.status(404).json({ message: "Personal no encontrado" });
+    }
+
+    // Asegurarse de que multer haya cargado el archivo
+    if (!req.file) {
+      return res.status(400).json({ message: "No se envió ningún archivo QR" });
+    }
+
+    // Guardar la ruta del archivo en la BD
+    personal.urlQR = req.file.path;
+    await personal.save();
+
+    res.status(200).json({
+      personal: personal.get({ plain: true }),
+      message: "Imagen de QR subida exitosamente",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al subir la imagen de QR" });
   }
 };
