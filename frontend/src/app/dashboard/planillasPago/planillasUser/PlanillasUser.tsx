@@ -140,7 +140,12 @@ export default function PlanillasUser() {
             onChange={(e) => setQ(e.target.value)}
             className="w-full sm:w-72"
           />
-          <Button onClick={() => setUploadModalOpen(true)}>Subir Imagen</Button>
+          <Button
+            className="bg-blue-600 hover:bg-blue-500 text-white cursor-pointer"
+            onClick={() => setUploadModalOpen(true)}
+          >
+            Subir QR de pago
+          </Button>
         </div>
       </header>
 
@@ -200,8 +205,8 @@ export default function PlanillasUser() {
 
               <div className="mt-4 flex items-center justify-between gap-2">
                 <Button
+                className="cursor-pointer"
                   size="sm"
-                  variant="ghost"
                   onClick={() => openModal(p)}
                   disabled={loadingId === p.idPlanilla}
                 >
@@ -253,8 +258,7 @@ export default function PlanillasUser() {
                   <header className="flex items-start justify-between border-b pb-4">
                     <div>
                       <h3 className="text-xl font-semibold">
-                        Planilla del{" "}
-                        {selectedPlanilla.fechaGeneracion}
+                        Planilla del {selectedPlanilla.fechaGeneracion}
                       </h3>
                       <p className="text-sm text-muted-foreground">
                         {selectedPlanilla.nombrePersonal} ·{" "}
@@ -388,7 +392,6 @@ export default function PlanillasUser() {
         </div>
       )}
 
-      {/* 🟢 MODAL DE SUBIDA DE IMAGEN */}
       {uploadModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div
@@ -396,19 +399,53 @@ export default function PlanillasUser() {
             onClick={() => setUploadModalOpen(false)}
           />
           <div className="relative bg-white dark:bg-slate-900 rounded-lg shadow-lg w-[95%] max-w-md p-6">
-            <h3 className="text-lg font-semibold mb-4">Subir Imagen</h3>
+            <h3 className="text-lg font-semibold mb-4">Subir Imagen QR</h3>
 
-            <form onSubmit={handleUpload}>
-              <Input type="file" accept="image/*" name="imagen" />
-              <div className="flex justify-end gap-2">
+            {/* Estado local para previsualización */}
+            <form
+              onSubmit={handleUpload}
+              className="flex flex-col gap-4"
+              onChange={(e: any) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    const img = document.getElementById(
+                      "qr-preview"
+                    ) as HTMLImageElement | null;
+                    if (img) img.src = reader.result as string;
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+            >
+              <div className="flex flex-col items-center justify-center gap-3 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 hover:border-amber-600 transition">
+                <Input type="file" accept="image/*" name="imagen" />
+                <img
+                  id="qr-preview"
+                  alt="Vista previa del QR"
+                  className="w-48 h-48 object-cover rounded-lg border shadow-md mt-2 hidden"
+                  onLoad={(e) => e.currentTarget.classList.remove("hidden")}
+                />
+                {/* <p className="text-xs text-muted-foreground">
+                  Selecciona una imagen para ver la vista previa
+                </p> */}
+              </div>
+
+              <div className="flex justify-end gap-2 mt-4">
                 <Button
                   type="button"
-                  variant="outline"
+                  className="cursor-pointer"
                   onClick={() => setUploadModalOpen(false)}
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">Subir</Button>
+                <Button
+                  type="submit"
+                  className="bg-blue-600 hover:bg-blue-500 text-white cursor-pointer"
+                >
+                  Subir
+                </Button>
               </div>
             </form>
           </div>

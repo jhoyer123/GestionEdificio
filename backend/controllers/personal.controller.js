@@ -236,6 +236,7 @@ export const deletePersonal = async (req, res) => {
 export const uploadQRPersonal = async (req, res) => {
   try {
     const { id } = req.params; // Buscar el personal por usuarioId
+    console.log(id);
     const personal = await Personal.findOne({ where: { usuarioId: id } });
     if (!personal) {
       return res.status(404).json({ message: "Personal no encontrado" });
