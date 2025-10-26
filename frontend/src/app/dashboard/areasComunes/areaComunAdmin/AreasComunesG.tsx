@@ -25,7 +25,7 @@ export const AreasComunesGest: React.FC<Props> = ({ setEditState }) => {
   }, []);
 
   return (
-    <div className="container mx-auto py-1">
+    <div className="mx-auto py-1">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold mb-6">Gestión de Áreas Comunes</h2>
         <Button

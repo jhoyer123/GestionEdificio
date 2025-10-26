@@ -1,4 +1,4 @@
-import Administrador from "../models/Administrador";
+import Administrador from "../models/Administrador.js";
 import Usuario from "../models/Usuario.js";
 //Crear un administrador desde el agregr rol
 export const createAdministrador = async (req, res) => {
@@ -38,7 +38,9 @@ export const createAdministrador = async (req, res) => {
 export const deleteAdministrador = async (req, res) => {
   try {
     const { id } = req.params;
-    const administrador = await Administrador.findOne({ where: { usuarioId: id } });
+    const administrador = await Administrador.findOne({
+      where: { usuarioId: id },
+    });
     if (!administrador) {
       return res.status(404).json({ message: "Administrador no encontrado" });
     }
@@ -58,3 +60,7 @@ export const deleteAdministrador = async (req, res) => {
     throw error;
   }
 };
+
+//Dashboard stats
+import { getDashboardStats } from "./helpers/dashboard.js";
+export { getDashboardStats };

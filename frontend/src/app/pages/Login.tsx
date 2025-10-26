@@ -11,6 +11,8 @@ import axios from "axios";
 import ReCAPTCHA from "react-google-recaptcha";
 // NUEVAS IMPORTACIONES: Iconos para la UI
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+// Estado global del usuario
+import { useAuth } from "@/components/shared/AuthContext";
 
 type FormData = {
   email: string;
@@ -24,6 +26,8 @@ export default function Login() {
   const [twoFAToken, setTwoFAToken] = useState("");
   const [showRecaptcha, setShowRecaptcha] = useState(false);
   const recaptchaRef = useRef<any>(null);
+  //desestruturar del estado global
+  const { loginUser } = useAuth();
 
   // --- NUEVO ESTADO PARA VISIBILIDAD DE CONTRASEÑA ---
   const [showPassword, setShowPassword] = useState(false);
@@ -51,6 +55,8 @@ export default function Login() {
         return;
       }
 
+      // Guardar el usuario en el useContext
+      loginUser(response.usuario);
       localStorage.setItem("user", JSON.stringify(response.usuario));
       toast.success(response.message, { duration: 4000, position: "top-left" });
       navigate("/dashboard");

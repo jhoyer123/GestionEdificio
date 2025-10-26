@@ -21,7 +21,41 @@ import ParqueoCaja from "../models/ParqueoCaja.js";
 //Mantenimientos
 import ConceptoMantenimiento from "../models/ConceptoMantenimiento.js";
 import Notificacion from "../models/Notificaciones.js";
+//Comunicaciones
+import Anuncio from "../models/Anuncio.js";
+import AnuncioUsuario from "../models/AnuncioUsuario.js";
+
 //Asociaciones
+
+//Asociar anuncio con usuario 1:N
+Usuario.hasMany(Anuncio, {
+  foreignKey: "usuarioId",
+  as: "anuncios",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+Anuncio.belongsTo(Usuario, {
+  foreignKey: "usuarioId",
+  as: "usuario",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+//Asociar suuario con anuncioUsuario N:M
+Usuario.belongsToMany(Anuncio, {
+  through: AnuncioUsuario,
+  foreignKey: "usuarioId",
+  otherKey: "anuncioId",
+  as: "anunciosVistos",
+});
+
+Anuncio.belongsToMany(Usuario, {
+  through: AnuncioUsuario,
+  foreignKey: "anuncioId",
+  otherKey: "usuarioId",
+  as: "usuariosQueVieron",
+});
 
 //Asoiar planilla con pago 1 : 1
 Planilla.hasOne(Pago, {

@@ -184,7 +184,12 @@ export const login = async (req, res) => {
     const usuario = await Usuario.findOne({
       where: { email },
       attributes: { exclude: ["createdAt", "updatedAt"] },
-      include: { model: Rol, as: "roles", attributes: ["rol"] },
+      include: {
+        model: Rol,
+        as: "roles",
+        attributes: ["rol"],
+        through: { attributes: [] },
+      },
     });
 
     if (!usuario) {
@@ -211,6 +216,16 @@ export const login = async (req, res) => {
       rol: usuario.roles,
       two_factor_enabled: usuario.two_factor_enabled,
     };
+
+    //limpiar los datos de sus roles---------------
+    usuarioParaCliente.rol = usuario.roles.map((rol) => {
+      return {
+        id: rol.idRol,
+        nombre: rol.rol,
+      };
+    });
+    //usuarioParaCliente.rol = usuario.roles;
+    //---------------------------------------------
 
     res.json({
       token: jwtToken,

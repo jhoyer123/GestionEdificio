@@ -25,7 +25,7 @@ export const Usuarios: React.FC<Props> = ({ setEditState }) => {
   }, []);
 
   return (
-    <div className="container mx-auto py-1">
+    <div>
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold">Gestión de Usuarios</h2>
         <Button

@@ -22,6 +22,8 @@ import { FacturaPage } from "@/app/dashboard/facturas/genFactMant/FacturaMantDet
 import FacturasUser from "@/app/dashboard/facturas/gestionFacturasUser/FacturasUser";
 import { Planillas } from "@/app/dashboard/planillasPago/Planillas";
 import PlanillasUser from "@/app/dashboard/planillasPago/planillasUser/PlanillasUser";
+import Anuncios from "@/app/dashboard/anuncios/Anuncios";
+import AnunciosUser from "@/app/dashboard/anuncios/anunciosUser/AnunciosUser";
 export type EditState = {
   view: string;
   entity: string;
@@ -92,6 +94,12 @@ export default function MainContent({
       return <Planillas />;
     case "planillasUser":
       return <PlanillasUser />;
+
+    //Comunicacion
+    case "anunciosAdmin":
+      return <Anuncios setEditState={setEditState} />;
+    case "anunciosUser":
+      return <AnunciosUser />;
     //seccion de creacion y edicion de entidades ***
     case "edit":
       if (editState.entity === "areaComun") {

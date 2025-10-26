@@ -18,6 +18,8 @@ import cajasRoutes from "./routes/parqueoCajas.routes.js";
 import ConceptoMantenimiento from "./routes/conceptosMantenimiento.routes.js";
 import Factura from "./routes/factura.routes.js";
 import Planilla from "./routes/planilla.routes.js";
+import AnuncioRoutes from "./routes/anuncios.routes.js";
+import AdminRoutes from "./routes/administrador.routes.js";
 
 // importamos asociaciones
 import roleRoutes from "./routes/roles.routes.js";
@@ -61,6 +63,8 @@ app.use(cajasRoutes);
 app.use(ConceptoMantenimiento);
 app.use(Factura);
 app.use(Planilla);
+app.use(AnuncioRoutes);
+app.use(AdminRoutes);
 
 // Iniciar el servidor
 app.listen(process.env.PORT, () => {

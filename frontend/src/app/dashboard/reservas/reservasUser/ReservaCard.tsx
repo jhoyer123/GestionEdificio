@@ -1,5 +1,5 @@
 // src/components/reservas/reserva-card.tsx
-
+import { parseISO } from "date-fns";
 import {
   Card,
   CardContent,
@@ -53,8 +53,12 @@ const InfoItem = ({
 );
 
 export function ReservaCard({ reserva }: ReservaCardProps) {
+
+  //esto deberia formatear la fecha pero no modificarla
+
   const formatDate = (dateStr: string) => {
-    return format(new Date(dateStr), "EEEE, d 'de' MMMM 'de' yyyy", {
+    // parseISO interpreta correctamente YYYY-MM-DD como fecha local sin modificarla
+    return format(parseISO(dateStr), "EEEE, d 'de' MMMM 'de' yyyy", {
       locale: es,
     });
   };

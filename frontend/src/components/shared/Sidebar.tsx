@@ -24,6 +24,7 @@ import {
 
 import { useNavigate } from "react-router-dom";
 import { set } from "date-fns";
+import { useAuth } from "./AuthContext";
 
 interface propsSidebar {
   activeView: string;
@@ -31,6 +32,7 @@ interface propsSidebar {
 }
 
 export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
+  const { logoutUser } = useAuth();
   const handleDashboardClick = () => {
     setActiveView("dashboard");
   };
@@ -99,10 +101,19 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
     setActiveView("planillasUser");
   };
 
+  const handleAnunciosAdminClick = () => {
+    setActiveView("anunciosAdmin");
+  };
+
+  const handleAnunciosUserClick = () => {
+    setActiveView("anunciosUser");
+  }
+
   const navigate = useNavigate();
   const handleCerrarSesionClick = () => {
     logout();
     navigate("/");
+    logoutUser();
   };
 
   return (
@@ -233,6 +244,20 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
             >
               <UserCog className="mr-2 h-4 w-4" />
               Planillas de Pago
+            </button>
+            <button
+              onClick={handleAnunciosAdminClick}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+            >
+              <UserCog className="mr-2 h-4 w-4" />
+              Gestión de Anuncios
+            </button>
+            <button
+              onClick={handleAnunciosUserClick}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+            >
+              <UserCog className="mr-2 h-4 w-4" />
+              Anuncios
             </button>
           </nav>
         </div>

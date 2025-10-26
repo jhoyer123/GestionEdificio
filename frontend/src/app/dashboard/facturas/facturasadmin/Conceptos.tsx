@@ -66,7 +66,7 @@ export const Concepto: React.FC<Props> = ({ setEditState }) => {
 
   return (
     <>
-      <div className="container mx-auto py-1">
+      <div className="mx-auto py-1">
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-3xl font-bold mb-3">Gestión de Conceptos</h2>
           <div className="flex gap-2"> 

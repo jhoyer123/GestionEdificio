@@ -258,10 +258,7 @@ export const getFacturas = async (req, res) => {
     const facturasNuevas = facturas.map((f) => ({
       idFactura: f.idFactura,
       nroFactura: f.nroFactura,
-      //convertir fecha a hora fecha hora boliviana
-      //fechaEmision: f.fechaEmision,
-
-      // Uso
+      tipoFactura: f.departamentoId ? "mantenimiento" : "reserva",
       fechaEmision: formatInTimeZone(
         new Date(f.fechaEmision + "Z"),
         "America/La_Paz",
@@ -274,11 +271,11 @@ export const getFacturas = async (req, res) => {
             "America/La_Paz",
             "yyyy-MM-dd HH:mm:ss"
           )
-        : null, // o undefined si preferís no enviar nada
+        : null,
 
       montoTotal: f.montoTotal,
       estado: f.estado,
-      //------------------- */
+      //-------------------
       departamentoId: f.departamentoId ? f.departamentoId : null,
       nroDepartamento: f.departamento ? f.departamento.nroDepartamento : null,
 

@@ -32,7 +32,7 @@ export default function AreaList({
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Áreas Comunes</h2>
         <div className="flex items-center space-x-2">

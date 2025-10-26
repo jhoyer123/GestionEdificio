@@ -28,7 +28,7 @@ const fetchUserReservas = async (): Promise<ReservaUser[]> => {
     console.error(error);
     return [];
   }
-}
+};
 
 export function MisReservasView() {
   const [reservas, setReservas] = useState<ReservaUser[]>([]);
@@ -52,33 +52,48 @@ export function MisReservasView() {
     };
     loadReservas();
   }, []);
+  console.log("Reservas loaded", reservas);
 
   const { proximas, historial } = useMemo(() => {
-    const ahora = new Date();
-    ahora.setHours(0, 0, 0, 0); // Comparar solo fechas
+    // Obtener fecha y hora actual en zona horaria Bolivia
+    const ahora = new Date(
+      new Date().toLocaleString("en-US", { timeZone: "America/La_Paz" })
+    );
 
-    const proximas = reservas.filter(
-      (r) =>
-        new Date(r.fechaFin) >= ahora &&
+    const proximas: ReservaUser[] = [];
+    const historial: ReservaUser[] = [];
+
+    reservas.forEach((r) => {
+      const fechaInicio = new Date(
+        `${r.fechaInicio}T${r.horaInicio || "00:00:00"}`
+      );
+      const fechaFin = new Date(`${r.fechaFin}T${r.horaFin || "23:59:59"}`);
+
+      // Clasificación lógica:
+      if (
         r.estado !== "cancelada" &&
-        r.estado !== "rechazada"
-    );
-    const historial = reservas.filter(
-      (r) =>
-        new Date(r.fechaFin) < ahora ||
-        r.estado === "cancelada" ||
-        r.estado === "rechazada"
-    );
+        r.estado !== "rechazada" &&
+        fechaFin >= ahora
+      ) {
+        // Aún no terminó
+        proximas.push(r);
+      } else {
+        historial.push(r);
+      }
+    });
 
-    // Ordenar: las más cercanas primero
+    // Ordenar las próximas (más cercanas primero)
     proximas.sort(
       (a, b) =>
-        new Date(a.fechaInicio).getTime() - new Date(b.fechaInicio).getTime()
+        new Date(`${a.fechaInicio}T${a.horaInicio || "00:00:00"}`).getTime() -
+        new Date(`${b.fechaInicio}T${b.horaInicio || "00:00:00"}`).getTime()
     );
-    // Ordenar: las más recientes primero
+
+    // Ordenar el historial (más recientes primero)
     historial.sort(
       (a, b) =>
-        new Date(b.fechaInicio).getTime() - new Date(a.fechaInicio).getTime()
+        new Date(`${b.fechaInicio}T${b.horaInicio || "00:00:00"}`).getTime() -
+        new Date(`${a.fechaInicio}T${a.horaInicio || "00:00:00"}`).getTime()
     );
 
     return { proximas, historial };

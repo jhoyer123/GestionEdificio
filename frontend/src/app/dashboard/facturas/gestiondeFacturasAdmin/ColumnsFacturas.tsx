@@ -27,6 +27,7 @@ export interface facturas {
   telefonoUsuario: string;
   conceptos: concepto[];
   reservaId: number | null;
+  tipoFactura: string;
 }
 
 const myCustomFilterFn: FilterFn<facturas> = (
@@ -77,6 +78,26 @@ export const columnsFacturas = ({
     },
   },
   {
+    accessorKey: "tipoFactura",
+    header: "Tipo de Factura",
+    filterFn: myCustomFilterFn,
+    //mostrar en formato de badge
+    cell: ({ row }) => {
+      if (row.original.tipoFactura === "mantenimiento") {
+        return (
+          <Badge className="bg-blue-600 font-bold">
+            {row.original.tipoFactura}
+          </Badge>
+        );
+      }
+      return (
+        <Badge className="bg-gray-600 font-bold">
+          {row.original.tipoFactura}
+        </Badge>
+      );
+    },
+  },
+  {
     accessorKey: "fechaEmision",
     header: "Fecha y hora de Emisión",
     filterFn: myCustomFilterFn,
@@ -112,7 +133,12 @@ export const columnsFacturas = ({
     id: "actions",
     cell: ({ row }) => {
       const factura = row.original;
-      return <ActionFacturas data={factura} /* refresh={refresh} */ setEditState={setEditState} />;
+      return (
+        <ActionFacturas
+          data={factura}
+          /* refresh={refresh} */ setEditState={setEditState}
+        />
+      );
     },
   },
 ];
