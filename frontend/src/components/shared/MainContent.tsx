@@ -42,7 +42,7 @@ export default function MainContent({
   switch (editState.view) {
     case "dashboard":
       return <Principal />;
-    //seccion de usuarios ***
+    //seccion de usuarios 
     case "residentes":
       return <Residente setEditState={setEditState} />;
     case "usuarios":

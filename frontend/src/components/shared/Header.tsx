@@ -14,7 +14,7 @@ export default function Header() {
   const nombre = usuario?.nombre || "Usuario";
 
   return (
-    <header className="flex h-16 items-center border-b bg-white px-6 shrink-0 dark:bg-gray-800">
+    <header className="flex h-16 items-center border-b bg-gray-400 px-6 shrink-0 dark:bg-gray-800">
      {/*  <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
         Dashboard
       </h2> */}

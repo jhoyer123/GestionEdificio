@@ -4,16 +4,23 @@ import Sidebar from "../components/shared/Sidebar";
 import { useState } from "react";
 
 export default function Layout() {
-  const [editState, setEditState] = useState<{ view: string, entity: string, id: number | null }>({
+  const [editState, setEditState] = useState<{
+    view: string;
+    entity: string;
+    id: number | null;
+  }>({
     view: "dashboard",
     entity: "",
-    id: null
+    id: null,
   });
 
   return (
     <div className="flex h-screen w-full bg-gray-100 dark:bg-gray-900">
       {/* Sidebar estático a la izquierda */}
-  <Sidebar activeView={editState.view} setActiveView={view => setEditState(state => ({ ...state, view }))}/>
+      <Sidebar
+        activeView={editState.view}
+        setActiveView={(view) => setEditState((state) => ({ ...state, view }))}
+      />
 
       {/* Contenedor principal que se flexiona para ocupar el espacio restante */}
       <div className="flex flex-1 flex-col overflow-hidden">
@@ -21,11 +28,8 @@ export default function Layout() {
         <Header />
 
         {/* Área de contenido principal con scroll vertical */}
-        <main className="flex-1 overflow-y-auto p-6 h-full relative">
-          <MainContent 
-            editState={editState}
-            setEditState={setEditState}
-          />
+        <main className="flex-1 overflow-y-auto p-6 h-full relative md:ml-64 transition-all duration-300 p-4">
+          <MainContent editState={editState} setEditState={setEditState} />
         </main>
       </div>
     </div>

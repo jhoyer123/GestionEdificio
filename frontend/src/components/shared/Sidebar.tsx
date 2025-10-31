@@ -107,7 +107,7 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
 
   const handleAnunciosUserClick = () => {
     setActiveView("anunciosUser");
-  }
+  };
 
   const navigate = useNavigate();
   const handleCerrarSesionClick = () => {
@@ -117,16 +117,25 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
   };
 
   return (
-    <aside className="hidden w-64 flex-col border-r bg-gray-900 text-white sm:flex">
-      <div className="flex h-full max-h-screen flex-col gap-2">
-        <div className="flex h-16 items-center justify-center border-b border-gray-700 px-6">
-          <h1 className="text-lg font-bold text-center">Habitat360</h1>
+    <aside
+      className="fixed top-0 left-0 z-40 h-screen w-64 bg-gray-900 text-white border-r border-gray-800 
+  flex flex-col transition-transform duration-300 ease-in-out 
+  md:translate-x-0 -translate-x-full sm:translate-x-0"
+    >
+      <div className="flex flex-col h-full">
+        {/* Header */}
+        <div className="flex h-16 items-center justify-center border-b border-gray-700 bg-gray-900/90 backdrop-blur-sm px-6">
+          <h1 className="text-lg font-bold text-center tracking-wide">
+            Habitat360
+          </h1>
         </div>
-        <div className="flex-1 overflow-y-auto py-4">
-          <nav className="grid items-start px-4 text-sm font-medium">
+
+        {/* Contenido con scroll bonito */}
+        <div className="flex-1 overflow-y-auto py-4 px-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900/50 hover:scrollbar-thumb-gray-600 transition-all">
+          <nav className="grid items-start gap-1 px-2 text-sm font-medium">
             <button
               onClick={handleDashboardClick}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 hover:bg-gray-700/60 hover:text-white transition-all`}
             >
               <LayoutDashboard className="mr-2 h-4 w-4" />
               Dashboard
@@ -178,14 +187,14 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
             >
               <CalendarCheck className="mr-2 h-4 w-4" />
-              Reservar Areas Comunes
+              Reservaciones
             </button>
             <button
               onClick={handleAreasComunesAdminClick}
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
             >
               <Building2 className="mr-2 h-4 w-4" />
-              Gestion Areas Comunes
+              Gestion de Areas
             </button>
             <button
               onClick={handleReservasClick}

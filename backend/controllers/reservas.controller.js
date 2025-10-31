@@ -234,19 +234,6 @@ export const createReserva = async (req, res) => {
         .status(404)
         .json({ message: "Solo un usuario residente puede reservar" });
     }
-
-    /*const [year, month, day] = fechaReserva.split("-").map(Number);
-    const [hh, mm] = horaInicio.split(":").map(Number);
-
-     const inicioReserva = new Date(year, month - 1, day, hh, mm, 0);
-    const ahora = new Date();
-    // Validar
-    if (inicioReserva <= ahora) {
-      await t.rollback();
-      return res
-        .status(400)
-        .json({ message: "FECHA/HORA NO PERMITIDA (pasada)" });
-    } */
     // --- Validación flexible ---
     let inicioReserva;
 

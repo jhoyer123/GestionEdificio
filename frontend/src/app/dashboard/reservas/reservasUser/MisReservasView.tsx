@@ -52,7 +52,7 @@ export function MisReservasView() {
     };
     loadReservas();
   }, []);
-  console.log("Reservas loaded", reservas);
+  //console.log("Reservas loaded", reservas);
 
   const { proximas, historial } = useMemo(() => {
     // Obtener fecha y hora actual en zona horaria Bolivia

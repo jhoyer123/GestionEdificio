@@ -5,6 +5,7 @@ import AreaComun from "../../models/AreaComun.js";
 import Departamento from "../../models/Departamento.js";
 import Usuario from "../../models/Usuario.js";
 import Residente from "../../models/Residente.js";
+import Habita from "../../models/Habita.js";
 import Sequelize from "sequelize";
 
 export const getDashboardStats = async (req, res) => {
@@ -92,7 +93,7 @@ export const getDashboardStats = async (req, res) => {
       ],
     });
 
-    // ============ NUEVO: INGRESOS ÚLTIMOS 6 MESES ============
+    /* // ============ NUEVO: INGRESOS ÚLTIMOS 6 MESES ============
     const ingresosPorMes = await Factura.findAll({
       attributes: [
         [
@@ -140,12 +141,74 @@ export const getDashboardStats = async (req, res) => {
       "Oct",
       "Nov",
       "Dic",
-    ];
+    ]; 
+
+  
     const ingresosMensuales = ingresosPorMes.map((item) => ({
       mes: meses[new Date(item.mes).getMonth()],
       ingresos: parseFloat(item.totalIngresos) || 0,
       facturas: parseInt(item.totalFacturas) || 0,
-    }));
+    }));*/
+    // ============ NUEVO: INGRESOS ÚLTIMOS 6 MESES ============
+
+    const ingresosPorMes = await Factura.findAll({
+      attributes: [
+        [
+          Sequelize.fn(
+            "DATE_FORMAT",
+            Sequelize.col("fechaEmision"),
+            "%Y-%m-01"
+          ),
+          "mes",
+        ],
+        [Sequelize.fn("SUM", Sequelize.col("montoTotal")), "totalIngresos"],
+        [Sequelize.fn("COUNT", Sequelize.col("idFactura")), "totalFacturas"],
+      ],
+      where: {
+        fechaEmision: { [Op.gte]: inicio6Meses },
+        estado: "pagada",
+      },
+      group: [
+        Sequelize.fn("DATE_FORMAT", Sequelize.col("fechaEmision"), "%Y-%m-01"),
+      ],
+      order: [
+        [
+          Sequelize.fn(
+            "DATE_FORMAT",
+            Sequelize.col("fechaEmision"),
+            "%Y-%m-01"
+          ),
+          "ASC",
+        ],
+      ],
+      raw: true,
+    });
+
+    // Nombres de los meses
+    const meses = [
+      "Ene",
+      "Feb",
+      "Mar",
+      "Abr",
+      "May",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dic",
+    ];
+
+    // Formatear datos de ingresos sin usar new Date()
+    const ingresosMensuales = ingresosPorMes.map((item) => {
+      const [year, month] = item.mes.split("-"); // "2025-10-01" → ["2025","10","01"]
+      return {
+        mes: meses[parseInt(month, 10) - 1], // mes correcto
+        ingresos: parseFloat(item.totalIngresos) || 0,
+        facturas: parseInt(item.totalFacturas) || 0,
+      };
+    });
 
     // ============ NUEVO: RESERVAS POR TIPO DE ÁREA (TOTAL HISTÓRICO) ============
     const reservasPorTipoArea = await Reserva.findAll({
@@ -273,6 +336,7 @@ export const getDashboardStats = async (req, res) => {
         fechaVencimiento: {
           [Op.between]: [hoy, fecha7Dias],
         },
+        departamentoId: { [Op.ne]: null }, // Solo facturas de mantenimiento
       },
       order: [["fechaVencimiento", "ASC"]],
       limit: 10,
@@ -280,31 +344,46 @@ export const getDashboardStats = async (req, res) => {
         {
           model: Departamento,
           as: "departamento",
-          attributes: ["numero", "piso"],
+          attributes: ["idDepartamento", "numero", "piso"],
         },
       ],
     });
 
-    // Obtener usuarios de cada departamento manualmente para evitar el error
+    // Obtener usuarios de cada departamento de forma más simple
     const facturasConUsuarios = await Promise.all(
       facturasProximasVencer.map(async (factura) => {
-        if (factura.departamento) {
-          const usuarios = await factura.departamento.getUsuarios({
-            attributes: ["nombre", "email"],
-            limit: 1,
-          });
-          return {
-            ...factura.toJSON(),
-            departamento: {
-              ...factura.departamento.toJSON(),
-              usuarios: usuarios,
-            },
-          };
+        if (factura.departamentoId !== null) {
+          try {
+            // Obtener usuario directamente desde el departamento usando la asociación many-to-many
+            const usuarios = await factura.departamento.getUsuarios({
+              attributes: ["nombre", "email"],
+            });
+
+            const usuario = usuarios[0];
+            return {
+              ...factura.toJSON(),
+              departamento: {
+                ...factura.departamento.toJSON(),
+                usuarios: usuario ? [usuario] : [],
+              },
+            };
+          } catch (error) {
+            console.error(
+              `Error obteniendo usuarios para departamento ${factura.departamentoId}:`,
+              error
+            );
+            return {
+              ...factura.toJSON(),
+              departamento: {
+                ...factura.departamento.toJSON(),
+                usuarios: [],
+              },
+            };
+          }
         }
         return factura.toJSON();
       })
     );
-
     // Formatear facturas próximas a vencer
     const facturasProximasFormateadas = facturasConUsuarios.map((factura) => {
       const diasRestantes = Math.ceil(

@@ -8,7 +8,6 @@ import { VerifyEmail } from "./app/pages/VerifyEmail";
 import { ResetPassword } from "./app/pages/ResetPassword";
 import { ForgotPassword } from "./app/pages/ForgotPassword";
 import SimuladorPago from "./app/dashboard/pagos/SimulardorPago";
-//import DetalleDepartamento from "./app/dashboard/departamento/DetalleDepartamento";
 
 export const App = () => {
   return (
@@ -25,13 +24,11 @@ export const App = () => {
             </PrivateRoute>
           }
         />
-        {/* <Route path="/dashboard" element={<Layout />} /> */}
-        {/* <Route path="/DetalleDepartamento" element={<DetalleDepartamento />} /> */}
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        {/* ✅ Nueva ruta para el simulador de pago */}
+        {/* ruta para el simulador de pago */}
         <Route path="/simulador-pago/:idPago" element={<SimuladorPago />} />
       </Routes>
       <Toaster />
