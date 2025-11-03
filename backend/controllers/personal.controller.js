@@ -1,7 +1,7 @@
 import Personal from "../models/Personal.js";
 import Usuario from "../models/Usuario.js";
 import Rol from "../models/Rol.js";
-import Funcion from "../models/Funcion.js";
+import Funcion from "../models/funcion.js";
 import sequelize from "../config/database.js";
 
 //Crear un nuevo personal y ademas agregar la relacion en rolesUsuario

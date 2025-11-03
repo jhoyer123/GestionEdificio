@@ -6,7 +6,7 @@ import sequelize from "../config/database.js";
 import Residente from "../models/Residente.js";
 import Habita from "../models/Habita.js";
 import Departamento from "../models/Departamento.js";
-import Funcion from "../models/Funcion.js";
+import Funcion from "../models/funcion.js";
 import { QueryTypes } from "sequelize";
 import Administrador from "../models/Administrador.js";
 import { transporter } from "./helpers/mails.js";

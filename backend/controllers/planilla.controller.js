@@ -1,7 +1,7 @@
 import Planilla from "../models/Planilla.js";
 import Personal from "../models/Personal.js";
 import Pago from "../models/Pagos.js";
-import Funcion from "../models/Funcion.js";
+import Funcion from "../models/funcion.js";
 import Usuario from "../models/Usuario.js";
 import { Op } from "sequelize";
 import nodemon from "nodemon";
