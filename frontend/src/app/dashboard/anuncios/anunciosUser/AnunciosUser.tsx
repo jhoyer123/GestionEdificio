@@ -28,6 +28,7 @@ export default function AnunciosUser() {
     const fetchAnuncios = async () => {
       try {
         const response = await getAnuncios();
+
         setAnuncios(response);
       } catch (error) {
         console.error("Error al obtener los anuncios:", error);
@@ -39,13 +40,11 @@ export default function AnunciosUser() {
     fetchAnuncios();
   }, []);
 
-  const rolesUser = user?.rol?.map((r) => r.nombre) || [];
-
+  const rolesUser = user?.rol?.map((r) => r.rol) || [];
   const anunciosVisibles = anuncios.filter(
     (anuncio) =>
       anuncio.visiblePara === "todos" || rolesUser.includes(anuncio.visiblePara)
   );
-
   const iconoPorTipo = (tipo: string) => {
     switch (tipo) {
       case "residente":

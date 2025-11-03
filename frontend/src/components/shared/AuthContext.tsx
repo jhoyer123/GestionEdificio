@@ -9,7 +9,7 @@ import {
 // ======== Tipos ========
 export interface Rol {
   id: number;
-  nombre: string;
+  rol: string;
 }
 
 export interface Usuario {

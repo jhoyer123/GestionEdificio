@@ -24,7 +24,7 @@ async function verifyCaptcha(recaptchaToken) {
   return data.success;
 }
 
-/* export const login = async (req, res) => {
+  export const login = async (req, res) => {
   const { email, password, token, recaptchaToken } = req.body; // token opcional 2FA, recaptchaToken opcional
 
   try {
@@ -170,10 +170,10 @@ async function verifyCaptcha(recaptchaToken) {
     console.error("Error en el login:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
-}; */
+}; 
 
 //login normal sin ninguna verificaion para pruebas
-export const login = async (req, res) => {
+/* export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -181,6 +181,9 @@ export const login = async (req, res) => {
         .status(400)
         .json({ message: "Complete todos los campos por favor" });
     }
+
+    
+
     const usuario = await Usuario.findOne({
       where: { email },
       attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -236,7 +239,7 @@ export const login = async (req, res) => {
     console.error("Error en el login:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
-};
+}; */
 
 // Cerrar sesion logout
 export const logout = (req, res) => {
