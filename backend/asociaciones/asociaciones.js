@@ -2,7 +2,7 @@ import Usuario from "../models/Usuario.js";
 import Rol from "../models/Rol.js";
 import Personal from "../models/Personal.js";
 //cambio de nombre del modelo funcion a Funcion
-import Funcion from "../models/Funcion.js";
+import Funcion from "../models/funcion.js";
 import Planilla from "../models/Planilla.js";
 import Habita from "../models/Habita.js";
 import Departamento from "../models/Departamento.js";
