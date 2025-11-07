@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { API_URL } from "../config/api";
 // src/services/areasService.ts
 export interface AreaComun {
   idAreaComun: number;
@@ -14,8 +14,8 @@ export interface AreaComun {
   imageUrl?: string;
 }
 
-const API_BASE_URL = "http://192.168.0.3:3000/api/areas-comunes"; // Cambia esto por la URL de tu API
-const API_RESERVAS_URL = "http://192.168.0.3:3000/api/reservas";
+const API_BASE_URL = `${API_URL}/areas-comunes`;
+const API_RESERVAS_URL = `${API_URL}/reservas`;
 
 //crear areas comunes
 export const crearAreaComun = async (data: FormData) => {

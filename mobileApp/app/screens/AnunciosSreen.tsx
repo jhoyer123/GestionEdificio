@@ -29,7 +29,7 @@ interface Anuncio {
 
 interface User {
   id: number;
-  rol?: Array<{ nombre: string }>;
+  rol?: Array<{ rol: string }>;
 }
 
 export default function AnunciosScreen() {
@@ -81,7 +81,7 @@ export default function AnunciosScreen() {
   };
 
   // Filtrar anuncios visibles según el rol del usuario
-  const rolesUser = user?.rol?.map((r) => r.nombre) || [];
+  const rolesUser = user?.rol?.map((r) => r.rol) || [];
   const anunciosVisibles = anuncios.filter(
     (anuncio) =>
       anuncio.visiblePara === "todos" || rolesUser.includes(anuncio.visiblePara)
@@ -120,7 +120,7 @@ export default function AnunciosScreen() {
 
     try {
       if (user) {
-        await marcarAnuncioVisto(user.id, anuncio.idAnuncio);
+        //await marcarAnuncioVisto(user.id, anuncio.idAnuncio);
       }
     } catch (error) {
       console.error("Error al marcar el anuncio como visto:", error);

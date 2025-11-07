@@ -1,10 +1,10 @@
-    import axios from "axios";
-
-    const API_URL = "http://192.168.0.3:3000/api";
+import axios from "axios";
+import { API_URL } from "../config/api";
 
     // INICIAR SESION — acepta payload flexible (email/password, token, recaptchaToken...)
     export const login = async (payload: Record<string, any>) => {
     try {
+        console.log("Payload de login:", API_URL);
         const { data } = await axios.post(`${API_URL}/login`, payload, {
         withCredentials: true,
         });

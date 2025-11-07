@@ -24,6 +24,7 @@ import { Planillas } from "@/app/dashboard/planillasPago/Planillas";
 import PlanillasUser from "@/app/dashboard/planillasPago/planillasUser/PlanillasUser";
 import Anuncios from "@/app/dashboard/anuncios/Anuncios";
 import AnunciosUser from "@/app/dashboard/anuncios/anunciosUser/AnunciosUser";
+import Chatbot from "@/app/dashboard/agenten8n/Chatbot";
 export type EditState = {
   view: string;
   entity: string;
@@ -42,6 +43,8 @@ export default function MainContent({
   switch (editState.view) {
     case "dashboard":
       return <Principal />;
+    case "chatbot":
+      return <Chatbot />;
     //seccion de usuarios 
     case "residentes":
       return <Residente setEditState={setEditState} />;

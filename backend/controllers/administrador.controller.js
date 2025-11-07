@@ -62,5 +62,5 @@ export const deleteAdministrador = async (req, res) => {
 };
 
 //Dashboard stats
-import { getDashboardStats } from "./helpers/dashboard.js";
-export { getDashboardStats };
+import { getDashboardStats, executeQuery } from "./helpers/dashboard.js";
+export { getDashboardStats, executeQuery };

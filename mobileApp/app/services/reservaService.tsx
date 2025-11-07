@@ -1,6 +1,8 @@
 import axios from "axios";
+import { API_URL } from "../config/api";
 
-const API_RESERVAS_URL = "http://192.168.0.3:3000/api/reservas";
+const API_RESERVAS_URL = `${API_URL}/reservas`;
+
 
 export interface CreateReservaPayload {
   usuarioId?: number | null;

@@ -1,4 +1,5 @@
 // components/AreaCard.tsx
+//import { API_URL } from "../config/api"; 
 import React from "react";
 import {
   View,
@@ -18,7 +19,7 @@ interface Props {
 
 // URL base para servir imágenes. Preferible usar EXPO_PUBLIC_API_URL en .env
 // Si no está definida usamos un fallback local (ajusta a tu IP si hace falta).
-const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://192.168.0.3:3000";
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://192.168.26.6:3000";
 
 // Calcula el ancho de la tarjeta para mostrarse a pantalla completa (una tarjeta por fila)
 const { width } = Dimensions.get("window");

@@ -535,3 +535,40 @@ export const getDashboardStats = async (req, res) => {
     });
   }
 };
+
+export const executeQuery = async (req, res) => {
+  const { query } = req.body;
+
+  if (!query) {
+    return res.status(400).json({
+      status: "error",
+      message: 'Falta la propiedad "query" en el cuerpo de la solicitud.',
+    });
+  }
+
+  console.log(`[BD Query] Recibida la consulta SQL: ${query}`);
+
+  try {
+    // Usamos sequelize.query() para ejecutar SQL crudo (raw queries),
+    // que es lo que el Agente de IA va a generar.
+    // El 'type: Sequelize.QueryTypes.SELECT' es para obtener solo los resultados.
+    const [results, metadata] = await sequelize.query(query, {
+      type: Sequelize.QueryTypes.SELECT,
+    });
+
+    // Éxito: Devolvemos los resultados en el formato esperado por n8n.
+    res.json({
+      status: "success",
+      data: results,
+    });
+  } catch (error) {
+    console.error("ERROR al ejecutar la consulta:", error.message);
+
+    // Fallo: Devolvemos un error, lo cual le ayudará al Agente de IA a entender que algo salió mal.
+    res.status(500).json({
+      status: "error",
+      message: "Error al ejecutar la consulta en la base de datos.",
+      details: error.message, // Útil para depuración, pero ten cuidado de no exponer demasiada info en producción.
+    });
+  }
+};

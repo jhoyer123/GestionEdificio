@@ -1,6 +1,6 @@
 import axios from "axios";
+import { API_URL } from "../config/api";
 
-const API_URL = "http://192.168.0.3:3000/api";
 
 //crear facturas
 export const createFactura = async () => {

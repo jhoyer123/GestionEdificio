@@ -11,7 +11,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // ======== Tipos (SIN CAMBIOS) ========
 export interface Rol {
   id: number;
-  nombre: string;
+  rol: string;
 }
 
 export interface Usuario {

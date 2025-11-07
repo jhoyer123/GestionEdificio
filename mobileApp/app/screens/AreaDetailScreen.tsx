@@ -1,4 +1,5 @@
 // screens/AreaDetailScreen.tsx
+//import { API_URL } from "../config/api";
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -49,7 +50,7 @@ const formatDateToYYYYMMDD = (d: Date) => {
   return `${y}-${m}-${dd}`;
 };
 // ⚠️ Usa la variable de entorno de Expo. Si no está definida, usamos fallback local.
-const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://192.168.0.3:3000";
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://192.168.26.6:3000";
 
 // 1. DEFINE LAS PROPS: Recibe 'navigation' y 'route'
 type Props = NativeStackScreenProps<RootStackParamList, "AreaDetail">;
@@ -421,9 +422,9 @@ export default function AreaDetailScreen({ navigation, route }: Props) {
           </View>
 
           {/* FORMULARIO DE RESERVA */}
-          <View style={styles.debugBanner}>
+          {/* <View style={styles.debugBanner}>
             <Text style={styles.debugText}>{`DEBUG: areaLoaded=${!!area}  areaId=${areaId}  cajones=${cajones.length}`}</Text>
-          </View>
+          </View> */}
           <ReservaForm
             area={area!}
             fechaInicial={formatDateToYYYYMMDD(fecha)}
@@ -440,7 +441,263 @@ export default function AreaDetailScreen({ navigation, route }: Props) {
 
 // --- ESTILOS ---
 // (Estos son una traducción directa de tu Tailwind)
+// --- ESTILOS REVISADOS ---
 const styles = StyleSheet.create({
+  // --- Estilos Base ---
+  container: {
+    flex: 1,
+    backgroundColor: "#F9FAFB", // Fondo más suave
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F9FAFB",
+  },
+  pageContainer: {
+    padding: 16,
+    paddingBottom: 40, // Espacio al final
+  },
+
+  // --- Botón Volver ---
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: "#FFFFFF", // Fondo blanco para el botón
+    borderBottomWidth: 1,
+    borderBottomColor: "#F3F4F6",
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: "#1F2937",
+    marginLeft: 8,
+    fontWeight: "500",
+  },
+
+  // --- Cabecera y Detalles de Área ---
+  headerContainer: {
+    flexDirection: "column",
+    marginBottom: 20, // Más espacio debajo
+  },
+  headerImage: {
+    width: "100%",
+    height: 220, // Un poco más bajo para mejor vista móvil
+    borderRadius: 12,
+    backgroundColor: "#E5E7EB",
+    marginBottom: 16, // Espacio debajo de la imagen
+  },
+  imagePlaceholder: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  placeholderText: {
+    color: "#6b7280",
+    fontSize: 14,
+    fontStyle: "italic",
+  },
+  headerInfo: {
+    flex: 1,
+    gap: 10,
+    paddingHorizontal: 4, // Pequeño padding para centrar mejor el texto
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "#111827",
+  },
+  description: {
+    fontSize: 15,
+    color: "#4B5563",
+    lineHeight: 22,
+  },
+  infoGrid: {
+    marginTop: 10,
+    gap: 6,
+  },
+  infoText: {
+    fontSize: 14,
+    color: "#374151",
+  },
+  infoLabel: {
+    fontWeight: "700", // Más peso
+    color: "#111827",
+  },
+
+  // --- Tarjeta de Disponibilidad (DispoCard) ---
+  dispoCard: {
+    borderRadius: 12,
+    // Eliminamos el borde y usamos una sombra más marcada
+    backgroundColor: "#FFFFFF",
+    padding: 16,
+    gap: 20, // Más espacio entre título, picker y bloques
+    marginBottom: 20, // Espacio antes del formulario
+
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  dispoTitle: {
+    fontSize: 22, // Título más grande
+    fontWeight: "700",
+    textAlign: "center",
+    color: "#1F2937",
+    paddingBottom: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F3F4F6",
+  },
+  datePickerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between", // Espacio entre label y botón
+    paddingHorizontal: 8,
+  },
+  dateLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#374151",
+  },
+  datePickerButton: {
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#9CA3AF", // Borde más visible
+  },
+  datePickerButtonText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#111827",
+  },
+
+  // --- Grid de Disponibilidad (Bloques y Cajones) ---
+  bloquesContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10, // Espacio entre ítems
+    justifyContent: "space-between", // Distribuye los elementos horizontalmente
+    paddingHorizontal: 5, // Pequeño padding interno
+  },
+
+  // Estilos Cajones (Parqueo)
+  cajonCard: {
+    width: "48%", // Asegura 2 columnas con espacio
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    backgroundColor: "#FFFFFF",
+    gap: 8,
+    marginBottom: 10, // Espacio inferior para el wrap
+  },
+  cajonTitle: {
+    fontWeight: "800", // Más peso
+    textAlign: "center",
+    fontSize: 17,
+    color: "#1F2937",
+  },
+  cajonOcupadoLabel: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#B91C1C", // Red más oscuro
+    textAlign: "center",
+  },
+  cajonOcupado: {
+    backgroundColor: "#FEE2E2",
+    padding: 6,
+    borderRadius: 6,
+    marginTop: 4,
+  },
+  cajonOcupadoText: {
+    color: "#991B1B",
+    fontSize: 12,
+    textAlign: "center",
+  },
+  cajonLibre: {
+    backgroundColor: "#D1FAE5", // Green-100
+    padding: 10,
+    borderRadius: 6,
+  },
+  cajonLibreText: {
+    color: "#065F46",
+    fontSize: 14,
+    textAlign: "center",
+    fontWeight: "600",
+  },
+
+  // Estilos Bloques (Salón / Gimnasio)
+  bloqueBase: {
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    width: "48%", // Asegura 2 columnas con espacio
+    marginBottom: 10, // Espacio inferior para el wrap
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+  },
+  bloqueLibre: {
+    backgroundColor: "#D1FAE5",
+    borderColor: "#34D399",
+  },
+  bloqueOcupado: {
+    backgroundColor: "#FEE2E2",
+    borderColor: "#F87171",
+  },
+  bloqueEstadoText: {
+    fontWeight: "bold",
+    fontSize: 14,
+    color: "#1F2937",
+    marginBottom: 4,
+  },
+  bloqueHoraText: {
+    fontSize: 13,
+    color: "#4B5563",
+  },
+
+  // Estilos Gimnasio (Color más contrastante para la ocupación)
+  bloqueGimVerde: {
+    backgroundColor: "#ECFDF5", // Fondo más claro
+    borderColor: "#34D399",
+  },
+  bloqueGimAmarillo: {
+    backgroundColor: "#FEF3C7", // Fondo más claro
+    borderColor: "#FBBF24",
+  },
+  bloqueGimRojo: {
+    backgroundColor: "#FEF2F2", // Fondo más claro
+    borderColor: "#F87171",
+  },
+  bloqueGimHora: {
+    fontWeight: "700",
+    fontSize: 14,
+    color: "#1F2937",
+    marginBottom: 2,
+  },
+  bloqueGimOcupacion: {
+    fontSize: 12,
+    color: "#4B5563",
+  },
+  // Debug
+  debugBanner: {
+    backgroundColor: "#FFFBEB", // bg-amber-50
+    padding: 8,
+    borderRadius: 4,
+    marginTop: 10,
+    borderLeftWidth: 4,
+    borderLeftColor: "#F59E0B", // border-amber-500
+  },
+  debugText: {
+    color: "#92400E",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+});
+
+/* const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#FFF" },
   loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
   backButton: {
@@ -456,15 +713,6 @@ const styles = StyleSheet.create({
   },
   pageContainer: {
     padding: 16,
-    gap: 24,
-  },
-  debugBanner: {
-    backgroundColor: "#FEF3C7",
-    borderRadius: 8,
-    padding: 8,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: "#F59E0B",
   },
   debugText: {
     color: "#92400E",
@@ -519,7 +767,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E5E7EB",
     backgroundColor: "#FFFFFF",
-    padding: 16,
+    padding: 10,
     gap: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -560,7 +808,6 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 12,
     justifyContent: "center",
-    marginTop: 8,
   },
   // Estilos Cajones (Parqueo)
   cajonCard: {
@@ -640,3 +887,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
+ */

@@ -1,6 +1,5 @@
 import axios from "axios";
-
-const API_URL = "http://192.168.0.3:3000/api";
+import { API_URL } from "../config/api";
 
 export const crearPago = async (pagoData: any) => {
   try {

@@ -109,6 +109,10 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
     setActiveView("anunciosUser");
   };
 
+  const handleChatbotClick = () => {
+    setActiveView("chatbot");
+  };
+
   const navigate = useNavigate();
   const handleCerrarSesionClick = () => {
     logout();
@@ -139,6 +143,13 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
             >
               <LayoutDashboard className="mr-2 h-4 w-4" />
               Dashboard
+            </button>
+            <button
+              onClick={handleChatbotClick}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 hover:bg-gray-700/60 hover:text-white transition-all`}
+            >
+              <LayoutDashboard className="mr-2 h-4 w-4" />
+              Agente IA
             </button>
             <button
               onClick={handlePerfilClick}
