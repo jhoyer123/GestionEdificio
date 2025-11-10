@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api/usuarios";
+const BASE = import.meta.env.VITE_API_URL || "https://gestionedificio-production.up.railway.app";
+const API_URL = `${BASE}/api/usuarios`;
 
 // Obtener todos los usuarios
 export const getUsuarios = async () => {

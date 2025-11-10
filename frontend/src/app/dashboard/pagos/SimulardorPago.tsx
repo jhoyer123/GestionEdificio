@@ -31,7 +31,7 @@ export default function SimuladorPago() {
     if (!id) return;
     try {
       const response = await axios.put(
-        `http://localhost:3000/api/pagos/confirmar/${id}`
+  `${import.meta.env.VITE_API_URL}/api/pagos/confirmar/${id}`
       );
       toast.success(response.data.message || "Pago confirmado correctamente", {
         duration: 4000,

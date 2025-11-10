@@ -27,7 +27,7 @@ export const VerifyEmail = () => {
     const verify = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3000/api/usuarios/verify-email?token=${token}&userId=${uid}`
+          `${import.meta.env.VITE_API_URL}/api/usuarios/verify-email?token=${token}&userId=${uid}`
         );
         setStatus("success");
         setMessage(res.data.message);
@@ -46,7 +46,7 @@ export const VerifyEmail = () => {
     if (!userId) return;
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/usuarios/resend-verify-email",
+  `${import.meta.env.VITE_API_URL}/api/usuarios/resend-verify-email`,
         {
           userId,
         }

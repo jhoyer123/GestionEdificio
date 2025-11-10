@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api/cajas";
+const BASE = import.meta.env.VITE_API_URL || "https://gestionedificio-production.up.railway.app";
+const API_URL = `${BASE}/api/cajas`;
 
 //crear caja
 export const createCaja = async (data: any) => {

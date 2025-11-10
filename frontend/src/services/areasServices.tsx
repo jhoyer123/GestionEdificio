@@ -14,8 +14,9 @@ export interface AreaComun {
   imageUrl?: string;
 }
 
-const API_BASE_URL = "http://localhost:3000/api/areas-comunes"; // Cambia esto por la URL de tu API
-const API_RESERVAS_URL = "http://localhost:3000/api/reservas";
+const BASE = import.meta.env.VITE_API_URL || "https://gestionedificio-production.up.railway.app";
+const API_BASE_URL = `${BASE}/api/areas-comunes`; // Cambia esto por la URL de tu API
+const API_RESERVAS_URL = `${BASE}/api/reservas`;
 
 //crear areas comunes
 export const crearAreaComun = async (data: FormData) => {

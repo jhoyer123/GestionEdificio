@@ -19,7 +19,7 @@ interface Props {
 
 // URL base para servir imágenes. Preferible usar EXPO_PUBLIC_API_URL en .env
 // Si no está definida usamos un fallback local (ajusta a tu IP si hace falta).
-const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://192.168.26.6:3000";
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://gestionedificio-production.up.railway.app";
 
 // Calcula el ancho de la tarjeta para mostrarse a pantalla completa (una tarjeta por fila)
 const { width } = Dimensions.get("window");
@@ -34,7 +34,7 @@ export function AreaCard({ area, onReservar }: Props) {
   // - object: { url, path, filename }
   const rawImage = (area as any).imageUrl;
 
-  function resolvePath(p: any): string {
+  /* function resolvePath(p: any): string {
     if (p === null || p === undefined) return "";
     const s = String(p);
     if (s.startsWith("http")) return s;
@@ -50,10 +50,10 @@ export function AreaCard({ area, onReservar }: Props) {
       if (c && typeof c === "string") return resolvePath(c);
     }
     return "";
-  }
+  } */
 
-  let imageUrl = "";
-  if (!rawImage) {
+  let imageUrl = `https://gestionedificio-production.up.railway.app/uploads/${rawImage}`;
+  /* if (!rawImage) {
     imageUrl = "";
   } else if (Array.isArray(rawImage) && rawImage.length > 0) {
     const v = rawImage[0];
@@ -62,7 +62,9 @@ export function AreaCard({ area, onReservar }: Props) {
     imageUrl = resolvePath(rawImage);
   } else if (typeof rawImage === "object") {
     imageUrl = resolveObjectPath(rawImage);
-  }
+  } */
+
+  console.log("Resolved imageUrl:", imageUrl);
   const costoTexto =
     area.tipoArea === "gimnasio"
       ? `Costo: ${area.costoBase} Bs/día`

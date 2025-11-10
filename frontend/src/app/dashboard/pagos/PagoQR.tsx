@@ -42,7 +42,7 @@ export default function PagoQR({
     if (!idPago) return;
     try {
       const response = await axios.put(
-        `http://localhost:3000/api/pagos/confirmar/${idPago}`
+  `${import.meta.env.VITE_API_URL}/api/pagos/confirmar/${idPago}`
       );
       setEstado("confirmado");
       toast.success(response.data.message || "Pago confirmado correctamente", {

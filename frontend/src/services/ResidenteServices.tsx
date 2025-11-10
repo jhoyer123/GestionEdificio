@@ -1,7 +1,8 @@
 import axios from "axios";
 
 // API endpoint
-const API_URL = "http://localhost:3000/api/residentes";
+const BASE = import.meta.env.VITE_API_URL || "https://gestionedificio-production.up.railway.app";
+const API_URL = `${BASE}/api/residentes`;
 
 // Get all residentes
 export const getResidentes = async () => {
