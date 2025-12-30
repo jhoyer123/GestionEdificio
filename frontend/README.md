@@ -100,8 +100,3 @@ Durante el desarrollo de este frontend se fortalecieron varias habilidades técn
 - Generación de PDFs: Implementación de facturas y reportes con @react-pdf/renderer.
 - Seguridad y autenticación: Implementación de roles, permisos y verificación en dos pasos (2FA).
 
-Buenas prácticas de desarrollo: Uso de estructura modular, componentes reutilizables y gestión de dependencias.
-
-Trabajo con herramientas modernas: Configuración de Vite, manejo de variables de entorno y optimización de desarrollo con npm scripts.
-
-
