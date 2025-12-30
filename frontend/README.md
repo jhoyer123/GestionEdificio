@@ -1,69 +1,75 @@
-# React + TypeScript + Vite
+# Sistema de Gestión de Edificios – Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación web desarrollada con **React** orientada a la gestión integral de edificios, residentes, personal y áreas comunes.  
+Este frontend es la interfaz principal del sistema y se comunica con un backend mediante una API.
 
-Currently, two official plugins are available:
+## ✨ Características
+- Gestión de usuarios
+- Gestión de residentes y personal
+- Gestión de áreas comunes
+- Reservas de áreas comunes con simulación de pagos
+- Gestión de reservas
+- Generación de facturas de mantenimiento
+- Sistema de roles (un usuario puede tener uno o más roles)
+- Gestión de anuncios diferenciados por rol
+- Autenticación con verificación en dos pasos (2FA)
+- Dashboard administrativo con métricas
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Tecnologías
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- shadcn/ui
+- HTML
+- CSS
+- TanStack (según uso en el proyecto)
+- @react-pdf/renderer (generación de documentos PDF)
 
-## Expanding the ESLint configuration
+## ⚙️ Instalación y ejecución
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Clonar el repositorio
+  ```bash
+  git clone https://github.com/jhoyer123/GestionEdificio.git
+### ingresat a la carpeta
+  cd frontend
+### Instalar dependencias
+  ```bash
+  npm install
+### Configurar variables de entorno en .env
+    - Crea un archivo .env en la raíz del proyecto y agrega tus credenciales
+        VITE_API_URL=url_de_tu_db
+        VITE_RECAPTCHA_SITE_KEY=tu_clave_de_google_recaptcha
+        #CLAVES DE GOOGLE RECAPTCHA con jhoyervega4@gmail.com
+        CLAVE_DEL_SITIO=...    
+        CLAVE_SECRETA=...
+### Ejecución
+  ```bash
+  npm run dev
+📂 Estructura del proyecto
+src/
+├── app/
+├── assets/                  
+│   └── dashboard/
+|               └── agenten8n/
+|               └── anuncios/
+|               └── areasComunes/
+|               └── departamento/
+|               └── facturas/
+|               └── funcionesPersonal/
+|               └── maindashboard/
+|               └── pagos/
+|               └── reservas/
+|               └── residentes/
+|               └── personal/
+├── pages/              
+├── assets/                 
+├── components/  
+|            └── shared/
+|            └── ui/
+├── lib/
+├── services/               
+├── types/
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+🧠 Aprendizajes y Competencias Adquiridas
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
