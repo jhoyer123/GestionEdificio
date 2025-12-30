@@ -92,7 +92,7 @@ src/
 ├── types/
 ```
 
-##:brain: Aprendizajes y Competencias Adquiridas
+## :brain: Aprendizajes y Competencias Adquiridas
 Durante el desarrollo de este frontend se fortalecieron varias habilidades técnicas y de gestión de proyectos:
 - React y TypeScript: Desarrollo de interfaces dinámicas y tipadas, con manejo eficiente del estado y componentes reutilizables.
 - Tailwind CSS y shadcn/ui: Creación de interfaces modernas, consistentes visualmente.
