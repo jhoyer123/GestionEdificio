@@ -3,7 +3,7 @@
 Aplicación web desarrollada con **React** orientada a la gestión integral de edificios, residentes, personal y áreas comunes.  
 Este frontend es la interfaz principal del sistema y se comunica con un backend mediante una API.
 
-## ✨ Características
+## :sparkles: Características
 - Gestión de usuarios
 - Gestión de residentes y personal
 - Gestión de áreas comunes
@@ -28,25 +28,45 @@ Este frontend es la interfaz principal del sistema y se comunica con un backend 
 
 ## ⚙️ Instalación y ejecución
 
-### Clonar el repositorio
-  ```bash
-  git clone https://github.com/jhoyer123/GestionEdificio.git
-### ingresat a la carpeta
-  cd frontend
-### Instalar dependencias
-  ```bash
-  npm install
-### Configurar variables de entorno en .env
-    - Crea un archivo .env en la raíz del proyecto y agrega tus credenciales
-        VITE_API_URL=url_de_tu_db
-        VITE_RECAPTCHA_SITE_KEY=tu_clave_de_google_recaptcha
-        #CLAVES DE GOOGLE RECAPTCHA con jhoyervega4@gmail.com
-        CLAVE_DEL_SITIO=...    
-        CLAVE_SECRETA=...
-### Ejecución
-  ```bash
-  npm run dev
-📂 Estructura del proyecto
+### Prerrequisitos
+- Cuenta de Google reCAPTCHA (para obtener las claves)
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/jhoyer123/GestionEdificio.git
+```
+
+### 2. Ingresar a la carpeta del frontend
+
+```bash
+cd frontend
+```
+
+### 3. Instalar dependencias
+
+```bash
+npm install
+```
+
+### 4. Configurar variables de entorno
+
+Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
+
+```env
+VITE_API_URL=tu_url_del_backend
+VITE_RECAPTCHA_SITE_KEY=tu_clave_de_sitio_recaptcha
+```
+
+### 5. Ejecutar en modo desarrollo
+
+```bash
+npm run dev
+```
+
+## :card_index_dividers: Estructura del proyecto
+
+```
 src/
 ├── app/
 ├── assets/                  
@@ -70,6 +90,18 @@ src/
 ├── lib/
 ├── services/               
 ├── types/
+```
 
-🧠 Aprendizajes y Competencias Adquiridas
+##:brain: Aprendizajes y Competencias Adquiridas
+Durante el desarrollo de este frontend se fortalecieron varias habilidades técnicas y de gestión de proyectos:
+- React y TypeScript: Desarrollo de interfaces dinámicas y tipadas, con manejo eficiente del estado y componentes reutilizables.
+- Tailwind CSS y shadcn/ui: Creación de interfaces modernas, consistentes visualmente.
+- Integración con APIs: Comunicación con backend REST para gestión de datos.
+- Generación de PDFs: Implementación de facturas y reportes con @react-pdf/renderer.
+- Seguridad y autenticación: Implementación de roles, permisos y verificación en dos pasos (2FA).
+
+Buenas prácticas de desarrollo: Uso de estructura modular, componentes reutilizables y gestión de dependencias.
+
+Trabajo con herramientas modernas: Configuración de Vite, manejo de variables de entorno y optimización de desarrollo con npm scripts.
+
 
