@@ -13,7 +13,6 @@ import {
 import { getFunciones } from "@/services/funcionServices";
 import { useEffect, useState } from "react";
 import type { propsPersonal } from "./ColumnsP";
-import axios from "axios";
 import { toast } from "sonner";
 import { updatePersonal } from "@/services/personalServices";
 

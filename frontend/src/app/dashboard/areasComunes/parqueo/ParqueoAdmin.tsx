@@ -11,16 +11,15 @@ import {
 export default function ParqueoAdmin() {
   const [nuevoNumero, setNuevoNumero] = useState("");
 
-  const [cajas, setCajas] = useState<any[]>([]); // ya es array
+  const [cajas, setCajas] = useState<any[]>([]);
 
   const fetchCajas = async () => {
     try {
       const cajas = await getCajas();
-      // res.data debe ser array, si no, usa res.data.cajas o similar según tu API
       setCajas(Array.isArray(cajas) ? cajas: []);
     } catch (err) {
       toast.error("Error al cargar cajones");
-      setCajas([]); // asegurar array vacío
+      setCajas([]); 
     }
   };
   useEffect(() => {

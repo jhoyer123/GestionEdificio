@@ -11,8 +11,6 @@ import {
 } from "@/components/ui/select";
 import { Controller, useForm } from "react-hook-form";
 import { createConcepto } from "@/services/conceptosServices";
-import type { AxiosError } from "axios";
-import { type concepto } from "./ColumnsConcepto";
 import { toast } from "sonner";
 import axios from "axios";
 
@@ -29,7 +27,7 @@ type FormData = {
 };
 
 const CrearConcepto = ({ setOpen, refresh }: EditConceptoProps) => {
-  // ✅ Inicializa los valores del formulario directamente
+ 
   const {
     control,
     register,
@@ -37,7 +35,6 @@ const CrearConcepto = ({ setOpen, refresh }: EditConceptoProps) => {
     formState: { errors },
   } = useForm<FormData>();
 
-  // ✅ Envío del formulario
   const onSubmit = async (data: FormData) => {
     try {
       const response = await createConcepto(data);
@@ -48,7 +45,6 @@ const CrearConcepto = ({ setOpen, refresh }: EditConceptoProps) => {
       setOpen(false);
       refresh();
     } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
       toast.error(
         axios.isAxiosError(error)
           ? error.response?.data?.message

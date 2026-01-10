@@ -13,14 +13,12 @@ import { useState } from "react";
 import { type concepto } from "./ColumnsConcepto";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { updateConcepto, deleteConcepto } from "@/services/conceptosServices";
+import { deleteConcepto } from "@/services/conceptosServices";
 import EditConcepto from "./EditConcepto";
 import {
   AlertDialog,

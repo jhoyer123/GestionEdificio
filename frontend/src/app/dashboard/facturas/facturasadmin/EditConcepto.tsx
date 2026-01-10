@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/select";
 import { Controller, useForm } from "react-hook-form";
 import { updateConcepto } from "@/services/conceptosServices";
-import type { AxiosError } from "axios";
 import { type concepto } from "./ColumnsConcepto";
 import { toast } from "sonner";
 import axios from "axios";
@@ -34,7 +33,7 @@ const EditConcepto = ({
   setOpenEdit,
   refresh,
 }: EditConceptoProps) => {
-  // ✅ Inicializa los valores del formulario directamente
+  
   const {
     control,
     register,
@@ -49,7 +48,7 @@ const EditConcepto = ({
     },
   });
 
-  // ✅ Envío del formulario
+ 
   const onSubmit = async (data: FormData) => {
     try {
       const response = await updateConcepto(conceptoEnv.idConcepto, data);
@@ -60,8 +59,7 @@ const EditConcepto = ({
       setOpenEdit(false);
       refresh();
     } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      toast.error(
+       toast.error(
         axios.isAxiosError(error)
           ? error.response?.data?.message
           : "Error al actualizar el concepto",

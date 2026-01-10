@@ -21,7 +21,7 @@ export interface ReservaPersonalizada {
   esPorDias: boolean;
 }
 
-// NUEVA FUNCIÓN HELPER: Formatea la hora para quitar los segundos (ej: "14:00:00" -> "14:00")
+//Funcion que Formatea la hora para quitar los segundos (ej: "14:00:00" -> "14:00")
 const formatTime = (timeString: string | null) => {
   if (!timeString) return "";
   const [hours, minutes] = timeString.split(":");
@@ -104,9 +104,7 @@ export default function AreaDetailPage({
   const esGimnasio = area?.tipoArea === "gimnasio";
   const esParqueo = area?.tipoArea === "parqueo";
 
-  // --- LÓGICA DE VISUALIZACIÓN DE BLOQUES REEMPLAZADA ---
-
-  // Lógica para Salones: Muestra bloques dinámicos de tiempo libre y ocupado
+  //Muestra bloques dinámicos de tiempo libre y ocupado
   const generarLineaDeTiempo = () => {
     if (!area || esParqueo || esGimnasio) return [];
 
@@ -166,34 +164,6 @@ export default function AreaDetailPage({
     return bloques;
   };
 
-  /* // Lógica para Gimnasio: Mantiene los bloques de 1 hora pero calcula la ocupación
-  const generarBloquesGimnasio = () => {
-    if (!area || !esGimnasio) return [];
-    const bloques: { hora: string; ocupacion: number }[] = [];
-    const abrir = parseInt(area.horarioApertura.split(":")[0]);
-    const cerrar = parseInt(area.horarioCierre.split(":")[0]);
-
-    for (let h = abrir; h < cerrar; h++) {
-      const bloqueInicio = `${String(h).padStart(2, "0")}:00`;
-      const bloqueFin = `${String(h + 1).padStart(2, "0")}:00`;
-      let ocupacion = 0;
-      reservas.forEach((r) => {
-        if (
-          r.horaInicio &&
-          r.horaFin &&
-          r.horaInicio < bloqueFin &&
-          r.horaFin > bloqueInicio
-        ) {
-          ocupacion += r.numAsistentes;
-        }
-      });
-      bloques.push({ hora: `${bloqueInicio} - ${bloqueFin}`, ocupacion });
-    }
-    return bloques;
-  };
-
-   */
-
   const toMinutes = (h: string) => {
     const [hh, mm] = h.split(":").map(Number);
     return hh * 60 + mm;
@@ -218,7 +188,6 @@ export default function AreaDetailPage({
         const inicioBloque = toMinutes(bloqueInicio);
         const finBloque = toMinutes(bloqueFin);
 
-        // ✅ Comparación corregida: estrictamente menor y mayor
         if (inicioReserva < finBloque && finReserva > inicioBloque) {
           ocupacion += r.numAsistentes;
         }
@@ -346,7 +315,6 @@ export default function AreaDetailPage({
                             {r.esPorDias ? (
                               <span>Todo el día</span>
                             ) : (
-                              // MODIFICADO: Aplicamos el formateo de hora
                               <span>
                                 {formatTime(r.horaInicio)} -{" "}
                                 {formatTime(r.horaFin)}
@@ -357,7 +325,7 @@ export default function AreaDetailPage({
                       </div>
                     ) : (
                       <p className="text-sm text-center text-green-600 font-medium py-2 bg-green-100 rounded">
-                        ✅ Libre todo el día
+                        Libre todo el día
                       </p>
                     )}
                   </div>
@@ -365,7 +333,6 @@ export default function AreaDetailPage({
               })}
             </div>
           ) : (
-            // REEMPLAZADO: Nueva lógica de renderizado para Salones y Gimnasio
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
               {bloquesDinamicos.length === 0 ? (
                 <p className="col-span-full text-center text-muted-foreground">

@@ -1,18 +1,8 @@
 //Tabla
 import { type ColumnDef, type FilterFn, type Row } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
 import { ArrowUpDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ref } from "process";
 import ActionsResidentes from "./useResidentes/ActionsResidentes";
 
 export interface propsResidente {
@@ -36,13 +26,8 @@ export interface propsResidente {
 
 const myCustomFilterFn: FilterFn<propsResidente> = (
   row: Row<propsResidente>,
-  columnId: string,
-  filterValue: string,
-  addMeta: (meta: any) => void
+  filterValue: string
 ) => {
-  /* if (row.original.email.includes(filterValue)) {
-    return true;
-  } */
   if (row.original.nombre.includes(filterValue)) {
     return true;
   }
@@ -73,26 +58,6 @@ export const columns = (refresh: () => void): ColumnDef<propsResidente>[] => [
       );
     },
   },
-  /* {
-    accessorKey: "email",
-    filterFn: myCustomFilterFn,
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  }, */
-  /* {
-    accessorKey: "rol",
-    header: "Rol",
-    filterFn: myCustomFilterFn,
-  }, */
   {
     accessorKey: "telefono",
     header: "Teléfono",

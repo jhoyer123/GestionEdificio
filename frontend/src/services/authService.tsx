@@ -2,7 +2,6 @@ import axios from "axios";
 
 const API_URL = "http://localhost:3000/api";
 
-// INICIAR SESION — acepta payload flexible (email/password, token, recaptchaToken...)
 export const login = async (payload: Record<string, any>) => {
   try {
     const { data } = await axios.post(`${API_URL}/login`, payload, {
@@ -18,12 +17,11 @@ export const login = async (payload: Record<string, any>) => {
 // CERRAR SESION
 export const logout = async () => {
   try {
-    // Petición al backend
     await axios.post(
       `${API_URL}/logout`,
       {},
       {
-        withCredentials: true, // si usas cookies
+        withCredentials: true,
       }
     );
     localStorage.clear();
@@ -42,7 +40,7 @@ export const generate2FA = async (username: string) => {
       { username },
       { withCredentials: true }
     );
-    return response.data; // Devuelve el código QR y el secreto
+    return response.data;
   } catch (error) {
     console.error("Error al generar 2FA:", error);
     return false;

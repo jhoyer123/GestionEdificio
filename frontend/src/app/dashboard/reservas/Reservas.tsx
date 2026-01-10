@@ -2,7 +2,6 @@ import { DataTable } from "../../../components/shared/DataTable";
 import { useEffect, useState } from "react";
 import { getReservas } from "@/services/reservaServices";
 import { columnsRes, type Reserva } from "./ColumnsRes";
-import { set } from "date-fns";
 
 type Props = {
   setEditState: React.Dispatch<

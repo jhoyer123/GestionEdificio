@@ -2,8 +2,6 @@
 import { type ColumnDef, type FilterFn, type Row } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { differenceInYears } from "date-fns";
-import { Action } from "@radix-ui/react-alert-dialog";
 import ActionConceptos from "./ActionsConceptos";
 
 export interface concepto {
@@ -17,13 +15,9 @@ export interface concepto {
 
 const myCustomFilterFn: FilterFn<concepto> = (
   row: Row<concepto>,
-  columnId: string,
   filterValue: string,
-  addMeta: (meta: any) => void
 ) => {
-  /* if (row.original.email.includes(filterValue)) {
-    return true;
-  } */
+
   if (row.original.titulo.includes(filterValue)) {
     return true;
   }

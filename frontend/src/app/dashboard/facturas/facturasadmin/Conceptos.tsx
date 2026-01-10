@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import CrearConcepto from "./CrearConcepto";
 import { toast } from "sonner";
-import { set } from "date-fns";
+
 //Creando la tabla
 
 type Props = {
@@ -33,7 +33,7 @@ type Props = {
   >;
 };
 
-export const Concepto: React.FC<Props> = ({ setEditState }) => {
+export const Concepto: React.FC<Props> = () => {
   const [concepto, setConcepto] = useState<concepto[]>([]);
   const [open, setOpen] = useState(false);
   const [openCreate, setOpenCreate] = useState(false);
@@ -71,7 +71,7 @@ export const Concepto: React.FC<Props> = ({ setEditState }) => {
           <h2 className="text-3xl font-bold mb-3">Gestión de Conceptos</h2>
           <div className="flex gap-2"> 
             <Button
-              className="bg-red-500 text-white hover:bg-red-600 cursor-pointer text-sm text-2xl"
+              className="bg-red-500 text-white hover:bg-red-600 cursor-pointer text-2xl"
               onClick={() => setOpenCreate(true)}
             >
               Generar Facturas

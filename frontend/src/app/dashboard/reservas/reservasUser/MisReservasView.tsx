@@ -8,9 +8,6 @@ import { UserReservas } from "@/services/reservaServices";
 // Función para obtener los datos del backend
 const fetchUserReservas = async (): Promise<ReservaUser[]> => {
   try {
-    // NOTA: Asegúrate de que este endpoint solo devuelva las reservas
-    // del usuario autenticado. Deberás implementar la lógica de autenticación.
-    // Obtener el string
     const usuarioString = localStorage.getItem("user");
 
     // Convertirlo a objeto (si existe)
@@ -52,7 +49,7 @@ export function MisReservasView() {
     };
     loadReservas();
   }, []);
-  //console.log("Reservas loaded", reservas);
+  
 
   const { proximas, historial } = useMemo(() => {
     // Obtener fecha y hora actual en zona horaria Bolivia
@@ -64,12 +61,9 @@ export function MisReservasView() {
     const historial: ReservaUser[] = [];
 
     reservas.forEach((r) => {
-      const fechaInicio = new Date(
-        `${r.fechaInicio}T${r.horaInicio || "00:00:00"}`
-      );
+
       const fechaFin = new Date(`${r.fechaFin}T${r.horaFin || "23:59:59"}`);
 
-      // Clasificación lógica:
       if (
         r.estado !== "cancelada" &&
         r.estado !== "rechazada" &&
@@ -118,7 +112,6 @@ export function MisReservasView() {
         <p className="text-muted-foreground mt-2">
           ¡Anímate a reservar un salón, parqueo o el gimnasio!
         </p>
-        {/* Opcional: Un botón para ir a la página de creación de reservas */}
       </div>
     );
   }

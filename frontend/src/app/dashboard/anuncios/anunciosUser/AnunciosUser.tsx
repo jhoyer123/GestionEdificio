@@ -130,7 +130,7 @@ export default function AnunciosUser() {
                 <AlertDialogTitle className="text-2xl font-bold text-gray-800">
                   {selectedAnuncio.titulo}
                 </AlertDialogTitle>
-                <AlertDialogDescription className="text-gray-600 mt-4 whitespace-pre-line max-h-[60vh] overflow-y-auto break-words whitespace-normal">
+                <AlertDialogDescription className="text-gray-600 mt-4 whitespace-normal max-h-[60vh] overflow-y-auto break-words">
                   {selectedAnuncio.descripcion}
                 </AlertDialogDescription>
               </AlertDialogHeader>

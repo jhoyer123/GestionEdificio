@@ -59,7 +59,6 @@ export default function PerfilUsuario() {
   const [qrCodeUrl, setQrCodeUrl] = useState(""); // URL del QR generado
   const [secretBase32, setSecretBase32] = useState(""); // secreto temporal
   const [twoFAToken, setTwoFAToken] = useState(""); // el código de 6 dígitos que ingresa el usuario
-  const [showConfirm2FA, setShowConfirm2FA] = useState(false); // mostrar input de confirmación
 
   useEffect(() => {
     setTwoFAEnabled(two_factor_enabled);
@@ -95,8 +94,7 @@ export default function PerfilUsuario() {
       if (response.message === "2FA activado correctamente") {
         toast.success("2FA activado ✅", { duration: 4000 });
         setTwoFAEnabled(true);
-        setShowConfirm2FA(false);
-        setQrCodeUrl(""); // opcional, ocultar QR
+        setQrCodeUrl("");
       }
     } catch (error) {
       console.error("Error confirmando 2FA:", error);
@@ -127,7 +125,6 @@ export default function PerfilUsuario() {
 
           {/* Columna Derecha: Formularios */}
           <div className="md:col-span-2 p-8 space-y-8">
-            {/* Sección 1: Información personal */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-stone-700">
                 Información personal
@@ -183,7 +180,7 @@ export default function PerfilUsuario() {
             {/* Separador Visual */}
             <hr className="border-stone-200" />
 
-            {/* Sección 2: Cambio de contraseña */}
+            {/* Cambio de contraseña */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-stone-700">
                 Cambiar contraseña

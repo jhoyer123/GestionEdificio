@@ -1,4 +1,3 @@
-// src/components/Dashboard.tsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -7,7 +6,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"; // Asumiendo tu ruta de shadcn
+} from "@/components/ui/card"; 
 import {
   Table,
   TableBody,
@@ -15,8 +14,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"; // Asumiendo tu ruta de shadcn
-import { Badge } from "@/components/ui/badge"; // Asumiendo tu ruta de shadcn
+} from "@/components/ui/table"; 
+import { Badge } from "@/components/ui/badge"; 
 import {
   LineChart,
   Line,
@@ -28,25 +27,18 @@ import {
   Pie,
   Cell,
   Legend,
-  // No necesitamos PieLabelRenderProps si casteamos a `any` o Number(),
-  // pero la dejaremos comentada para referencia si usas tipado estricto.
-  // type PieLabelRenderProps,
 } from "recharts";
 import {
   DollarSign,
   CreditCard,
   CalendarCheck,
-  FileText,
   AlertTriangle,
   Users,
   CalendarDays,
-  // --- ICONOS NUEVOS ---
-  CheckCircle, // Para facturas pagadas (Verde)
-  Clock, // Para facturas pendientes (Amarillo)
-  ClipboardList, // Para el total
+  CheckCircle,
+  Clock, 
+  ClipboardList,
 } from "lucide-react";
-
-// --- 1. Definición de Tipos (ACTUALIZADA con campos de mantenimiento) ---
 
 interface KpiData {
   totalFacturasMes: number;
@@ -54,7 +46,6 @@ interface KpiData {
   montoPendiente: number;
   reservasHoy: number;
   reservasHoySalones: number;
-  // --- CAMPOS NUEVOS ---
   totalFacturasMantenimientoPagadas: number;
   totalFacturasMantenimientoPendientes: number;
   totalFacturasMantenimiento: number;
@@ -70,7 +61,7 @@ interface ReservaPorArea {
   area: string;
   cantidad: number;
   porcentaje: number;
-  [key: string]: any; // Firma de índice para recharts
+  [key: string]: any; 
 }
 
 interface EstadoPagos {
@@ -134,7 +125,7 @@ interface DashboardData {
 // --- Colores para el gráfico de Donut ---
 const COLORS = ["#8884d8", "#82ca9d", "#FFBB28", "#FF8042", "#0088FE"];
 
-// --- Datos de ejemplo para el estado inicial/fallback (de tu JSON) ---
+// --- Datos de ejemplo para el estado inicial/fallback ---
 const INITIAL_DATA: DashboardData = {
   kpis: {
     totalFacturasMes: 6,
@@ -148,7 +139,7 @@ const INITIAL_DATA: DashboardData = {
   },
   ingresosMensuales: [{ mes: "Sep", ingresos: 875, facturas: 4 }],
   reservasPorArea: [
-    { area: "salones", cantidad: 1, porcentaje: 33 }, // Asegura la dataKey y nameKey
+    { area: "salones", cantidad: 1, porcentaje: 33 }, 
     { area: "gimnasio", cantidad: 1, porcentaje: 33 },
     { area: "parqueo", cantidad: 1, porcentaje: 33 },
   ],
@@ -194,16 +185,15 @@ const INITIAL_DATA: DashboardData = {
   },
 };
 
-// --- Componente Principal del Dashboard ---
+//Componente Principal del Dashboard
 
 export const Principal: React.FC = () => {
-  const [data, setData] = useState<DashboardData | null>(INITIAL_DATA); // Usar data inicial
-  const [loading, setLoading] = useState(false); // Cambiado a false ya que usamos INITIAL_DATA
+  const [data, setData] = useState<DashboardData | null>(INITIAL_DATA); 
+  const [loading, setLoading] = useState(false); 
   const [error, setError] = useState<string | null>(null);
   const API_URL = (import.meta.env as any)?.VITE_API_URL || "";
 
   useEffect(() => {
-    // Mantengo la lógica de fetch por si quieres usarla en producción
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
@@ -211,7 +201,6 @@ export const Principal: React.FC = () => {
         setData(response.data as DashboardData);
         setError(null);
       } catch (err) {
-        // En caso de error, mostramos el error pero mantenemos INITIAL_DATA
         console.error("Error fetching dashboard data:", err);
         setError(
           "No se pudieron cargar los datos del dashboard. Mostrando datos de ejemplo."
@@ -348,7 +337,7 @@ export const Principal: React.FC = () => {
         ))}
       </div>
 
-      {/* --- 2. NUEVA FILA: KPIs de Mantenimiento (3 tarjetas coloreadas) --- */}
+      {/* KPIs de Mantenimiento */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {mantenimientoCards.map((card) => (
           <Card key={card.title} className={card.className}>
@@ -368,9 +357,9 @@ export const Principal: React.FC = () => {
         ))}
       </div>
 
-      {/* --- 3. Fila de Gráficos Principales --- */}
+      {/* Fila de Gráficos Principales */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Gráfico de Ingresos (Línea) */}
+        {/* Gráfico de Ingresos*/}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Ingresos (Últimos Meses)</CardTitle>
@@ -440,7 +429,7 @@ export const Principal: React.FC = () => {
                   outerRadius={100}
                   fill="#8884d8"
                   label={(props: any) => {
-                    // Mantenemos la lógica de coerción de tipos para seguridad
+            
                     const cx = Number(props.cx || 0);
                     const cy = Number(props.cy || 0);
                     const midAngle = Number(props.midAngle || 0);
@@ -490,7 +479,7 @@ export const Principal: React.FC = () => {
         </Card>
       </div>
 
-      {/* --- 4. Fila de Tablas y Listas --- */}
+      {/* Fila de Tablas y Listas */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Tabla de Facturas */}
         <Card className="lg:col-span-2">

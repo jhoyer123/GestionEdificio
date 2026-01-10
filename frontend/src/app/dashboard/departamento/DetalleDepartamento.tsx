@@ -18,10 +18,7 @@ type Props = {
   idDepartamento: number | null;
 };
 
-export default function DetalleDepartamento({ setEditState, idDepartamento }: Props) {
-  //mostrar el id que esta llegando de la vista departamentos en setEditState
-  console.log(idDepartamento);
-
+export default function DetalleDepartamento({ setEditState }: Props) {
   // Datos de prueba (mock)
   const facturas = [
     {

@@ -52,7 +52,7 @@ export default function ModalCreateAnuncio({
   const formatearFecha = (fecha: string | undefined) => {
     if (!fecha) return "";
     const [dia, mes, año] = fecha.split("/");
-    return `${año}-${mes}-${dia}`; // formato compatible con <input type="date" />
+    return `${año}-${mes}-${dia}`; 
   };
 
   //react-hook-form
@@ -75,7 +75,7 @@ export default function ModalCreateAnuncio({
   const onSubmit = async (data: FormData) => {
     try {
       let response;
-      // Llamada al servicio que crea el anuncio (ajusta según tu API)
+      
       if (!dataAnuncio) {
         response = await createAnuncio({
           usuarioId: user?.id,
@@ -104,11 +104,10 @@ export default function ModalCreateAnuncio({
       // cerrar modal y resetear formulario
       setOpen(false);
       reset();
-      // refrescar lista en el padre si lo necesita
+      // refrescar lista en el padre
       refresh();
     } catch (error) {
       console.error("Error creando anuncio:", error);
-      // aquí podrías mostrar un toast o mensaje de error
       toast.error("Error creando anuncio", {
         duration: 4000,
         position: "top-left",

@@ -31,7 +31,7 @@ type FormData = {
   genero: string;
   rol: string;
   funcionId: number;
-  confirmPassword?: string; // Campo para confirmar la contraseña
+  confirmPassword?: string; 
 };
 
 interface Funcion {
@@ -54,15 +54,15 @@ const CreatePersonal = ({ setEditState }: EditPersonalProps) => {
 
   const onSubmit = async (data: FormData) => {
     const { confirmPassword, ...rest } = data;
-    //agregar el dato rolId aqui
-    rest.rol = "personal" ; // Asignar un valor de rolId
+   
+    rest.rol = "personal" ; 
     console.log(rest);
-    // Aquí puedes manejar el envío del formulario, como llamar a una API para crear el personal
+  
     try {
       const response = await createUsuario(rest);
       console.log("Personal creado:", response.usuario);
       console.log("Mensaje:", response.message);
-      // Después de crear el personal, puedes volver a la vista de lista
+      
       setEditState({ view: "personal", entity: "", id: null });
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
@@ -70,12 +70,12 @@ const CreatePersonal = ({ setEditState }: EditPersonalProps) => {
         console.error(
           "Este es el mensaje del backend:",
           err.response.data.message
-        ); // <-- tu mensaje del backend
+        ); 
       }
     }
   };
 
-  //Aqui traer las funciones
+ 
   const [funciones, setFunciones] = useState<Funcion[]>([]);
 
   useEffect(() => {
@@ -181,7 +181,7 @@ const CreatePersonal = ({ setEditState }: EditPersonalProps) => {
               setValue("genero", val, { shouldValidate: true });
               clearErrors("genero");
             }}
-            defaultValue="" // ✅ Valor por defecto para el Select
+            defaultValue="" 
           >
             <SelectTrigger
               className={`w-full bg-gray-100 ${

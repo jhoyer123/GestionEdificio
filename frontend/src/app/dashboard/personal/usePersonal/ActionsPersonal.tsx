@@ -13,10 +13,8 @@ import { useState } from "react";
 import { type propsPersonal } from "../ColumnsP";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";

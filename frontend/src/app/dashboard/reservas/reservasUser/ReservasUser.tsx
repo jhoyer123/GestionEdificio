@@ -5,10 +5,10 @@ import { Suspense } from "react";
 
 export type ReservaUser = {
   idReserva: number;
-  fechaInicio: string; // Formato YYYY-MM-DD
-  fechaFin: string; // Formato YYYY-MM-DD
-  horaInicio: string | null; // Formato HH:MM:SS
-  horaFin: string | null; // Formato HH:MM:SS
+  fechaInicio: string;
+  fechaFin: string;
+  horaInicio: string | null;
+  horaFin: string | null;
   esPorHoras: boolean;
   esPorDias: boolean;
   motivo: string;
@@ -17,7 +17,7 @@ export type ReservaUser = {
   pagado: boolean;
   costoTotal: number;
 };
-// Metadata para SEO (opcional pero recomendado)
+
 export const metadata = {
   title: "Mis Reservas",
   description: "Consulta y gestiona tus reservas de áreas comunes.",

@@ -1,4 +1,3 @@
-// app/pages/Login.tsx
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -6,10 +5,10 @@ import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { login } from "@/services/authService";
 import { toast } from "sonner";
-import { useState, useRef } from "react"; // Importa useRef de react
+import { useState, useRef } from "react";
 import axios from "axios";
 import ReCAPTCHA from "react-google-recaptcha";
-// NUEVAS IMPORTACIONES: Iconos para la UI
+// Iconos para la UI
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 // Estado global del usuario
 import { useAuth } from "@/components/shared/AuthContext";
@@ -17,8 +16,8 @@ import { useAuth } from "@/components/shared/AuthContext";
 type FormData = {
   email: string;
   password: string;
-  token?: string; // 2FA
-  recaptchaToken: string; // siempre requerido
+  token?: string;
+  recaptchaToken: string;
 };
 
 export default function Login() {
@@ -29,7 +28,7 @@ export default function Login() {
   //desestruturar del estado global
   const { loginUser } = useAuth();
 
-  // --- NUEVO ESTADO PARA VISIBILIDAD DE CONTRASEÑA ---
+  //NUEVO ESTADO PARA VISIBILIDAD DE CONTRASEÑA
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -40,7 +39,6 @@ export default function Login() {
   } = useForm<FormData>();
   const navigate = useNavigate();
 
-  // TU LÓGICA onSubmit NO SE TOCA, SE MANTIENE INTACTA
   const onSubmit = async (data: FormData) => {
     try {
       const payload = {
@@ -55,7 +53,6 @@ export default function Login() {
         return;
       }
 
-      // Guardar el usuario en el useContext
       loginUser(response.usuario);
       localStorage.setItem("user", JSON.stringify(response.usuario));
       toast.success(response.message, { duration: 4000, position: "top-left" });
@@ -81,7 +78,6 @@ export default function Login() {
     }
   };
 
-  // --- NUEVA ESTRUCTURA JSX PARA EL DISEÑO MEJORADO ---
   return (
     <div
       className="flex min-h-screen w-full items-center justify-center bg-cover bg-center p-4"
@@ -123,11 +119,10 @@ export default function Login() {
               </p>
             )}
 
-            {/* --- Password con Icono y "Ojito" --- */}
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
               <Input
-                type={showPassword ? "text" : "password"} // Tipo dinámico
+                type={showPassword ? "text" : "password"}
                 placeholder="Contraseña"
                 className="bg-gray-800/80 py-6 pl-10 pr-10 border border-gray-700 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500"
                 {...register("password", {
@@ -159,7 +154,7 @@ export default function Login() {
                       shouldValidate: true,
                     })
                   }
-                  theme="dark" // Añadido para que combine con el diseño
+                  theme="dark"
                 />
                 {errors.recaptchaToken && (
                   <p className="text-red-400 text-sm mt-1">

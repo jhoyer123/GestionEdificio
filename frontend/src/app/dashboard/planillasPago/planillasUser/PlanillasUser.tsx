@@ -102,10 +102,9 @@ export default function PlanillasUser() {
     }
 
     try {
-      // uploadQR devuelve response.data directamente
+     
       const data = await uploadQR(usuarioId, file);
 
-      // Aquí ya puedes usar data.message, data.personal, etc.
       setUploadModalOpen(false);
       toast.success(data.message, {
         position: "top-right",
@@ -114,7 +113,6 @@ export default function PlanillasUser() {
     } catch (err: any) {
       console.error(err);
 
-      // Axios lanza error en err.response.data
       toast.error(err.response?.data?.message || "Error subiendo la imagen", {
         position: "top-right",
         duration: 4000,
@@ -218,7 +216,6 @@ export default function PlanillasUser() {
         </div>
       )}
 
-      {/* MODAL DETALLES DE PLANILLA MEJORADO */}
       {modalOpen && selectedPlanilla && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div
@@ -246,7 +243,7 @@ export default function PlanillasUser() {
               </Button>
             </header>
 
-            {/* MODAL DETALLES DE PLANILLA SIN EMOJIS */}
+            {/* MODAL DETALLES DE PLANILLA */}
             {modalOpen && selectedPlanilla && (
               <div className="fixed inset-0 z-50 flex items-center justify-center">
                 <div
@@ -278,17 +275,6 @@ export default function PlanillasUser() {
                   {/* Body */}
                   <section className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-3 text-sm">
-                      {/* <div>
-                        <p className="font-medium">Fecha de generación</p>
-                        <p className="text-muted-foreground">
-                          {selectedPlanilla.fechaGeneracion
-                            ? new Date(
-                                selectedPlanilla.fechaGeneracion
-                              ).toLocaleString()
-                            : "—"}
-                        </p>
-                      </div> */}
-
                       <div>
                         <p className="font-medium">Email</p>
                         <p className="text-muted-foreground">
@@ -427,9 +413,6 @@ export default function PlanillasUser() {
                   className="w-48 h-48 object-cover rounded-lg border shadow-md mt-2 hidden"
                   onLoad={(e) => e.currentTarget.classList.remove("hidden")}
                 />
-                {/* <p className="text-xs text-muted-foreground">
-                  Selecciona una imagen para ver la vista previa
-                </p> */}
               </div>
 
               <div className="flex justify-end gap-2 mt-4">

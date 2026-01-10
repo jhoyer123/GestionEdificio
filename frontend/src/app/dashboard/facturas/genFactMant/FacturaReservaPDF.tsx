@@ -104,11 +104,11 @@ interface ReservaFactura {
   reservaData: any;
 }
 
-// 📄 PDF de factura de reserva
+
 export const FacturaReservaPDF = ({ factura, reservaData }: ReservaFactura) => {
   if (!reservaData) return null;
 
-  // --- Lógica para formatear el detalle según tipo de área ---
+
   const tipo = reservaData.areaComun.tipoArea?.toLowerCase();
   const nombreArea = reservaData.areaComun.nombreAreaComun;
 
@@ -226,7 +226,6 @@ export const FacturaReservaPDF = ({ factura, reservaData }: ReservaFactura) => {
   );
 };
 
-// 💾 Botón de descarga
 export const DescargarFacturaReserva = ({
   factura,
   reservaData,

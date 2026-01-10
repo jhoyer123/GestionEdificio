@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import axios from "axios";
 import { toast } from "sonner";
 import type { propsUsuarios } from "./Columns";
 import { deleteUsuario } from "@/services/usuariosServices";
@@ -21,7 +20,6 @@ export default function DeleteUser({
     try {
       console.log(data);
       console.log(data.idUsuario);
-      // Llamar al servicio para eliminar el usuario
       const response = await deleteUsuario(data.idUsuario);
       const message = response.message;
       toast.success(message, {

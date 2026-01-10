@@ -9,11 +9,7 @@ import Usuario from "../models/Usuario.js";
 
 async function generarFacturas(periodDate = new Date()) {
   const year = periodDate.getFullYear();
-  const month = periodDate.getMonth() + 1; // 1-12
-  //Esto en producción sería el primer y último día del mes
-/*   const start = new Date(year, month - 1, 1, 0, 0, 0);
-  const end = new Date(year, month, 0, 23, 59, 59); // último día del mes */
-  // En desarrollo: período por minuto
+  const month = periodDate.getMonth() + 1;
   const minute = periodDate.getMinutes();
   const start = new Date(year, month-1, periodDate.getDate(), periodDate.getHours(), minute, 0);
   const end = new Date(year, month-1, periodDate.getDate(), periodDate.getHours(), minute, 59);
@@ -47,16 +43,6 @@ async function generarFacturas(periodDate = new Date()) {
       });
     }
 
-    /* // ejemplo: mantenimiento puede venir del departamento o de config
-    const mantenimiento = d.mantenimientoMensual || 0;
-    if (mantenimiento > 0)
-      detalles.push({
-        concepto: "Mantenimiento",
-        cantidad: 1,
-        precioUnitario: mantenimiento,
-        subtotal: mantenimiento,
-      }); */
-
     const montoTotal = detalles.reduce((s, it) => s + it.monto, 0);
 
     // generar numero (FAC-YYYYMM-XXXX)
@@ -65,7 +51,6 @@ async function generarFacturas(periodDate = new Date()) {
     });
     const seq = String(countThisMonth + 1).padStart(4, "0");
     // ESTO ES PARA PRODUCCION CADA MES
-    /* const numero = `FAC-${year}${String(month).padStart(2, "0")}-${seq}`; */
     const numero = `FAC-${year}${String(month).padStart(2, "0")}-${Date.now()}-${seq}`;
 
     // crear factura y detalles en transacción

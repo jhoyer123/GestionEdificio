@@ -45,17 +45,17 @@ export const registrarPago = async (req, res) => {
       fechaPago: fecha,
     });
 
-    // 2. Generar la URL para el simulador
+    // Generar la URL para el simulador
     const iplocal = "192.168.26.3";
     const urlSimulador = `http://${iplocal}:5173/simulador-pago/${pago.idPago}`;
 
-    // 3. Generar el QR code a partir de la URL
+    // Generar el QR code a partir de la URL
     const qrCodeDataUrl = await qrcode.toDataURL(urlSimulador);
 
     pago.id_unico_pago = uuidv4(); // Guardar el QR code en la base de datos
     await pago.save();
 
-    // 4. Devolver el QR al frontend
+    // Devolver el QR al frontend
     res.json({ qr: qrCodeDataUrl, idPago: pago.idPago });
   } catch (error) {
     console.error(error);

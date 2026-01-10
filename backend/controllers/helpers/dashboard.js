@@ -1,16 +1,15 @@
-import { Model, Op } from "sequelize";
+import { Op } from "sequelize";
 import Factura from "../../models/Factura.js";
 import Reserva from "../../models/Reserva.js";
 import AreaComun from "../../models/AreaComun.js";
 import Departamento from "../../models/Departamento.js";
 import Usuario from "../../models/Usuario.js";
 import Residente from "../../models/Residente.js";
-import Habita from "../../models/Habita.js";
 import Sequelize from "sequelize";
 
 export const getDashboardStats = async (req, res) => {
   try {
-    // ============ FECHAS BASE ============
+    
     const hoy = new Date();
     const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
     const inicioMesAnterior = new Date(
@@ -23,7 +22,7 @@ export const getDashboardStats = async (req, res) => {
 
     const fechaHoy = hoy.toISOString().slice(0, 10);
 
-    // ============ KPIs ACTUALES ============
+    //KPIs
     const totalFacturasMes = await Factura.count({
       where: { fechaEmision: { [Op.gte]: inicioMes } },
     });
@@ -93,64 +92,6 @@ export const getDashboardStats = async (req, res) => {
       ],
     });
 
-    /* // ============ NUEVO: INGRESOS ÚLTIMOS 6 MESES ============
-    const ingresosPorMes = await Factura.findAll({
-      attributes: [
-        [
-          Sequelize.fn(
-            "DATE_FORMAT",
-            Sequelize.col("fechaEmision"),
-            "%Y-%m-01"
-          ),
-          "mes",
-        ],
-        [Sequelize.fn("SUM", Sequelize.col("montoTotal")), "totalIngresos"],
-        [Sequelize.fn("COUNT", Sequelize.col("idFactura")), "totalFacturas"],
-      ],
-      where: {
-        fechaEmision: { [Op.gte]: inicio6Meses },
-        estado: "pagada",
-      },
-      group: [
-        Sequelize.fn("DATE_FORMAT", Sequelize.col("fechaEmision"), "%Y-%m-01"),
-      ],
-      order: [
-        [
-          Sequelize.fn(
-            "DATE_FORMAT",
-            Sequelize.col("fechaEmision"),
-            "%Y-%m-01"
-          ),
-          "ASC",
-        ],
-      ],
-      raw: true,
-    });
-
-    // Formatear datos de ingresos
-    const meses = [
-      "Ene",
-      "Feb",
-      "Mar",
-      "Abr",
-      "May",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dic",
-    ]; 
-
-  
-    const ingresosMensuales = ingresosPorMes.map((item) => ({
-      mes: meses[new Date(item.mes).getMonth()],
-      ingresos: parseFloat(item.totalIngresos) || 0,
-      facturas: parseInt(item.totalFacturas) || 0,
-    }));*/
-    // ============ NUEVO: INGRESOS ÚLTIMOS 6 MESES ============
-
     const ingresosPorMes = await Factura.findAll({
       attributes: [
         [
@@ -209,8 +150,7 @@ export const getDashboardStats = async (req, res) => {
         facturas: parseInt(item.totalFacturas) || 0,
       };
     });
-
-    // ============ NUEVO: RESERVAS POR TIPO DE ÁREA (TOTAL HISTÓRICO) ============
+    //RESERVAS POR TIPO DE ÁREA (TOTAL HISTÓRICO) 
     const reservasPorTipoArea = await Reserva.findAll({
       attributes: [
         [Sequelize.fn("COUNT", Sequelize.col("Reserva.idReserva")), "cantidad"],
@@ -243,7 +183,7 @@ export const getDashboardStats = async (req, res) => {
       };
     });
 
-    // ============ NUEVO: ESTADO DE PAGOS (FACTURAS) ============
+    //ESTADO DE PAGOS (FACTURAS)
     const estadoPagos = await Factura.findAll({
       attributes: [
         "estado",
@@ -276,7 +216,7 @@ export const getDashboardStats = async (req, res) => {
       }
     });
 
-    // ============ NUEVO: ÚLTIMAS 10 RESERVAS ============
+    //ÚLTIMAS 10 RESERVAS 
     const ultimasReservas = await Reserva.findAll({
       limit: 10,
       order: [["createdAt", "DESC"]],
@@ -326,7 +266,7 @@ export const getDashboardStats = async (req, res) => {
       costo: parseFloat(reserva.costoTotal) || 0,
     }));
 
-    // ============ NUEVO: FACTURAS PRÓXIMAS A VENCER (< 7 días) ============
+    //FACTURAS PRÓXIMAS A VENCER (< 7 días) 
     const fecha7Dias = new Date();
     fecha7Dias.setDate(fecha7Dias.getDate() + 7);
 
@@ -404,7 +344,7 @@ export const getDashboardStats = async (req, res) => {
       };
     });
 
-    // ============ NUEVO: COMPARATIVA MES ACTUAL VS ANTERIOR ============
+    // COMPARATIVA MES ACTUAL VS ANTERIOR 
     const ingresosMesAnterior = await Factura.sum("montoTotal", {
       where: {
         estado: "pagada",
@@ -453,16 +393,13 @@ export const getDashboardStats = async (req, res) => {
       ),
     };
 
-    // ============ TOP 5 ÁREAS MÁS RESERVADAS ============
+    // TOP 5 ÁREAS MÁS RESERVADAS 
     const topAreasReservadas = await AreaComun.findAll({
       attributes: [
         "idAreaComun",
         "nombreAreaComun",
         "tipoArea",
         [
-          // SOLUCIÓN: Usar Sequelize.literal para el COUNT.
-          // Esto fuerza el alias de la tabla 'reservas' y la columna 'areaComunId'
-          // a ser reconocidos directamente por MySQL como parte del JOIN subyacente.
           Sequelize.literal("COUNT(reservas.areaComunId)"),
           "totalReservas",
         ],
@@ -473,19 +410,14 @@ export const getDashboardStats = async (req, res) => {
           as: "reservas",
           attributes: [],
           where: { estado: "confirmada" },
-          // required: true es esencial para el INNER JOIN
           required: true,
-          // Una optimización que puede ayudar al JOIN
           duplicating: false,
         },
       ],
       group: [
-        // La cláusula GROUP BY debe ser perfecta
         "AreaComun.idAreaComun",
         "AreaComun.nombreAreaComun",
         "AreaComun.tipoArea",
-        // NOTA: Algunos motores de MySQL/MariaDB pueden requerir que el ID sea referenciado
-        // por su alias de tabla: "AreaComun.idAreaComun"
       ],
       // Ordena por el alias calculado
       order: [[Sequelize.literal("totalReservas"), "DESC"]],
@@ -500,7 +432,7 @@ export const getDashboardStats = async (req, res) => {
       reservas: parseInt(area.totalReservas) || 0,
     }));
 
-    // ============ RESPUESTA FINAL ============
+    // RESPUESTA FINAL
     res.json({
       // KPIs Actuales
       kpis: {
@@ -550,13 +482,11 @@ export const executeQuery = async (req, res) => {
 
   try {
     // Usamos sequelize.query() para ejecutar SQL crudo (raw queries),
-    // que es lo que el Agente de IA va a generar.
-    // El 'type: Sequelize.QueryTypes.SELECT' es para obtener solo los resultados.
     const [results, metadata] = await sequelize.query(query, {
       type: Sequelize.QueryTypes.SELECT,
     });
 
-    // Éxito: Devolvemos los resultados en el formato esperado por n8n.
+    // Devolvemos los resultados en el formato esperado por n8n.
     res.json({
       status: "success",
       data: results,
@@ -564,11 +494,11 @@ export const executeQuery = async (req, res) => {
   } catch (error) {
     console.error("ERROR al ejecutar la consulta:", error.message);
 
-    // Fallo: Devolvemos un error, lo cual le ayudará al Agente de IA a entender que algo salió mal.
+    //Devolvemos un error, lo cual le ayudará al Agente de IA a entender que algo salió mal.
     res.status(500).json({
       status: "error",
       message: "Error al ejecutar la consulta en la base de datos.",
-      details: error.message, // Útil para depuración, pero ten cuidado de no exponer demasiada info en producción.
+      details: error.message,
     });
   }
 };

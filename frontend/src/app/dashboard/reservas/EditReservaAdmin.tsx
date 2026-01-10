@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { type AreaComun } from "@/services/areasServices";
 import { getAreaById } from "@/services/areasServices";
-import { getReservaById, updateReserva } from "@/services/reservaServices";
+import { getReservaById } from "@/services/reservaServices";
 import { getCajas } from "@/services/parqueoCajasServices";
 import { Skeleton } from "@/components/ui/skeleton";
 import FormEditarReserva from "./FormEditarReserva";
@@ -100,7 +100,6 @@ export default function EditarReservaAdmin({
   const esGimnasio = area?.tipoArea === "gimnasio";
   const esParqueo = area?.tipoArea === "parqueo";
 
-  // helpers (pegar arriba en el mismo scope)
   const startOfDay = (d: Date) => {
     const x = new Date(d);
     x.setHours(0, 0, 0, 0);
@@ -118,7 +117,6 @@ export default function EditarReservaAdmin({
     return startOfDay(d).getTime() === startOfDay(compare).getTime();
   };
 
-  // --- CONDICIÓN DE EDICIÓN (REEMPLAZAR) ---
   const reservaEditable = (() => {
     if (!reservaActual) return false;
 
@@ -126,51 +124,41 @@ export default function EditarReservaAdmin({
     if (estado === "cancelada" || estado === "rechazada") return false;
     if ((reservaActual as any).pagado === true) return false;
 
-    // Campos reales según tu JSON:
-    const fechaInicio = (reservaActual as any).fechaReserva as string | null; // ej "2025-10-04"
-    const fechaFin = (reservaActual as any).fechaFinReserva as string | null; // ej null o "2025-10-05"
-    const horaFin = (reservaActual as any).horaFin as string | null; // ej "12:00:00" o null
+    const fechaInicio = (reservaActual as any).fechaReserva as string | null;
+    const fechaFin = (reservaActual as any).fechaFinReserva as string | null;
+    const horaFin = (reservaActual as any).horaFin as string | null;
 
     const now = new Date();
 
-    // Si hay fechaFin (reserva por días o rango), priorizamos ella
     if (fechaFin) {
-      // 1) si fechaFin < hoy -> no editable
       if (isDateBefore(fechaFin, now)) return false;
 
-      // 2) si fechaFin === hoy -> chequear horaFin si existe
       if (isSameDate(fechaFin, now)) {
         if (horaFin) {
-          const endIso = `${fechaFin}T${horaFin}`; // "2025-10-04T12:00:00"
+          const endIso = `${fechaFin}T${horaFin}`;
           if (new Date(endIso).getTime() < now.getTime()) return false;
         }
       }
 
-      // fechaFin > hoy -> editable
       return true;
     }
 
-    // Si no hay fechaFin (reserva de un día)
     if (fechaInicio) {
-      if (isDateBefore(fechaInicio, now)) return false; // fecha pasada -> no editable
+      if (isDateBefore(fechaInicio, now)) return false;
 
       if (isSameDate(fechaInicio, now)) {
-        // si es hoy, chequear horaFin (si existe)
         if (horaFin) {
           const endIso = `${fechaInicio}T${horaFin}`;
           if (new Date(endIso).getTime() < now.getTime()) return false;
         }
       }
 
-      // fecha futura o hoy (y hora no pasada) -> editable
       return true;
     }
 
-    // Si no hay información de fecha, por defecto permitir editar (o cambiar a false según preferencia)
     return true;
   })();
 
-  // --- BLOQUES DE DISPONIBILIDAD ---
   const generarLineaDeTiempo = () => {
     if (!area || esParqueo || esGimnasio) return [];
     const bloques: {
@@ -270,10 +258,6 @@ export default function EditarReservaAdmin({
     if (!reservaActual) return;
     try {
       console.log(formData);
-      /* const response = await updateReserva(reservaActual.idReserva, formData);
-      const message = response.message;
-      toast.success(message || "Reserva actualizada correctamente ✅");
-      setEditState({ view: "reservasAdmin", entity: "", id: null }); */
     } catch (error: any) {
       toast.error(
         error.response?.data?.message || "Error al actualizar la reserva"
@@ -285,7 +269,6 @@ export default function EditarReservaAdmin({
     return <Skeleton className="h-screen w-full" />;
   }
 
-  // --- SI NO ES EDITABLE ---
   if (!reservaEditable) {
     return (
       <div className="flex flex-col items-center justify-center h-full bg-gray-50 text-center px-6">
@@ -451,20 +434,6 @@ export default function EditarReservaAdmin({
           onSave={handleUpdate}
           cajones={cajones}
         />
-        {/* {reservaEditable ? (
-          <FormEditarReserva
-            area={area!}
-            fechaInicial={fecha}
-            reservaParaEditar={reservaActual}
-            onSave={handleUpdate}
-            cajones={cajones}
-          />
-        ) : (
-          <div className="p-6 bg-gray-100 border rounded-lg text-center text-gray-600 font-medium">
-            ⚠️ Esta reserva no puede editarse porque está pagada, cancelada,
-            rechazada o su fecha ya ha pasado.
-          </div>
-        )} */}
       </div>
     </>
   );

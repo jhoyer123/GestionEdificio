@@ -13,7 +13,7 @@ import { transporter } from "./helpers/mails.js";
 import crypto from "crypto";
 import { Op } from "sequelize";
 
-//***** Crear un usuario *****//
+// Crear un usuario
 export const createUsuario = async (req, res) => {
   const t = await sequelize.transaction();
   try {
@@ -66,7 +66,7 @@ export const createUsuario = async (req, res) => {
       { transaction: t }
     );
 
-    // ✅ SOLUCIÓN: Asignar rol ANTES de convertir a objeto plano
+    // Asignar rol ANTES de convertir a objeto plano
     await nuevoUsuario.addRoles(rolFind.idRol, { transaction: t });
 
     if (rol === "administrador") {
@@ -86,7 +86,7 @@ export const createUsuario = async (req, res) => {
         { transaction: t }
       );
       nuevoAdministrador = nuevoAdministrador.get({ plain: true });
-      // ✅ Convertir a objeto plano DESPUÉS de usar addRol()
+      // Convertir a objeto plano
       nuevoUsuario = nuevoUsuario.get({ plain: true });
       nuevoUsuario = { ...nuevoUsuario, ...nuevoAdministrador };
     }
@@ -132,7 +132,7 @@ export const createUsuario = async (req, res) => {
       );
 
       const personalResponse = nuevoPersonal.get({ plain: true });
-      // ✅ Convertir a objeto plano DESPUÉS de todas las operaciones de Sequelize
+      //Convertir a objeto plano DESPUÉS de todas las operaciones de Sequelize
       nuevoUsuario = {
         ...nuevoUsuario.get({ plain: true }),
         ...personalResponse,
@@ -184,7 +184,7 @@ export const createUsuario = async (req, res) => {
       let nuevoResidente = await Residente.create(
         {
           telefono,
-          usuarioId: nuevoUsuario.idUsuario, // ✅ Corregido: era usuarioId sin definir
+          usuarioId: nuevoUsuario.idUsuario, 
         },
         { transaction: t }
       );
@@ -194,7 +194,7 @@ export const createUsuario = async (req, res) => {
           departamentoId,
           fecha,
           tipoResidencia,
-          usuarioId: nuevoUsuario.idUsuario, // ✅ Corregido: era usuarioId sin definir
+          usuarioId: nuevoUsuario.idUsuario, 
         },
         { transaction: t }
       );
@@ -202,27 +202,25 @@ export const createUsuario = async (req, res) => {
       const residenteResponse = nuevoResidente.get({ plain: true });
       const habitaResponse = nuevoHabita.get({ plain: true });
 
-      // ✅ Convertir a objeto plano DESPUÉS de todas las operaciones
+      // Convertir a objeto plano DESPUÉS de todas las operaciones
       nuevoUsuario = {
-        ...nuevoUsuario.get({ plain: true }), // ✅ Corregido: era nuevoUsuarios
+        ...nuevoUsuario.get({ plain: true }), 
         ...residenteResponse,
         ...habitaResponse,
       };
     }
 
     try {
-      // El objeto 'nuevoUsuario' ya tiene el 'idUsuario' después de ser creado
       await transporter.sendMail({
         from: `"Gestión Edificio (Habitat360)" <${process.env.SMTP_USER}>`,
         to: nuevoUsuario.email,
         subject: "Verifica tu correo",
-        // <<--- ¡CAMBIO AQUÍ! Añadimos el userId a la URL
+        // Añadimos el userId a la URL
         html: `<p>Hola ${nuevoUsuario.nombre},</p>
                <p>Para activar tu cuenta haz clic <a href="http://localhost:5173/verify-email?token=${verificationToken}&userId=${nuevoUsuario.idUsuario}">aquí</a></p>`,
       });
     } catch (mailError) {
       console.error("Error enviando correo de verificación:", mailError);
-      // No rompemos la creación del usuario
     }
 
     // Limpiar campos sensibles
@@ -243,10 +241,10 @@ export const createUsuario = async (req, res) => {
   }
 };
 
-//**** Verificar correo electrónico *****/
+ //Verificar correo electrónico
 export const verifyEmail = async (req, res) => {
   try {
-    const { userId, token } = req.query; // recibimos el token como query
+    const { userId, token } = req.query; 
 
     if (!token || !userId) {
       return res
@@ -287,7 +285,7 @@ export const verifyEmail = async (req, res) => {
   }
 };
 
-//***** Reenvío de correo electrónico *****//
+//Reenvío de correo electrónico
 export const resendVerifyEmail = async (req, res) => {
   try {
     const { userId } = req.body;
@@ -340,7 +338,7 @@ export const resendVerifyEmail = async (req, res) => {
   }
 };
 
-//***** Actualizar un usuario *****//
+//Actualizar un usuario
 export const updateUsuario = async (req, res) => {
   try {
     const { id } = req.params;
@@ -365,7 +363,7 @@ export const updateUsuario = async (req, res) => {
   }
 };
 
-//***** Obtener todos los usuarios   *****//
+//Obtener todos los usuarios
 export const getUsuarios = async (req, res) => {
   try {
     const usuarios = await Usuario.findAll({
@@ -405,7 +403,7 @@ export const getUsuario = async (req, res) => {
     if (!usuario) {
       return res.status(404).json({ message: "Usuario no encontrado (id)" });
     }
-    delete usuario.password; // No enviar la contraseña en la respuesta
+    delete usuario.password;
     res.json(usuario);
   } catch (error) {
     console.error("Error fetching usuario:", error);
@@ -413,7 +411,7 @@ export const getUsuario = async (req, res) => {
   }
 };
 
-//***** Eliminar un usuario *****//
+ //Eliminar un usuario
 export const EliminarUsuario = async (req, res) => {
   const transaction = await sequelize.transaction();
 
@@ -424,7 +422,7 @@ export const EliminarUsuario = async (req, res) => {
       include: [
         {
           model: Rol,
-          through: { attributes: [] }, // Excluye datos de tabla intermedia
+          through: { attributes: [] }, 
         },
       ],
     });
@@ -435,19 +433,17 @@ export const EliminarUsuario = async (req, res) => {
     }
 
     if (usuarioFind.Rols.some((r) => r.rol === "residente")) {
-      // ✅ 1. PRIMERO eliminar los registros dependientes
+      
       await Habita.destroy({
         where: { usuarioId: id },
         transaction,
       });
-
-      // ✅ 2. Eliminar otros registros relacionados si existen
       await Residente.destroy({
         where: { usuarioId: id },
         transaction,
       });
     }
-    // ✅ 3. FINALMENTE eliminar el usuario
+
     await usuarioFind.destroy({ transaction });
 
     await transaction.commit();
@@ -461,7 +457,7 @@ export const EliminarUsuario = async (req, res) => {
   }
 };
 
-//***** Activar o desactivar un usuario *****//
+//Activar o desactivar un usuario
 export const toggleUsuarioEstado = async (req, res) => {
   try {
     const { id } = req.params;
@@ -478,11 +474,9 @@ export const toggleUsuarioEstado = async (req, res) => {
   }
 };
 
-//Aqui user el cambio de contraseña del helper de usuario.js
 import { cambiarContrasena, resetPassword, sendResetPasswordEmail } from "./helpers/usuario.js";
 export { cambiarContrasena, resetPassword, sendResetPasswordEmail };
 
-// Eliminar un usuario probando el ondelete cascade
 export const deleteUsuario = async (req, res) => {
   try {
     const { id } = req.params;

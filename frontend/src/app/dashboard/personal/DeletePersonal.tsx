@@ -1,10 +1,7 @@
 import { Button } from "@/components/ui/button";
-import axios from "axios";
 import { toast } from "sonner";
 import type { propsPersonal } from "./ColumnsP";
 import { deleteUsuario } from "@/services/usuariosServices";
-import { deleteResidente } from "@/services/residenteServices";
-import { IdCardLanyardIcon } from "lucide-react";
 import { deletePersonalRol } from "@/services/personalServices";
 
 interface DeleteUserProps {
@@ -24,7 +21,7 @@ export default function DeleteResidente({
     try {
         console.log(data);
       if (data.rol.length === 1) {
-        // ✅ El usuario tiene un solo rol → se elimina completo
+        // El usuario tiene un solo rol → se elimina completo
         const response = await deleteUsuario(data.usuarioId);
         const message = response.message;
         toast.success(message, {
@@ -32,7 +29,7 @@ export default function DeleteResidente({
           position: "top-left",
         });
       } else {
-        // ✅ El usuario tiene varios roles → solo eliminar "residente"
+        
         const rolResidente = data.rol.find((rol) => rol.rol === "personal");
         const response = await deletePersonalRol(data.usuarioId, {
           idRol: rolResidente?.idRol,

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import axios from "axios";
 
-// 🔹 Importamos componentes del AlertDialog de shadcn
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,7 +34,7 @@ interface Planilla {
 
 export const Planillas = () => {
   const [planillas, setPlanillas] = useState<Planilla[]>([]);
-  const [isOpen, setIsOpen] = useState(false); // controla el estado del modal
+  const [isOpen, setIsOpen] = useState(false);
 
   const fetchPlanillas = async () => {
     try {
@@ -54,7 +53,7 @@ export const Planillas = () => {
     try {
       const newPlanillas = await createPlanillas("sueldos");
       console.log("Planillas creadas:", newPlanillas);
-      fetchPlanillas(); // Refrescar la lista de planillas después de crear nuevas
+      fetchPlanillas(); 
       toast.success(newPlanillas.message || "Planillas creadas exitosamente");
     } catch (error) {
       axios.isAxiosError(error)
@@ -67,7 +66,7 @@ export const Planillas = () => {
     }
   };
 
-  // 🔹 Fecha actual formateada
+ 
   const fechaActual = new Date().toLocaleDateString("es-BO", {
     year: "numeric",
     month: "long",
@@ -78,7 +77,7 @@ export const Planillas = () => {
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">Planillas</h1>
 
-        {/* 🔹 Modal de Confirmación */}
+     
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
           <AlertDialogTrigger asChild>
             <Button

@@ -3,7 +3,6 @@ import { DataTable } from "../../../components/shared/DataTable";
 import { useEffect, useState } from "react";
 import { columns } from "./ColumnsP";
 import { type propsPersonal } from "./ColumnsP";
-import { Button } from "@/components/ui/button";
 
 //Creando la tabla
 
@@ -13,7 +12,7 @@ type Props = {
   >;
 };
 
-export const Personal: React.FC<Props> = ({ setEditState }) => {
+export const Personal: React.FC<Props> = () => {
   const [personal, setPersonal] = useState<propsPersonal[]>([]);
 
   const fetchData = async () => {

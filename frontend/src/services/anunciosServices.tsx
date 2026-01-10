@@ -26,14 +26,6 @@ export const getAnuncios = async () => {
   }
 };
 
-// Obtener un anuncio por ID
-/* export const getAnuncioById = async (id: number) => {
-  const response = await axios.get(`${API_URL}/anuncios/${id}`, {
-    withCredentials: true,
-  });
-  return response.data;
-}; */
-
 // Actualizar un anuncio
 export const updateAnuncio = async (id: number, data: any) => {
   try {

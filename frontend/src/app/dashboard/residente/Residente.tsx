@@ -1,4 +1,4 @@
-import { getResidentes } from "@/services/residenteServices";
+import { getResidentes } from "@/services/ResidenteServices";
 import { DataTable } from "../../../components/shared/DataTable";
 import { useEffect, useState } from "react";
 import { columns } from "./ColumnsR";
@@ -11,7 +11,7 @@ type Props = {
 };
 
 //Creando la tabla
-export const Residente: React.FC<Props> = ({ setEditState }) => {
+export const Residente: React.FC<Props> = () => {
   const [residente, setResidente] = useState<propsResidente[]>([]);
 
   const fetchData = async () => {

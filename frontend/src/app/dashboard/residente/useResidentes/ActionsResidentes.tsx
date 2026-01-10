@@ -64,20 +64,6 @@ const ActionsResidentes = ({ data, refresh }: GestionarRolUsuarioProps) => {
               Aquí puedes gestionar el rol del usuario.
             </DialogDescription>
           </DialogHeader>
-          {/* <GestionarRolUsuario
-            data={data}
-            setOpenEdit={setOpenEditRol}
-            refresh={refresh}
-          >
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button type="button" variant="outline">
-                  Cancelar
-                </Button>
-              </DialogClose>
-              <Button type="submit">Guardar cambios</Button>
-            </DialogFooter>
-          </GestionarRolUsuario> */}
         </DialogContent>
       </Dialog>
       {/* Dialog para gestionar el update del usuario */}
@@ -87,7 +73,11 @@ const ActionsResidentes = ({ data, refresh }: GestionarRolUsuarioProps) => {
             <DialogTitle>Gestionar Datos</DialogTitle>
             <DialogDescription>Actualizar datos del usuario</DialogDescription>
           </DialogHeader>
-          <EditResidente data={data} setOpenEdit={setOpenEdit} refresh={refresh}>
+          <EditResidente
+            data={data}
+            setOpenEdit={setOpenEdit}
+            refresh={refresh}
+          >
             <DialogFooter>
               <DialogClose asChild>
                 <Button type="button" variant="outline">

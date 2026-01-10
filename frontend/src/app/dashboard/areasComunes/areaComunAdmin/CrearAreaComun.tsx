@@ -1,11 +1,9 @@
-import { Form, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { crearAreaComun, type AreaComun } from "@/services/areasServices";
-import { type EditState } from "@/components/shared/MainContent";
 import { toast } from "sonner";
-import type { AxiosError } from "axios";
 import axios from "axios";
 
 interface Props {

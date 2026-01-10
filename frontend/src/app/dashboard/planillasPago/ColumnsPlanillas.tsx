@@ -1,7 +1,5 @@
 import { type ColumnDef, type FilterFn, type Row } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import ActionsPlanillas from "./ActionsPlanillas";
 
 export interface Planilla {
@@ -23,9 +21,7 @@ export interface Planilla {
 
 const myCustomFilterFn: FilterFn<Planilla> = (
   row: Row<Planilla>,
-  columnId: string,
   filterValue: string,
-  addMeta: (meta: any) => void
 ) => {
   if (row.original.nombrePersonal?.includes(filterValue)) {
     return true;

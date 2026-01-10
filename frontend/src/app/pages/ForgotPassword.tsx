@@ -25,7 +25,7 @@ export const ForgotPassword = () => {
       toast.success(
         "Se ha enviado el correo de restablecimiento de contraseña."
       );
-      setTimeout(() => navigate("/"), 3000); // redirige al login
+      setTimeout(() => navigate("/"), 3000); 
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Error enviando correo");
     } finally {

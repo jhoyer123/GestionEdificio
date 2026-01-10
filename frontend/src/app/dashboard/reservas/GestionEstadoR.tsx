@@ -1,13 +1,10 @@
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { set } from "date-fns";
 import { updateEstadoReserva } from "@/services/reservaServices";
 import { toast } from "sonner";
 import axios from "axios";
 
 interface GestionEstadoRProps {
-  // Aquí puedes definir las props que necesites, como la reserva actual y una función para actualizarla
   data?: any;
   setOpenEditEstado: React.Dispatch<React.SetStateAction<boolean>>;
   refresh?: () => void;
@@ -18,7 +15,6 @@ export default function GestionEstadoR({
   setOpenEditEstado,
   refresh,
 }: GestionEstadoRProps) {
-  // estados posibles: Pendiente | Confirmada | Rechazada | Cancelada
   const handleConfirmar = () => {
     handleChangeEstado("confirmada");
   };
@@ -29,7 +25,6 @@ export default function GestionEstadoR({
     handleChangeEstado("cancelada");
   };
 
-  // Aquí puedes agregar la lógica para manejar los cambios de estado, como llamadas a una API
   const handleChangeEstado = async (nuevoEstado: string) => {
     try {
       // Lógica para actualizar el estado en la API

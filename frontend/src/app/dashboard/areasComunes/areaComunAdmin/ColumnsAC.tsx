@@ -8,9 +8,7 @@ import { type EditState } from "@/components/shared/MainContent";
 
 const myCustomFilterFn: FilterFn<AreaComun> = (
   row: Row<AreaComun>,
-  columnId: string,
   filterValue: string,
-  addMeta: (meta: any) => void
 ) => {
   if (row.original.nombreAreaComun.includes(filterValue)) {
     return true;

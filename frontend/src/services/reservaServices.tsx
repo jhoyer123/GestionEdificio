@@ -11,7 +11,6 @@ export interface Reserva {
   horaFin: string;
   motivo: string;
   numAsistentes: number;
-  // Otros campos relevantes
 }
 
 // Crear una nueva reserva
@@ -74,7 +73,6 @@ export const updateEstadoReserva = async (id: number, nuevoEstado: string) => {
 export const UserReservas = async (idUsuario: number) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/usuario/${idUsuario}`);
-    //console.log("Response from UserReservas:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error al obtener las reservas del usuario:", error);

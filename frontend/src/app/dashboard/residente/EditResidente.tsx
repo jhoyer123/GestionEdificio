@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import type { propsResidente } from "./ColumnsR";
 import axios from "axios";
 import { toast } from "sonner";
-import { updateResidente } from "@/services/residenteServices";
+import { updateResidente } from "@/services/ResidenteServices";
 
 interface GestionarDatosUsuarioProps {
   data: propsResidente;
@@ -60,10 +60,7 @@ export default function EditUsuario({
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-      {/* Aqui mostraremos el nombre del usuario a actualizar */}
-      <h2 className="text-lg font-medium">
-        Editando datos de: {data.nombre}
-      </h2>
+      <h2 className="text-lg font-medium">Editando datos de: {data.nombre}</h2>
       {/* Teléfono */}
       <Input
         defaultValue={data.telefono}
@@ -81,7 +78,7 @@ export default function EditUsuario({
         <p className="text-red-500">{errors.telefono.message}</p>
       )}
 
-      {/* Tipo Residencia (Select de shadcn) */}
+      {/* Tipo Residencia */}
       <div>
         <label className="block text-sm font-medium mb-2">
           Tipo Residencia

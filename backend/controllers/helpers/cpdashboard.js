@@ -53,7 +53,7 @@ export const getDashboardStats = async (req, res) => {
       where: { departamentoId: null, fechaEmision: { [Op.gte]: inicioMes } },
     });
 
-    //Reservas del dia de hoy de salones de uso común************
+    //Reservas del dia de hoy de salones de uso común
     const hoy = new Date().toISOString().slice(0, 10);
     const reservas = await Reserva.findAll({
       include: [{ model: AreaComun, as: "areaComun" }],
@@ -113,7 +113,7 @@ export const getDashboardStats = async (req, res) => {
       ],
     });
 
-    //Todas las reservas del dia de hoy de todas las areas existentes********
+    //Todas las reservas del dia de hoy de todas las areas existentes
     const hoy2 = new Date();
     const año = hoy2.getFullYear();
     const mes = String(hoy2.getMonth() + 1).padStart(2, "0");
@@ -123,29 +123,6 @@ export const getDashboardStats = async (req, res) => {
     const reservasHoyData = await Reserva.count({
       where: Sequelize.literal(`DATE(fechaReserva) = '${fechaHoy}'`),
     });
-
-    /* 
-    //ultimas 5 facturas emitidas
-    const recentFacturas = await Factura.findAll({
-      limit: 5,
-      order: [["createdAt", "DESC"]],
-      attributes: [
-        "idFactura",
-        "nroFactura",
-        "fechaEmision",
-        "montoTotal",
-        "pagado",
-      ],
-    });
-
-    //Agrupar ingresos por mes
-    const ingresosPorMes = await sequelize.query(
-      `SELECT to_char("fechaEmision", 'YYYY-MM') as month, sum("montoTotal") as total
-   FROM facturas
-   GROUP BY month
-   ORDER BY month`,
-      { type: sequelize.QueryTypes.SELECT }
-    );  */
 
     res.json({
       totalFacturasMes,
@@ -160,9 +137,6 @@ export const getDashboardStats = async (req, res) => {
       totalFacturasMantenimientoPendientes,
       totalFacturasMantenimiento,
       totalFacturasReservas,
-      /* reservasActivasAhora, */
-      /* recentFacturas,
-      ingresosPorMes,  */
     });
   } catch (error) {
     console.error("Error al obtener las estadísticas del dashboard:", error);

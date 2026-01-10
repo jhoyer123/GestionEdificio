@@ -13,7 +13,7 @@ import Infraestructura from "../models/Infraestructura.js";
 import Empresa from "../models/Empresa.js";
 import Factura from "../models/Factura.js";
 import DetalleFactura from "../models/DetallesFactura.js";
-// RESERVAs
+// reservas
 import Reserva from "../models/Reserva.js";
 import Pago from "../models/Pagos.js";
 import AreaComun from "../models/AreaComun.js";
@@ -196,18 +196,6 @@ Reserva.belongsTo(Usuario, {
   onDelete: "CASCADE",
   onUpdate: "CASCADE",
 });
-/* Residente.hasMany(Reserva, {
-  foreignKey: "usuarioId",
-  as: "reservas",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
-});
-Reserva.belongsTo(Residente, {
-  foreignKey: "usuarioId",
-  as: "residente",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
-}); */
 
 // AreaComun 1---N Reserva
 AreaComun.hasMany(Reserva, {
@@ -222,24 +210,6 @@ Reserva.belongsTo(AreaComun, {
   onDelete: "CASCADE",
   onUpdate: "CASCADE",
 });
-
-// Reserva 1---1 Pago (ficticio)
-/* Reserva.hasOne(Pago, {
-  foreignKey: "reservaId",
-  as: "pago",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
-});
-Pago.belongsTo(Reserva, {
-  foreignKey: "reservaId",
-  as: "reserva",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
-}); */
-
-/* //Asociacion 1:N Rol - Usuario
-Rol.hasMany(Usuario, { foreignKey: "rolId", as: "usuarios" });
-Usuario.belongsTo(Rol, { foreignKey: "rolId", as: "rol" }); */
 
 // Asociacion 1:N Rol - Usuario
 Usuario.belongsToMany(Rol, {

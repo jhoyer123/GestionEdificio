@@ -1,16 +1,7 @@
-import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  DollarSign,
-  MapPin,
-  Mail,
-  Phone,
-  CalendarDays,
-  User,
-  Flag,
-} from "lucide-react"; // Importa iconos
+import { DollarSign, MapPin, Mail, Phone } from "lucide-react";
 
 function ProfilePage() {
   return (

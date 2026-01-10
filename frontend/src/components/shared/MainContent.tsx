@@ -18,13 +18,13 @@ import { MisReservasView } from "@/app/dashboard/reservas/reservasUser/MisReserv
 import EditarReservaAdmin from "@/app/dashboard/reservas/EditReservaAdmin";
 import { Concepto } from "@/app/dashboard/facturas/facturasadmin/Conceptos";
 import { Facturas } from "@/app/dashboard/facturas/gestiondeFacturasAdmin/Facturas";
-import { FacturaPage } from "@/app/dashboard/facturas/genFactMant/FacturaMantDetalle";
 import FacturasUser from "@/app/dashboard/facturas/gestionFacturasUser/FacturasUser";
 import { Planillas } from "@/app/dashboard/planillasPago/Planillas";
 import PlanillasUser from "@/app/dashboard/planillasPago/planillasUser/PlanillasUser";
 import Anuncios from "@/app/dashboard/anuncios/Anuncios";
 import AnunciosUser from "@/app/dashboard/anuncios/anunciosUser/AnunciosUser";
 import Chatbot from "@/app/dashboard/agenten8n/Chatbot";
+import Funciones from "@/app/dashboard/funcionesPersonal/Funciones";
 export type EditState = {
   view: string;
   entity: string;
@@ -45,7 +45,7 @@ export default function MainContent({
       return <Principal />;
     case "chatbot":
       return <Chatbot />;
-    //seccion de usuarios 
+    //seccion de usuarios
     case "residentes":
       return <Residente setEditState={setEditState} />;
     case "usuarios":
@@ -55,9 +55,13 @@ export default function MainContent({
     case "perfil":
       return <PerfilUsuario />;
 
+    //seccion de funciones del personal
+    case "funciones":
+      return <Funciones />;
+
     //seccion de departamentos ***
     case "departamentos":
-      return <Departamento setEditState={setEditState} />;
+      return <Departamento />;
     case "detalleDepartamento":
       return (
         <DetalleDepartamento
@@ -78,7 +82,7 @@ export default function MainContent({
     case "parqueosAdmins":
       return <ParqueoAdmin />;
 
-    //seccion de reservas admin ***
+    //seccion de reservas admin
     case "reservasAdmin":
       return <Reservas setEditState={setEditState} />;
     case "misReservas":
@@ -100,10 +104,10 @@ export default function MainContent({
 
     //Comunicacion
     case "anunciosAdmin":
-      return <Anuncios setEditState={setEditState} />;
+      return <Anuncios />;
     case "anunciosUser":
       return <AnunciosUser />;
-    //seccion de creacion y edicion de entidades ***
+    //seccion de creacion y edicion de entidades
     case "edit":
       if (editState.entity === "areaComun") {
         return (
@@ -121,16 +125,8 @@ export default function MainContent({
           />
         );
       }
-      /* if (editState.entity === "personal") {
-        return (
-          <EditPersonal setEditState={setEditState} personalId={editState.id} />
-        );
-      }
-      if (editState.entity === "residente") {
-        return <EditResidente setEditState={setEditState} />;
-      } */
-      // Aquí puedes agregar otros componentes de edición para otras entidades
       return <p>Selecciona una entidad para editar</p>;
+
     case "create":
       if (editState.entity === "residente") {
         return <CreateResidente setEditState={setEditState} />;
@@ -141,15 +137,8 @@ export default function MainContent({
       if (editState.entity === "areaComun") {
         return <CrearAreaComun setEditState={setEditState} />;
       }
-      // Aquí puedes agregar otros componentes de edición para otras entidades
-      return <p>Selecciona una entidad para editar</p>;
-    case "students":
-      return (
-        <div>
-          <h2 className="text-2xl font-bold">Estudiantes</h2>
-          <p>Listado de estudiantes aquí...</p>
-        </div>
-      );
+      return <p>Selecciona una entidad para crear</p>;
+
     default:
       return <p>Selecciona una opción del menú</p>;
   }

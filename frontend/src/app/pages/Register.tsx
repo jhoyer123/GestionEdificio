@@ -1,4 +1,3 @@
-// app/pages/Login.tsx
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -27,7 +26,7 @@ export default function Register() {
       {/* Columna derecha (Imagen) */}
       <div className="w-1/2">
         <img
-          src="https://i.pinimg.com/736x/28/2b/2f/282b2f988040ffd5dd30544b0f946880.jpg" // Reemplaza con tu imagen (la que subiste)
+          src="https://i.pinimg.com/736x/28/2b/2f/282b2f988040ffd5dd30544b0f946880.jpg" 
           alt="imagen representativa"
           className="h-full w-full object-cover"
         />

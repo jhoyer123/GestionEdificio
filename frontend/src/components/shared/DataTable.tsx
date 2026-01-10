@@ -58,15 +58,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-2 justify-end w-64 inline-block margin auto">
-        {/* <Input
-          placeholder="Caja de busqueda..."
-          value={(table.getColumn("nombre")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("nombre")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm bg-white"
-        /> */}
+      <div className="flex items-center py-2 justify-end w-64 margin auto">
         <div className="flex items-center gap-2">
           <Input
             className="max-w-sm bg-white"

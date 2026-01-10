@@ -13,7 +13,6 @@ import { useEffect, useState } from "react";
 
 import { createUsuario } from "@/services/usuariosServices";
 import type { AxiosError } from "axios";
-// interface par los datos del formulario
 type FormData = {
   nombre: string;
   email: string;
@@ -22,7 +21,7 @@ type FormData = {
   rol: string;
   tipoResidencia: string;
   departamentoId: string;
-  confirmPassword?: string; // Campo para confirmar la contraseña
+  confirmPassword?: string;
 };
 
 interface DepartamentoProps {
@@ -49,13 +48,10 @@ const CreateResidente = ({ setEditState }: createResidentProps) => {
 
   const onSubmit = async (data: FormData) => {
     const { confirmPassword, ...rest } = data;
-    //agregar el dato rolId aqui
-    rest.rol = "residente"; // Asignar un valor de rolId
-    // Aquí puedes manejar el envío del formulario, como llamar a una API para crear el personal
+    rest.rol = "residente";
     try {
       const response = await createUsuario(rest);
       console.log("mensage del backend:", response.message);
-      //Aqui redigir a la vista de residentes
       setEditState({ view: "residentes", entity: "", id: null });
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
@@ -63,11 +59,10 @@ const CreateResidente = ({ setEditState }: createResidentProps) => {
         console.error(
           "Este es el mensaje del backend:",
           err.response.data.message
-        ); // <-- tu mensaje del backend
+        );
       }
     }
   };
-  //Aqui traer las departamentos
   const [departamentos, setDepartamentos] = useState<DepartamentoProps[]>([]);
 
   useEffect(() => {
@@ -133,7 +128,6 @@ const CreateResidente = ({ setEditState }: createResidentProps) => {
         {errors.password && (
           <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
         )}
-        {/* Para confirmar la contraseña solo en el front sin añadirlo al formulario data */}
         <Input
           placeholder="Confirmar contraseña"
           className="bg-gray-100"
@@ -164,7 +158,6 @@ const CreateResidente = ({ setEditState }: createResidentProps) => {
           <p className="text-red-500 text-sm mt-1">{errors.telefono.message}</p>
         )}
 
-        {/* Opción más simple sin Controller */}
         <div>
           <label className="block text-sm font-medium mb-2">
             Tipo Residencia
@@ -192,7 +185,6 @@ const CreateResidente = ({ setEditState }: createResidentProps) => {
             </SelectContent>
           </Select>
 
-          {/* Input hidden para react-hook-form */}
           <input
             type="hidden"
             {...register("tipoResidencia", {

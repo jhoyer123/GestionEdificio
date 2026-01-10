@@ -5,8 +5,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { createReserva } from "@/services/reservaServices";
-import type { EditState } from "@/components/shared/MainContent";
-// <-- CAMBIO: Importamos los componentes de Select de shadcn/ui
 import {
   Select,
   SelectContent,
@@ -16,17 +14,13 @@ import {
 } from "@/components/ui/select";
 
 interface ReservaFormProps {
-  //setState: React.Dispatch<React.SetStateAction<EditState>>;
-  //refresh?: () => void;
   area: any;
   fechaInicial: string;
-  //areaComunId: number | null;
   cajones?: any[];
   reservaParaEditar?: any;
   onSave?: (data: any) => Promise<void>;
 }
 
-// <-- CAMBIO: Función auxiliar para convertir "HH:MM" a minutos. Es clave para comparar horarios.
 const toMinutes = (timeStr: string | null): number => {
   if (!timeStr) return 0;
   const [hours, minutes] = timeStr.split(":").map(Number);
@@ -51,17 +45,14 @@ export default function FormEditarReserva({
   const [numAsistentes, setNumAsistentes] = useState(
     area.tipoArea === "gimnasio" ? "1" : ""
   );
-  // <-- CAMBIO: El valor del select ahora se maneja como string para compatibilidad con el componente
   const [cajaSeleccionada, setCajaSeleccionada] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // <-- CAMBIO: Nuevo estado para guardar la lista de cajones filtrados dinámicamente
   const [cajonesDisponibles, setCajonesDisponibles] = useState<any[]>([]);
 
   const usuarioComoString = localStorage.getItem("user");
   const usuarioId = usuarioComoString ? JSON.parse(usuarioComoString).id : null;
 
-  // <-- CAMBIO CLAVE: useEffect para filtrar los cajones dinámicamente
   useEffect(() => {
     // Si no es un parqueo, no hacemos nada
     if (area.tipoArea !== "parqueo") return;
@@ -100,7 +91,6 @@ export default function FormEditarReserva({
 
       const disponibles = cajones.filter((cajon) => {
         const tieneConflicto = area.reservas?.some((r: any) => {
-          // El conflicto debe ser (1) para el mismo cajón, (2) en la misma fecha y (3) no estar cancelada
           if (
             r.cajaId !== cajon.idParqueoCaja ||
             r.fechaReserva !== fecha ||
@@ -123,7 +113,7 @@ export default function FormEditarReserva({
           );
         });
 
-        return !tieneConflicto; // Un cajón está disponible si NO tiene conflictos
+        return !tieneConflicto;
       });
 
       setCajonesDisponibles(disponibles);
@@ -149,11 +139,13 @@ export default function FormEditarReserva({
   useEffect(() => {
     if (!reservaParaEditar) return;
     try {
-      // fechas: algunos endpoints usan fechaReserva o fechaInicio
-      const f = (reservaParaEditar.fechaReserva || reservaParaEditar.fechaInicio || reservaParaEditar.fecha) as string | undefined;
+      const f = (reservaParaEditar.fechaReserva ||
+        reservaParaEditar.fechaInicio ||
+        reservaParaEditar.fecha) as string | undefined;
       if (f) setFecha(f.split("T")[0]);
-      // si existe fechaFinReserva o fechaFin
-      const ff = (reservaParaEditar.fechaFinReserva || reservaParaEditar.fechaFin) as string | undefined;
+
+      const ff = (reservaParaEditar.fechaFinReserva ||
+        reservaParaEditar.fechaFin) as string | undefined;
       if (ff) setFechaFin(ff.split("T")[0]);
 
       if (reservaParaEditar.horaInicio && reservaParaEditar.horaFin) {
@@ -164,9 +156,16 @@ export default function FormEditarReserva({
         setModalidad("dias");
       }
 
-      setMotivo(reservaParaEditar.motivo || reservaParaEditar.descripcion || "");
-      setNumAsistentes(String(reservaParaEditar.numAsistentes ?? reservaParaEditar.asistentes ?? ""));
-      if (reservaParaEditar.cajaId) setCajaSeleccionada(String(reservaParaEditar.cajaId));
+      setMotivo(
+        reservaParaEditar.motivo || reservaParaEditar.descripcion || ""
+      );
+      setNumAsistentes(
+        String(
+          reservaParaEditar.numAsistentes ?? reservaParaEditar.asistentes ?? ""
+        )
+      );
+      if (reservaParaEditar.cajaId)
+        setCajaSeleccionada(String(reservaParaEditar.cajaId));
     } catch (err) {
       console.warn("No se pudo inicializar el formulario de edición:", err);
     }
@@ -207,7 +206,6 @@ export default function FormEditarReserva({
         reservaData.numAsistentes = 1;
       }
 
-      // Si se proporcionó una función onSave la usamos para actualizar
       if (onSave) {
         await onSave(reservaData);
       } else {
@@ -215,9 +213,7 @@ export default function FormEditarReserva({
         await createReserva(reservaData);
         toast.success("Reserva creada correctamente ✅");
       }
-
     } catch (error: any) {
-      // Si onSave maneja los errores en el padre, no sobreescribimos el mensaje
       if (!onSave) {
         toast.error(
           error.response?.data?.message ||
@@ -225,7 +221,6 @@ export default function FormEditarReserva({
             "Error al crear la reserva"
         );
       } else {
-        // rethrow para que el padre pueda capturarlo si lo desea
         throw error;
       }
     } finally {
@@ -246,7 +241,6 @@ export default function FormEditarReserva({
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* ... (código de botones de modalidad y fechas igual que antes) ... */}
             {(area.tipoArea === "parqueo" || area.tipoArea !== "gimnasio") && (
               <div className="flex gap-4">
                 <Button
@@ -307,7 +301,6 @@ export default function FormEditarReserva({
               </div>
             )}
 
-            {/* ... (código de motivo y asistentes igual que antes) ... */}
             {area.tipoArea !== "gimnasio" && area.tipoArea !== "parqueo" && (
               <>
                 <div>
@@ -332,7 +325,6 @@ export default function FormEditarReserva({
             {area.tipoArea === "parqueo" && (
               <div>
                 <Label>Selecciona un cajón disponible</Label>
-                {/* <-- CAMBIO: Usamos el nuevo componente Select y la lista dinámica */}
                 <Select
                   value={cajaSeleccionada}
                   onValueChange={setCajaSeleccionada}

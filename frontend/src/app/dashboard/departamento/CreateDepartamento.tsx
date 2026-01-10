@@ -1,12 +1,12 @@
 // app/pages/CrearDepartamento.tsx
 import { useForm } from "react-hook-form";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import axios from "axios";
 import { crearDepartamento } from "@/services/departamentosServices";
-import { ref } from "process";
+
 
 type FormData = {
   numero: number;

@@ -16,19 +16,15 @@ export default function Layout() {
 
   return (
     <div className="flex h-screen w-full bg-gray-100 dark:bg-gray-900">
-      {/* Sidebar estático a la izquierda */}
       <Sidebar
         activeView={editState.view}
         setActiveView={(view) => setEditState((state) => ({ ...state, view }))}
       />
 
-      {/* Contenedor principal que se flexiona para ocupar el espacio restante */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Header estático en la parte superior del contenido */}
         <Header />
 
-        {/* Área de contenido principal con scroll vertical */}
-        <main className="flex-1 overflow-y-auto p-6 h-full relative md:ml-64 transition-all duration-300 p-4">
+        <main className="flex-1 overflow-y-auto h-full relative md:ml-64 transition-all duration-300 p-4">
           <MainContent editState={editState} setEditState={setEditState} />
         </main>
       </div>

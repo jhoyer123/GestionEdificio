@@ -1,6 +1,6 @@
 import Rol from "../models/Rol.js";
 
-//*****  Crear un rol *****//
+// Crear un rol
 export const createRol = async (req, res) => {
   try {
     const { rol } = req.body;

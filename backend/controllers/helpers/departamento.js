@@ -4,7 +4,7 @@ import { QueryTypes } from "sequelize";
 // Obtener los departamentos y además sus usuarios de los que tengan si no null
 export const getDepartamentosConUsuarios = async (req, res) => {
   try {
-    // ✅ Opción 1: Consulta más eficiente con LEFT JOIN
+    // Consulta más eficiente con LEFT JOIN
     const departamentos = await sequelize.query(
       `
         SELECT 

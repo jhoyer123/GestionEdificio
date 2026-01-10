@@ -18,9 +18,7 @@ export interface propsUsuarios {
 
 const myCustomFilterFn: FilterFn<propsUsuarios> = (
   row: Row<propsUsuarios>,
-  columnId: string,
-  filterValue: string,
-  addMeta: (meta: any) => void,
+  filterValue: string
 ) => {
   if (row.original.email.includes(filterValue)) {
     return true;
@@ -69,20 +67,15 @@ export const columns = (refresh: () => void): ColumnDef<propsUsuarios>[] => [
     header: "Rol/es",
     filterFn: myCustomFilterFn,
     cell: ({ row }) => {
-      // Obtenemos el array de roles de la fila actual
       const roles = row.getValue("roles");
-      // Es buena práctica verificar si 'roles' es un array antes de mapearlo
       if (!Array.isArray(roles)) {
-        return null; // O muestra un guion, o lo que prefieras
+        return null;
       }
 
-      // 3. Mapeamos el array y renderizamos un Badge por cada rol
       return (
         <div className="flex flex-wrap gap-1">
-          {" "}
-          {/* Un div para alinear los badges */}
           {roles.map((rol) => {
-            if (!rol.rol) return null; // Verificamos que 'rol.rol' exista
+            if (!rol.rol) return null;
             if (rol.rol === "administrador") {
               return <Badge key={rol.idRol}>{rol.rol}</Badge>;
             }

@@ -3,7 +3,6 @@ import axios from "axios";
 import { crearPago } from "@/services/pagosServices";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import type { promises } from "dns";
 import { getFacturasByUsuario } from "@/services/facturas.services";
 
 interface PagoQRProps {

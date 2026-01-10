@@ -3,7 +3,6 @@ import axios from "axios";
 import { crearPago } from "@/services/pagosServices";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import type { promises } from "dns";
 import { getFacturasByUsuario } from "@/services/facturas.services";
 
 interface PagoQRProps {
@@ -49,7 +48,7 @@ export default function PagoQR({
         duration: 4000,
         position: "top-right",
       });
-      // Actualizar la lista de facturas después de confirmar el pago
+  
       const facturasActualizadas = await getFacturasByUsuario(usuarioId);
       setFacturas(facturasActualizadas)
     } catch (error) {

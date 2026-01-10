@@ -6,7 +6,6 @@ import {
   type ReactNode,
 } from "react";
 
-// ======== Tipos ========
 export interface Rol {
   id: number;
   rol: string;
@@ -38,7 +37,6 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<Usuario | null>(null);
 
-  // 🔹 Cargar usuario del localStorage al iniciar
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -46,13 +44,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }, []);
 
-  // 🔹 Guardar usuario al hacer login
   const loginUser = (userData: Usuario) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  // 🔹 Eliminar usuario al hacer logout
   const logoutUser = () => {
     setUser(null);
     localStorage.removeItem("user");

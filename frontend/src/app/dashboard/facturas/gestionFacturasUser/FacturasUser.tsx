@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { pdf } from "@react-pdf/renderer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,10 +7,8 @@ import { Input } from "@/components/ui/input";
 import { getFacturasByUsuario } from "@/services/facturas.services";
 import { FacturaMantPDF } from "../genFactMant/FacturaMantPDF";
 import { type facturas } from "../gestiondeFacturasAdmin/ColumnsFacturas";
-//import para el modal
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -19,13 +17,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import PagoQR from "../../pagos/PagoQR";
-import { set } from "date-fns";
 
 export default function FacturasUser() {
   const [facturas, setFacturas] = useState<facturas[]>([]);
-  const [filter, setFilter] = useState<"todos" | "mantenimiento" | "reservas">(
-    "todos"
-  );
+
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingPdfId, setLoadingPdfId] = useState<number | null>(null);
@@ -55,77 +50,34 @@ export default function FacturasUser() {
       mounted = false;
     };
   }, []);
-
-  const filtered = useMemo(() => {
-    return facturas.filter((f) => {
-      if (filter === "mantenimiento" && f.departamentoId === null) return false;
-      if (filter === "reservas" && f.departamentoId !== null) return false;
-      if (q.trim()) {
-        const s = q.toLowerCase();
-        return (
-          (f.nroFactura || "").toLowerCase().includes(s) ||
-          (f.estado || "").toLowerCase().includes(s)
-        );
-      }
-      return true;
-    });
-  }, [facturas, filter, q]);
-
-  const [loadingPdf, setLoadingPdf] = useState(false);
   const [open, setOpen] = useState(false);
 
-  // JavaScript / React: handler para abrir PDF en nueva ventana sin bloqueo de popup
+  //handler para abrir PDF en nueva ventana sin bloqueo de popup
   const handleOpenPdf = async (data: facturas) => {
     try {
-      setLoadingPdf(true);
-      // 🧠 Generar PDF y crear blob
+      // Generar PDF y crear blob
       const doc = <FacturaMantPDF factura={data} />;
       const blob = await pdf(doc).toBlob();
 
-      // 🔗 Crear URL del PDF y abrir en nueva pestaña (sin bloqueo)
+      // Crear URL del PDF y abrir en nueva pestaña (sin bloqueo)
       const url = URL.createObjectURL(blob);
       window.open(url, "_blank");
 
-      // 🔥 Liberar el blob después de 1 minuto
+      // Liberar el blob después de 1 minuto
       setTimeout(() => URL.revokeObjectURL(url), 60000);
     } catch (err) {
       console.error("Error generando/abriendo PDF:", err);
-    } finally {
-      setLoadingPdf(false);
     }
-  };
-
-  const handlePagar = () => {
-    setOpen(false);
   };
 
   return (
     <div className="space-y-6">
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h2 className="text-2xl font-semibold">Mis Facturas</h2>
+        <h2 className="text-2xl font-semibold">
+          Mis Facturas de Mantenimiento del Edificio
+        </h2>
 
         <div className="flex gap-2 items-center">
-          <div className="hidden sm:flex gap-2">
-            <Button
-              variant={filter === "todos" ? "default" : "ghost"}
-              onClick={() => setFilter("todos")}
-            >
-              Todos
-            </Button>
-            <Button
-              variant={filter === "mantenimiento" ? "default" : "ghost"}
-              onClick={() => setFilter("mantenimiento")}
-            >
-              Mantenimiento
-            </Button>
-            <Button
-              variant={filter === "reservas" ? "default" : "ghost"}
-              onClick={() => setFilter("reservas")}
-            >
-              Reservas
-            </Button>
-          </div>
-
           <Input
             placeholder="Buscar número o estado..."
             value={q}
@@ -137,13 +89,9 @@ export default function FacturasUser() {
 
       {loading ? (
         <div className="text-center py-8">Cargando facturas...</div>
-      ) : filtered.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">
-          No hay facturas que coincidan.
-        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((f) => (
+          {facturas.map((f) => (
             <article
               key={f.idFactura}
               className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800 shadow-sm"
@@ -208,7 +156,6 @@ export default function FacturasUser() {
                     variant="outline"
                     className="cursor-pointer"
                     onClick={() => {
-                      /* aquí puedes abrir detalle en app si quieres */
                       setOpen(true);
                       setIdFact(f.idFactura);
                       setMonto(f.montoTotal);
@@ -241,12 +188,6 @@ export default function FacturasUser() {
             <AlertDialogCancel className="cursor-pointer">
               Volver
             </AlertDialogCancel>
-            {/* <AlertDialogAction
-              onClick={handlePagar}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 text-white cursor-pointer"
-            >
-              Realizar Pago
-            </AlertDialogAction> */}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

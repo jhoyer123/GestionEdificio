@@ -6,7 +6,6 @@ import Rol from "../models/Rol.js";
 import sequelize from "../config/database.js";
 
 // crear un nuevo usuario residente
-
 export const createResidente = async (req, res) => {
   const { telefono, departamentoId, usuarioId, tipoResidencia, idRol } =
     req.body;
@@ -75,7 +74,7 @@ export const createResidente = async (req, res) => {
     );
 
     // Asignar el rol de residente al usuario
-    await usuario.addRoles(idRol, { transaction: t }); // 3 es el idRol para Residente
+    await usuario.addRoles(idRol, { transaction: t });
 
     await t.commit();
 
@@ -159,9 +158,6 @@ export const getResidentes = async (req, res) => {
             fecha: r.usuario.departamentos[0].Habita.fecha
               ? new Date(r.usuario.departamentos[0].Habita.fecha).toLocaleDateString("es-ES")
               : null,
-            /* fecha: r.usuario.departamentos[0].Habita.fecha
-              .toISOString()
-              .split("T")[0], */
             tipoResidencia: r.usuario.departamentos[0].Habita.tipoResidencia,
           }
         : null,

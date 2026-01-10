@@ -1,21 +1,20 @@
 // Archivo: ColumnsRes.tsx
 
-import { type ColumnDef, type FilterFn } from "@tanstack/react-table";
+import { type ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import ActionsRes from "./ActionsRes";
 
-// PASO 1: Actualizar la interfaz para reflejar datos opcionales
 export interface Reserva {
   idReserva: number;
   fechaInicio: string;
-  fechaFin: string | null; // Añadido para reservas de varios días
-  horaInicio: string | null; // Convertido a opcional
-  horaFin: string | null; // Convertido a opcional
+  fechaFin: string | null;
+  horaInicio: string | null;
+  horaFin: string | null;
   motivo: string;
   asistentes: number;
-  estado: "confirmada" | "pendiente" | "cancelada" | string; // Tipado más específico
+  estado: "confirmada" | "pendiente" | "cancelada" | string;
   idAreaComun: number;
   tipoAreaComun: string;
   areaNombre: string;
@@ -31,22 +30,18 @@ export interface Reserva {
   numeroDepartamento: number;
 }
 
-// --- Funciones de Formateo para mantener el código limpio ---
 const formatDate = (dateString: string | null) => {
   if (!dateString) return "";
   const date = new Date(dateString);
-  // Usamos toLocaleDateString para un formato amigable (ej: 29/9/2025)
   return date.toLocaleDateString("es-BO", { timeZone: "UTC" });
 };
 
 const formatTime = (timeString: string | null) => {
   if (!timeString) return "";
-  // Quita los segundos si existen
   const [hours, minutes] = timeString.split(":");
   return `${hours}:${minutes}`;
 };
 
-// --- Columnas de la tabla ---
 export const columnsRes = (
   refresh: () => void,
   setEditState: React.Dispatch<
@@ -74,14 +69,12 @@ export const columnsRes = (
     header: "Teléfono",
   },
   { accessorKey: "numeroDepartamento", header: "Departamento" },
-  // PASO 2: La nueva columna unificada que reemplaza a fecha y horas
   {
     id: "periodo",
     header: "Periodo de Reserva",
     cell: ({ row }) => {
       const { fechaInicio, fechaFin, horaInicio, horaFin } = row.original;
 
-      // Caso 1: Reserva por horas en un día específico
       if (horaInicio && horaFin) {
         return (
           <div className="flex flex-col">
@@ -93,7 +86,6 @@ export const columnsRes = (
         );
       }
 
-      // Caso 2: Reserva por varios días
       if (fechaFin && fechaFin !== fechaInicio) {
         return (
           <div className="flex flex-col">
@@ -103,7 +95,6 @@ export const columnsRes = (
         );
       }
 
-      // Caso 3: Reserva de un día completo
       return (
         <div className="flex flex-col">
           <span className="font-semibold">{formatDate(fechaInicio)}</span>
@@ -122,7 +113,6 @@ export const columnsRes = (
     cell: ({ row }) => {
       const estado = row.original.estado;
 
-      // PASO 3: Forma más robusta de asignar colores a los badges
       const styleMap = {
         confirmada: "bg-green-500 hover:bg-green-600",
         pendiente: "bg-yellow-500 hover:bg-yellow-600",

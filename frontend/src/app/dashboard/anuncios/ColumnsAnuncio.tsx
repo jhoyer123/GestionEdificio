@@ -17,19 +17,12 @@ interface Anuncio {
 
 const myCustomFilterFn: FilterFn<Anuncio> = (
   row: Row<Anuncio>,
-  columnId: string,
   filterValue: string,
-  addMeta: (meta: any) => void
 ) => {
-  /* if (row.original.email.includes(filterValue)) {
-    return true;
-  } */
+
   if (row.original.titulo.includes(filterValue)) {
     return true;
   }
-  /*  if (row.original.rol.includes(filterValue)) {
-    return true;
-  } */
   if (row.original.descripcion.includes(filterValue)) {
     return true;
   }

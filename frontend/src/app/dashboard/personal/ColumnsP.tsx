@@ -25,19 +25,11 @@ export interface propsPersonal {
 
 const myCustomFilterFn: FilterFn<propsPersonal> = (
   row: Row<propsPersonal>,
-  columnId: string,
   filterValue: string,
-  addMeta: (meta: any) => void
 ) => {
-  /* if (row.original.email.includes(filterValue)) {
-    return true;
-  } */
   if (row.original.nombre.includes(filterValue)) {
     return true;
   }
-  /*  if (row.original.rol.includes(filterValue)) {
-    return true;
-  } */
   if (row.original.telefono.includes(filterValue)) {
     return true;
   }

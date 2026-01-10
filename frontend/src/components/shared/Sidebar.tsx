@@ -2,14 +2,21 @@ import {
   LayoutDashboard,
   Users,
   LogOut,
-  Home,
-  FolderCog,
   UserCog,
   CalendarCheck,
-  Building2,
   ClipboardList,
-  CarFront,
   CalendarDays,
+  Bot,
+  Building,
+  Briefcase,
+  Map,
+  Calendar,
+  Car,
+  Receipt,
+  FileStack,
+  Banknote,
+  Megaphone,
+  Bell,
 } from "lucide-react";
 import { logout } from "@/services/authService";
 
@@ -17,13 +24,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 import { useNavigate } from "react-router-dom";
-import { set } from "date-fns";
 import { useAuth } from "./AuthContext";
 
 interface propsSidebar {
@@ -31,8 +35,8 @@ interface propsSidebar {
   setActiveView: (view: string) => void;
 }
 
-export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
-  const { logoutUser } = useAuth();
+export default function Sidebar({ setActiveView }: propsSidebar) {
+  const { logoutUser, user } = useAuth();
   const handleDashboardClick = () => {
     setActiveView("dashboard");
   };
@@ -137,20 +141,121 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
         {/* Contenido con scroll bonito */}
         <div className="flex-1 overflow-y-auto py-4 px-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900/50 hover:scrollbar-thumb-gray-600 transition-all">
           <nav className="grid items-start gap-1 px-2 text-sm font-medium">
-            <button
-              onClick={handleDashboardClick}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 hover:bg-gray-700/60 hover:text-white transition-all`}
-            >
-              <LayoutDashboard className="mr-2 h-4 w-4" />
-              Dashboard
-            </button>
-            <button
-              onClick={handleChatbotClick}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 hover:bg-gray-700/60 hover:text-white transition-all`}
-            >
-              <LayoutDashboard className="mr-2 h-4 w-4" />
-              Agente IA
-            </button>
+            {user?.rol.some((r) => r.rol === "administrador") && (
+              <>
+                {/* dashboard */}
+                <button
+                  onClick={handleDashboardClick}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 hover:bg-gray-700/60 hover:text-white transition-all`}
+                >
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  Dashboard
+                </button>
+                {/* agente IA */}
+                <button
+                  onClick={handleChatbotClick}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 hover:bg-gray-700/60 hover:text-white transition-all`}
+                >
+                  <Bot className="mr-2 h-4 w-4" />
+                  Agente IA
+                </button>
+                {/* usuarios */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+                  >
+                    <Users className="mr-2 h-4 w-4" />
+                    Usuarios
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={handleUsuarioClick}>
+                      Todos
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleResidentesClick}>
+                      Residentes
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handlePersonalClick}>
+                      Personal
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                {/* departamentos */}
+                <button
+                  onClick={handleDepartamentoClick}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+                >
+                  <Building className="mr-2 h-4 w-4" />
+                  Departamentos
+                </button>
+                {/* funciones del personal */}
+                <button
+                  onClick={handleFuncionClick}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+                >
+                  <Briefcase className="mr-2 h-4 w-4" />
+                  Funciones De Personal
+                </button>
+                {/* Gestión de Areas Comunes */}
+                <button
+                  onClick={handleAreasComunesAdminClick}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700 text-start`}
+                >
+                  <Map className="mr-2 h-4 w-4" />
+                  Gestión de Areas Comunes
+                </button>
+                {/* Gestión de Reservas */}
+                <button
+                  onClick={handleReservasClick}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+                >
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Gestión de Reservas
+                </button>
+                {/* gestión de parqueos */}
+                <button
+                  onClick={handleParqueoAdminClick}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+                >
+                  <Car className="mr-2 h-4 w-4" />
+                  Gestión de parqueos
+                </button>
+                {/* Gestión de facturas */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+                  >
+                    <FileStack className="mr-2 h-4 w-4" />
+                    Gestion de Facturas
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={handleConceptosClick}>
+                      Conceptos de Facturación
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleFacturasClick}>
+                      Facturas
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                {/* Gestión de planillas de pago */}
+                <button
+                  onClick={handlePlanillasAdminClick}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700 text-start`}
+                >
+                  <ClipboardList className="mr-2 h-4 w-4" />
+                  Gestión de planillas de Pago
+                </button>
+                {/* gestión de anuncios */}
+                <button
+                  onClick={handleAnunciosAdminClick}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+                >
+                  <Megaphone className="mr-2 h-4 w-4" />
+                  Gestión de Anuncios
+                </button>
+              </>
+            )}
+
+            {/* perfil */}
             <button
               onClick={handlePerfilClick}
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
@@ -158,125 +263,55 @@ export default function Sidebar({ activeView, setActiveView }: propsSidebar) {
               <UserCog className="mr-2 h-4 w-4" />
               Perfil
             </button>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
-              >
-                <Users className="mr-2 h-4 w-4" />
-                Usuarios
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {/* <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator /> */}
-                <DropdownMenuItem onClick={handleUsuarioClick}>
-                  Todos
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleResidentesClick}>
-                  Residentes
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handlePersonalClick}>
-                  Personal
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <button
-              onClick={handleDepartamentoClick}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
-            >
-              <Home className="mr-2 h-4 w-4" />
-              Departamentos
-            </button>
-            <button
-              onClick={handleFuncionClick}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
-            >
-              <FolderCog className="mr-2 h-4 w-4" />
-              Funciones De Personal
-            </button>
-            <button
-              onClick={handleAreaComunClick}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
-            >
-              <CalendarCheck className="mr-2 h-4 w-4" />
-              Reservaciones
-            </button>
-            <button
-              onClick={handleAreasComunesAdminClick}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
-            >
-              <Building2 className="mr-2 h-4 w-4" />
-              Gestion de Areas
-            </button>
-            <button
-              onClick={handleReservasClick}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
-            >
-              <ClipboardList className="mr-2 h-4 w-4" />
-              Gestion de Reservas
-            </button>
-            <button
-              onClick={handleParqueoAdminClick}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
-            >
-              <CarFront className="mr-2 h-4 w-4" />
-              Gestion de Parqueos
-            </button>
-            <button
-              onClick={handleMisReservasClick}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
-            >
-              <CalendarDays className="mr-2 h-4 w-4" />
-              Mis reservas
-            </button>
-            <button
-              onClick={handleFacturasUserClick}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
-            >
-              <UserCog className="mr-2 h-4 w-4" />
-              Mis facturas
-            </button>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
-              >
-                <Users className="mr-2 h-4 w-4" />
-                Gestion de Facturas
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={handleConceptosClick}>
-                  Conceptos de Facturación
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleFacturasClick}>
-                  Facturas
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <button
-              onClick={handlePlanillasUserClick}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
-            >
-              <UserCog className="mr-2 h-4 w-4" />
-              Pagos de Salario
-            </button>
-            <button
-              onClick={handlePlanillasAdminClick}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
-            >
-              <UserCog className="mr-2 h-4 w-4" />
-              Planillas de Pago
-            </button>
-            <button
-              onClick={handleAnunciosAdminClick}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
-            >
-              <UserCog className="mr-2 h-4 w-4" />
-              Gestión de Anuncios
-            </button>
+
+            {user?.rol.some((r) => r.rol === "residente") && (
+              <>
+                {/* reservaciones */}
+                <button
+                  onClick={handleAreaComunClick}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+                >
+                  <CalendarCheck className="mr-2 h-4 w-4" />
+                  Reservar Area Común
+                </button>
+                {/* Mis reservas */}
+                <button
+                  onClick={handleMisReservasClick}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+                >
+                  <CalendarDays className="mr-2 h-4 w-4" />
+                  Mis reservas
+                </button>
+                {/* Mis facturas */}
+                <button
+                  onClick={handleFacturasUserClick}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+                >
+                  <Receipt className="mr-2 h-4 w-4" />
+                  Mis facturas
+                </button>
+              </>
+            )}
+
+            {user?.rol.some((r) => r.rol === "personal") && (
+              <>
+                {/* Mis planillas de pago */}
+                <button
+                  onClick={handlePlanillasUserClick}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
+                >
+                  <Banknote className="mr-2 h-4 w-4" />
+                  Mis planillas de pago
+                </button>
+              </>
+            )}
+
+            {/*mis anuncios */}
             <button
               onClick={handleAnunciosUserClick}
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-700`}
             >
-              <UserCog className="mr-2 h-4 w-4" />
+              <Bell className="mr-2 h-4 w-4" />
               Anuncios
             </button>
           </nav>

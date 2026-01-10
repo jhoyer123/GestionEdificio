@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useState } from "react";
+import React, { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { pdf } from "@react-pdf/renderer";
 import { FacturaMantPDF } from "../genFactMant/FacturaMantPDF";
 import { FacturaReservaPDF } from "../genFactMant/FacturaReservaPDF";
-//import { getFacturaById } from "@/services/facturas.services";
 import type { facturas } from "./ColumnsFacturas";
 import { useEffect } from "react";
 import { getReservaById } from "@/services/reservaServices";
@@ -26,7 +25,7 @@ interface FacturasProps {
   >;
 }
 
-const ActionsPersonal = ({ data, setEditState }: FacturasProps) => {
+const ActionsPersonal = ({ data }: FacturasProps) => {
   const [loadingPdf, setLoadingPdf] = useState(false);
   const [reserva, setReserva] = useState<any | null>(null);
 
@@ -40,22 +39,19 @@ const ActionsPersonal = ({ data, setEditState }: FacturasProps) => {
     fetchReserva();
   }, [data.reservaId]);
 
-  // JavaScript / React: handler para abrir PDF en nueva ventana sin bloqueo de popup
   const handleOpenPdf = async () => {
     try {
       setLoadingPdf(true);
-      // 🧠 Generar PDF y crear blob
+
       let doc = <FacturaMantPDF factura={data} />;
       if (!data.fechaVencimiento) {
         doc = <FacturaReservaPDF factura={data} reservaData={reserva} />;
       }
       const blob = await pdf(doc).toBlob();
 
-      // 🔗 Crear URL del PDF y abrir en nueva pestaña (sin bloqueo)
       const url = URL.createObjectURL(blob);
       window.open(url, "_blank");
 
-      // 🔥 Liberar el blob después de 1 minuto
       setTimeout(() => URL.revokeObjectURL(url), 60000);
     } catch (err) {
       console.error("Error generando/abriendo PDF:", err);

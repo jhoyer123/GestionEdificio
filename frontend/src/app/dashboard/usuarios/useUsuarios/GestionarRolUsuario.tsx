@@ -19,8 +19,7 @@ import {
 } from "../../../../services/personalServices";
 import { useEffect, useState, useMemo } from "react";
 import { getDepartamentos } from "@/services/departamentosServices";
-import { createResidente, deleteResidente } from "@/services/residenteServices";
-import type { AxiosError } from "axios";
+import { createResidente, deleteResidente } from "@/services/ResidenteServices";
 import { toast } from "sonner";
 import axios from "axios";
 
@@ -68,7 +67,6 @@ export function GestionarRolUsuario({
     }[]
   >([]);
 
-  // estados optimizados en vez de watch
   const [accion, setAccion] = useState<"agregar" | "quitar">("agregar");
   const [rolSeleccionado, setRolSeleccionado] = useState<string>("");
 
@@ -393,12 +391,7 @@ export function GestionarRolUsuario({
             </p>
           )}
 
-          {/* Opción más simple sin Controller */}
           <div>
-            {/* <label className="block text-sm font-medium mb-2">
-              Tipo Residencia
-            </label> */}
-
             <Select
               onValueChange={(val) => {
                 setValue("tipoResidencia", val, { shouldValidate: true });
@@ -436,9 +429,7 @@ export function GestionarRolUsuario({
             )}
           </div>
 
-          {/* Select de unidad */}
           <div>
-            {/* <label className="block text-sm font-medium mb-2">Unidad</label> */}
             <Select
               onValueChange={(val) =>
                 setValue("departamentoId", val, { shouldValidate: true })

@@ -7,29 +7,26 @@ import {
   PDFDownloadLink,
 } from "@react-pdf/renderer";
 import { type facturas } from "../gestiondeFacturasAdmin/ColumnsFacturas";
-//import { type FacturaMantDetalleProps } from "./FacturaMantDetalle";
 
-// 🎨 Estilos del PDF (Ajustados para un diseño más moderno)
 const styles = StyleSheet.create({
   page: {
-    padding: 50, // Más padding para un respiro visual
+    padding: 50,
     fontSize: 10,
     fontFamily: "Helvetica",
-    color: "#374151", // Tono de gris más oscuro para el texto
+    color: "#374151",
   },
 
-  // --- ENCABEZADO Y LOGO ---
   headerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    borderBottom: "2 solid #059669", // Verde elegante para la línea divisoria
+    borderBottom: "2 solid #059669",
     marginBottom: 25,
     paddingBottom: 10,
   },
   logo: {
     fontSize: 24,
-    fontFamily: "Helvetica-Bold", // Usamos la versión Bold para el nombre
+    fontFamily: "Helvetica-Bold",
     color: "#059669",
   },
   companyInfoContainer: {
@@ -46,11 +43,10 @@ const styles = StyleSheet.create({
     lineHeight: 1.5,
   },
 
-  // --- SECCIONES DE INFORMACIÓN ---
   section: {
     marginBottom: 20,
     padding: 10,
-    backgroundColor: "#F9FAFB", // Fondo ligero para agrupar la información
+    backgroundColor: "#F9FAFB",
     borderRadius: 4,
   },
   title: {
@@ -71,10 +67,9 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
 
-  // --- TABLA DE DETALLES ---
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: "#059669", // Fondo verde para la cabecera
+    backgroundColor: "#059669",
     color: "white",
     paddingVertical: 7,
     fontFamily: "Helvetica-Bold",
@@ -86,21 +81,20 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     alignItems: "center",
   },
-  // Ajuste de anchos para quitar 'Frecuencia'
+
   colConcepto: { width: "30%", paddingLeft: 5 },
   colDescripcion: { width: "55%", paddingLeft: 5 },
   colMonto: { width: "15%", textAlign: "right", paddingRight: 5 },
 
-  // --- TOTALES ---
   totalContainer: {
     marginTop: 20,
     flexDirection: "row",
-    justifyContent: "flex-end", // Empuja el total hacia la derecha
+    justifyContent: "flex-end",
   },
   totalBox: {
-    width: "40%", // Un recuadro más pequeño y definido
+    width: "40%",
     padding: 10,
-    backgroundColor: "#E0F7FA", // Fondo suave para el total
+    backgroundColor: "#E0F7FA",
     border: "1 solid #059669",
     borderRadius: 4,
   },
@@ -114,7 +108,7 @@ const styles = StyleSheet.create({
     color: "#059669",
   },
 
-  // --- PIE DE PÁGINA ---
+  //PIE DE PÁGINA
   footer: {
     position: "absolute",
     bottom: 50,
@@ -130,7 +124,6 @@ interface FacturaMantPDFProps {
   factura: facturas | null;
 }
 
-// 📄 Componente principal
 export const FacturaMantPDF = ({ factura }: FacturaMantPDFProps) => (
   <Document>
     <Page size="A4" style={styles.page}>
@@ -164,10 +157,6 @@ export const FacturaMantPDF = ({ factura }: FacturaMantPDFProps) => (
           </Text>
         </View>
         <View style={styles.infoRow}>
-          {/* <Text style={styles.infoText}>
-            <Text style={{ fontFamily: "Helvetica-Bold" }}>Estado:</Text>{" "}
-            {factura?.estado}
-          </Text> */}
           <Text style={styles.infoText}>
             <Text style={{ fontFamily: "Helvetica-Bold" }}>
               Fecha de Vencimiento:
@@ -219,7 +208,7 @@ export const FacturaMantPDF = ({ factura }: FacturaMantPDFProps) => (
       <View style={styles.totalContainer}>
         <View style={styles.totalBox}>
           <View style={styles.totalRow}>
-            <Text style={styles.totalText}>TOTAL A PAGAR:  </Text>
+            <Text style={styles.totalText}>TOTAL A PAGAR: </Text>
             <Text style={styles.totalText}>
               {Number(factura?.montoTotal).toFixed(2)} Bs
             </Text>
@@ -239,7 +228,7 @@ export const FacturaMantPDF = ({ factura }: FacturaMantPDFProps) => (
 interface DescargarFacturaProps {
   factura: facturas | null;
 }
-// 💾 Componente de descarga
+
 export const DescargarFactura = ({ factura }: DescargarFacturaProps) => (
   <PDFDownloadLink
     document={<FacturaMantPDF factura={factura} />}

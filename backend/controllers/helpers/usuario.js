@@ -69,7 +69,7 @@ export const resetPassword = async (req, res) => {
   }
 };
 
-//***** Enviar correo para reestablecer la contraseña del usuario *****/
+//Enviar correo para reestablecer la contraseña del usuario 
 export const sendResetPasswordEmail = async (req, res) => {
   try {
     const { email } = req.body;

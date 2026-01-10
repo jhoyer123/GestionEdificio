@@ -29,7 +29,6 @@ export const EditAreaComun = ({ setEditState, areaComunId }: Props) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loadingData, setLoadingData] = useState(true);
 
-  // 👀 Observar tipoArea para ocultar horarios en parqueo
   const tipoArea = watch("tipoArea");
 
   const fetchAreaData = async () => {
@@ -41,7 +40,7 @@ export const EditAreaComun = ({ setEditState, areaComunId }: Props) => {
       setValue("descripcion", areaComun.descripcion || "");
       setValue("capacidadMaxima", areaComun.capacidadMaxima);
       setValue("costoBase", areaComun.costoBase);
-      setValue("tipoArea", areaComun.tipoArea); // ✅ cargamos el tipo
+      setValue("tipoArea", areaComun.tipoArea); 
       setValue("horarioApertura", areaComun.horarioApertura);
       setValue("horarioCierre", areaComun.horarioCierre);
       setValue("requiereAprobacion", areaComun.requiereAprobacion);
@@ -80,7 +79,7 @@ export const EditAreaComun = ({ setEditState, areaComunId }: Props) => {
     formData.append("descripcion", data.descripcion || "");
     formData.append("capacidadMaxima", data.capacidadMaxima.toString());
     formData.append("costoBase", data.costoBase.toString());
-    formData.append("tipoArea", data.tipoArea); // ✅ enviar tipo
+    formData.append("tipoArea", data.tipoArea); 
     if (data.tipoArea !== "parqueo") {
       formData.append("horarioApertura", data.horarioApertura);
       formData.append("horarioCierre", data.horarioCierre);

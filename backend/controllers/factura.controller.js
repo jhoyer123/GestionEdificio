@@ -15,7 +15,7 @@ import Reserva from "../models/Reserva.js";
 export const crearFactura = async (req, res) => {
   const t = await sequelize.transaction();
   try {
-    // 1) Obtener fecha actual y preparar contador para nroFactura
+    //Obtener fecha actual y preparar contador para nroFactura
     const fechaActual = new Date().toISOString().slice(0, 10).replace(/-/g, ""); // YYYYMMDD
     //departamentos donde solo viven usuarios
     const departamentos = await Departamento.findAll({
@@ -313,83 +313,6 @@ export const getFacturas = async (req, res) => {
   }
 };
 
-/* //obtener todas las facturas
-export const getFacturas = async (req, res) => {
-  try {
-    const facturas = await Factura.findAll({
-      include: [
-        {
-          model: Departamento,
-          as: "departamento",
-          include: [
-            {
-              model: Usuario,
-              as: "usuarios",
-              include: [{ model: Residente, as: "residente" }],
-            },
-          ],
-        },
-        { model: ConceptoMantenimiento, as: "conceptosMantenimiento" },
-        {
-          model: Reserva,
-          as: "reserva",
-          include: [{ model: Usuario, as: "usuario" }],
-        },
-      ],
-    });
-    //limpiar datos de las facturas
-    const facturasNuevas = facturas.map((f) => ({
-      idFactura: f.idFactura,
-      nroFactura: f.nroFactura,
-      //convertir fecha a hora fecha hora boliviana
-      //fechaEmision: f.fechaEmision,
-
-      fechaVencimiento: f.fechaVencimiento
-        ? formatInTimeZone(
-            new Date(f.fechaVencimiento + "Z"),
-            "America/La_Paz",
-            "yyyy-MM-dd HH:mm:ss"
-          )
-        : null, // o undefined si preferís no enviar nada
-
-      montoTotal: f.montoTotal,
-      estado: f.estado,
-      //------------------
-      departamentoId: f.departamentoId ? f.departamentoId : null,
-      nroDepartamento: f.departamento ? f.departamento.nroDepartamento : null,
-
-      reservaId: f.reservaId ? f.reservaId : null,
-      //-----------------------
-      usuarioId: f.departamento.usuarios.length
-        ? f.departamento.usuarios[0].idUsuario
-        : null,
-      nombreUsuario: f.departamento.usuarios.length
-        ? f.departamento.usuarios[0].nombre
-        : "Sin usuario",
-      emailUsuario: f.departamento ? f.departamento.usuarios.length
-        ? f.departamento.usuarios[0].email
-        : "Sin email",
-      telefonoUsuario: f.departamento.usuarios[0].residente
-        ? f.departamento.usuarios[0].residente.telefono
-        : "Sin teléfono",
-      conceptos: f.conceptosMantenimiento.map((c) => ({
-        idConcepto: c.idConcepto,
-        titulo: c.titulo,
-        monto: c.monto,
-        frecuencia: c.frecuencia,
-        descripcion: c.descripcion,
-      })),
-    }));
-    return res.status(200).json(facturasNuevas);
-  } catch (error) {
-    console.error("Error al obtener facturas:", error);
-    return res.status(500).json({
-      message: "Error interno al obtener facturas",
-      error: error.message,
-    });
-  }
-}; */
-
 //obtener factura por id
 export const getFacturaById = async (req, res) => {
   const { id } = req.params;
@@ -416,10 +339,6 @@ export const getFacturaById = async (req, res) => {
     const facturaNueva = {
       idFactura: factura.idFactura,
       nroFactura: factura.nroFactura,
-      //convertir fecha a hora fecha hora boliviana
-      //fechaEmision: f.fechaEmision,
-
-      // Uso
       fechaEmision: formatInTimeZone(
         new Date(factura.fechaEmision + "Z"),
         "America/La_Paz",
@@ -469,7 +388,7 @@ export const getFacturaById = async (req, res) => {
 export const getFacturasByUsuario = async (req, res) => {
   const { idUsuario } = req.params;
   try {
-    // 1) Encontrar departamentos del usuario
+    //Encontrar departamentos del usuario
     const usuario = await Usuario.findByPk(idUsuario, {
       include: [
         {
@@ -505,7 +424,6 @@ export const getFacturasByUsuario = async (req, res) => {
     const facturaNueva = facturas.map((f) => ({
       idFactura: f.idFactura,
       nroFactura: f.nroFactura,
-      // Uso
       fechaEmision: formatInTimeZone(
         new Date(f.fechaEmision + "Z"),
         "America/La_Paz",

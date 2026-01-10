@@ -24,13 +24,7 @@ interface Departamento {
   alquilerPrecio: number;
 }
 
-type Props = {
-  setEditState: React.Dispatch<
-    React.SetStateAction<{ view: string; entity: string; id: number | null }>
-  >;
-};
-
-export default function Departamento({ setEditState }: Props) {
+export default function Departamento(/* { setEditState }: Props */) {
   const [departamentos, setDepartamentos] = useState<Departamento[]>([]);
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
@@ -131,15 +125,8 @@ export default function Departamento({ setEditState }: Props) {
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() =>
-                    setEditState({
-                      view: "detalleDepartamento",
-                      entity: "departamento",
-                      id: dpto.idDepartamento,
-                    })
-                  }
                 >
-                  Ver Detalles
+                  Gestionar
                 </Button>
               </CardContent>
             </Card>

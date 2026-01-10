@@ -4,7 +4,6 @@ import { AreaCard } from "./AreaCard";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { EditState } from "@/components/shared/MainContent";
-import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
 export default function AreaList({
@@ -27,7 +26,6 @@ export default function AreaList({
   );
 
   const handleReservar = (area: AreaComun) => {
-    // 🔗 Aquí podrías navegar al detalle o abrir modal
     setEditState({ view: "reservas", entity: "", id: area.idAreaComun });
   };
 

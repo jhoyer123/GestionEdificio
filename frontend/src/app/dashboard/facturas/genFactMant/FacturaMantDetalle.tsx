@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { pdf } from "@react-pdf/renderer";
 import { FacturaMantPDF } from "./FacturaMantPDF";
 import { getFacturaById } from "@/services/facturas.services";
@@ -28,7 +28,6 @@ export const FacturaPage = ({ id }: FacturaPageProps) => {
       const blob = await pdf(doc).toBlob();
       const url = URL.createObjectURL(blob);
       window.open(url, "_blank", "noopener,noreferrer");
-      // opcional: liberar el object URL después de un tiempo
       setTimeout(() => URL.revokeObjectURL(url), 60 * 1000);
     } catch (err) {
       console.error("Error generando PDF:", err);

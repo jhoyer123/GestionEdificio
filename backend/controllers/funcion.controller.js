@@ -61,7 +61,6 @@ export const updateFuncion = async (req, res) => {
   }
 };
 
-//Obtener una funcion por ID (opcional)
 export const getFuncionById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -86,7 +85,6 @@ export const deleteFuncion = async (req, res) => {
     }
     await funcionExistente.destroy();
 
-    // Usar 200 para que sí devuelva el JSON
     res.status(200).json({ message: "Funcion eliminada correctamente" });
   } catch (error) {
     console.error("Error al eliminar la funcion:", error);

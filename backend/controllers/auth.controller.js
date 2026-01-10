@@ -59,9 +59,6 @@ async function verifyCaptcha(recaptchaToken) {
       : null;
     // Bloqueo
     if (usuario.blockedUntil && blockedUntilDate > ahora) {
-      //console.log("Usuario bloqueado hasta:", blockedUntilDate);
-      //console.log("ahora:", ahora);
-
       const minutosRestantes = Math.ceil(
         (blockedUntilDate.getTime() - ahora.getTime()) / 60000
       );
@@ -172,75 +169,6 @@ async function verifyCaptcha(recaptchaToken) {
   }
 }; 
 
-//login normal sin ninguna verificaion para pruebas
-/* export const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Complete todos los campos por favor" });
-    }
-
-    
-
-    const usuario = await Usuario.findOne({
-      where: { email },
-      attributes: { exclude: ["createdAt", "updatedAt"] },
-      include: {
-        model: Rol,
-        as: "roles",
-        attributes: ["rol"],
-        through: { attributes: [] },
-      },
-    });
-
-    if (!usuario) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
-    }
-
-    // Verificar contraseña
-    const isMatch = await bcrypt.compare(password, usuario.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Credenciales inválidas" });
-    }
-
-    // Generar JWT
-    const jwtToken = jwt.sign(
-      { id: usuario.idUsuario, email: usuario.email },
-      JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-
-    const usuarioParaCliente = {
-      id: usuario.idUsuario,
-      nombre: usuario.nombre,
-      email: usuario.email,
-      rol: usuario.roles,
-      two_factor_enabled: usuario.two_factor_enabled,
-    };
-
-    //limpiar los datos de sus roles---------------
-    usuarioParaCliente.rol = usuario.roles.map((rol) => {
-      return {
-        id: rol.idRol,
-        nombre: rol.rol,
-      };
-    });
-    //usuarioParaCliente.rol = usuario.roles;
-    //---------------------------------------------
-
-    res.json({
-      token: jwtToken,
-      usuario: usuarioParaCliente,
-      message: "Inicio de sesión exitoso",
-    });
-  } catch (error) {
-    console.error("Error en el login:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-}; */
-
 // Cerrar sesion logout
 export const logout = (req, res) => {
   // Eliminar la cookie del token
@@ -254,30 +182,26 @@ export const logout = (req, res) => {
   res.json({ message: "Sesión cerrada" });
 };
 
-//endpoints para la auth de 2FA (Two-Factor Authentication) podrian ser:
+//endpoints para la auth de 2FA (Two-Factor Authentication):
 export const generate2FA = async (req, res) => {
   try {
-    // 1. Generar secreto TOTP único
     const secret = speakeasy.generateSecret({
-      name: "Habitat360 (" + req.body.username + ")", // opcional: nombre visible en Google Authenticator
+      name: "Habitat360 (" + req.body.username + ")",
     });
 
-    // 2. Generar QR en base64
+    //Generar QR en base64
     const qrCodeDataURL = await qrcode.toDataURL(secret.otpauth_url);
 
-    // 3. Devolver QR y secret base32 al frontend
+    //Devolver QR y secret base32 al frontend
     res.json({
       qrCodeImageUrl: qrCodeDataURL,
-      secretBase32: secret.base32, // esto lo puedes usar temporalmente hasta confirmación
+      secretBase32: secret.base32,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error generando 2FA" });
   }
 };
-
-// POST /api/2fa/verify
-// (También protegida por el middleware de autenticación)
 
 export const verify2FA = async (req, res) => {
   try {

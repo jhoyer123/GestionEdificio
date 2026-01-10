@@ -2,8 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
-import { useNavigate, useSearchParams } from "react-router-dom";
-//import { verifyCode } from "@/services/authService";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 type FormData = {
@@ -17,13 +16,9 @@ export default function VerifyCode() {
     formState: { errors },
   } = useForm<FormData>();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const userId = searchParams.get("userId");
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async () => {
     try {
-      //const response = await verifyCode({ userId, code: data.code });
-      //localStorage.setItem("user", JSON.stringify(response.usuario));
       toast.success("Autenticación correcta", {
         duration: 4000,
         position: "top-left",

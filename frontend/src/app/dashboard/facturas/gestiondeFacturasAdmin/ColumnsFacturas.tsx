@@ -32,13 +32,9 @@ export interface facturas {
 
 const myCustomFilterFn: FilterFn<facturas> = (
   row: Row<facturas>,
-  columnId: string,
-  filterValue: string,
-  addMeta: (meta: any) => void
+
+  filterValue: string
 ) => {
-  /* if (row.original.email.includes(filterValue)) {
-    return true;
-  } */
   if (row.original.nroFactura.includes(filterValue)) {
     return true;
   }
@@ -54,7 +50,6 @@ interface ActionFacturasProps {
 
 //Columnas de la tabla
 export const columnsFacturas = ({
-  refresh,
   setEditState,
 }: ActionFacturasProps): ColumnDef<facturas>[] => [
   {
@@ -133,12 +128,7 @@ export const columnsFacturas = ({
     id: "actions",
     cell: ({ row }) => {
       const factura = row.original;
-      return (
-        <ActionFacturas
-          data={factura}
-          /* refresh={refresh} */ setEditState={setEditState}
-        />
-      );
+      return <ActionFacturas data={factura} setEditState={setEditState} />;
     },
   },
 ];

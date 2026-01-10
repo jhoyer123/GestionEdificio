@@ -1,4 +1,3 @@
-// src/components/reservas/reserva-card.tsx
 import { parseISO } from "date-fns";
 import {
   Card,
@@ -10,17 +9,16 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { CalendarDays, Clock, Users, Building } from "lucide-react";
+import { CalendarDays, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import type { ReservaUser } from "./ReservasUser"; // Ajusta la ruta si es necesario
+import type { ReservaUser } from "./ReservasUser";
 import { ReservaActions } from "./ReservaActions";
 
 interface ReservaCardProps {
   reserva: ReservaUser;
 }
 
-// Función para obtener el color del Badge según el estado
 const getBadgeVariant = (
   estado: ReservaUser["estado"]
 ): "default" | "secondary" | "destructive" | "outline" => {
@@ -53,11 +51,7 @@ const InfoItem = ({
 );
 
 export function ReservaCard({ reserva }: ReservaCardProps) {
-
-  //esto deberia formatear la fecha pero no modificarla
-
   const formatDate = (dateStr: string) => {
-    // parseISO interpreta correctamente YYYY-MM-DD como fecha local sin modificarla
     return format(parseISO(dateStr), "EEEE, d 'de' MMMM 'de' yyyy", {
       locale: es,
     });
@@ -65,7 +59,6 @@ export function ReservaCard({ reserva }: ReservaCardProps) {
 
   const formatTime = (timeStr: string | null) => {
     if (!timeStr) return "";
-    // Asumimos que el formato es HH:mm:ss, lo convertimos a HH:mm
     const [hours, minutes] = timeStr.split(":");
     return `${hours}:${minutes}`;
   };
@@ -126,9 +119,7 @@ export function ReservaCard({ reserva }: ReservaCardProps) {
         </div>
         {/* Solo mostrar acciones para reservas próximas */}
         {(reserva.estado === "confirmada" ||
-          reserva.estado === "pendiente") && (
-          <ReservaActions idReserva={reserva.idReserva} />
-        )}
+          reserva.estado === "pendiente") && <ReservaActions />}
       </CardFooter>
     </Card>
   );

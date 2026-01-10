@@ -1,15 +1,10 @@
 import { DataTable } from "@/components/shared/DataTable";
 import { columnsAnuncio } from "./ColumnsAnuncio";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getAnuncios } from "@/services/anunciosServices";
-import { type EditState } from "@/components/shared/MainContent";
 import { Button } from "@/components/ui/button";
 import ModalCreateAnuncio from "./ModalCreateAnuncio";
 //para el modal dell formulario de creacion
-
-interface AnuncioProps {
-  setEditState: React.Dispatch<React.SetStateAction<EditState>>;
-}
 
 export interface Anuncio {
   idAnuncio: number;
@@ -21,7 +16,7 @@ export interface Anuncio {
   usuarioId: number;
 }
 
-const Anuncios = ({ setEditState }: AnuncioProps) => {
+const Anuncios = () => {
   const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
   const [open, setOpen] = useState(false);
 

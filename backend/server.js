@@ -12,9 +12,6 @@ import residenteRoutes from "./routes/residentes.routes.js";
 import turnosRoutes from "./routes/turnos.routes.js";
 import reservasRoutes from "./routes/reservas.routes.js";
 import pagosRoutes from "./routes/pagos.routes.js";
-//eliminar esto
-import debugRoutes from "./routes/debug.routes.js";
-//-------------
 import areasComunesRoutes from "./routes/areasComunes.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
 import cajasRoutes from "./routes/parqueoCajas.routes.js";
@@ -28,9 +25,6 @@ import AdminRoutes from "./routes/administrador.routes.js";
 import roleRoutes from "./routes/roles.routes.js";
 //import de cors
 import cors from "cors";
-//import de tareas automaticas como facturas
-//import './tasks/generarFacturas.js';
-
 import cookieParser from "cookie-parser";
 import "./asociaciones/asociaciones.js";
 
@@ -68,11 +62,7 @@ app.use(Factura);
 app.use(Planilla);
 app.use(AnuncioRoutes);
 app.use(AdminRoutes);
-// rutas de depuracion (solo en desarrollo) eliminar esto
-if (process.env.NODE_ENV !== "production") {
-  app.use(debugRoutes);
-}
-//---------------------------------------------------------
+
 // Iniciar el servidor
 app.listen(process.env.PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${process.env.PORT}`);
