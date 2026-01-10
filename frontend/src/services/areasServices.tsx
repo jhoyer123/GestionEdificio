@@ -38,25 +38,24 @@ export const getAreasComunes = async () => {
   }
 };
 
-// ✅ Obtener 1 área común por ID
 export const getAreaById = async (id: string) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/${id}`);
-    return response.data; // { id, nombre, descripcion, costoPorHora, horarioInicio, horarioFin, ... }
+    return response.data;
   } catch (error) {
     console.error("Error al obtener el área común:", error);
     throw error;
   }
 };
 
-// ✅ Obtener reservas de un área en una fecha
+// Obtener reservas de un área en una fecha
 export const getReservasByFecha = async (areaId: string, fecha: Date) => {
   try {
     const dateStr = fecha.toISOString().split("T")[0]; // yyyy-mm-dd
     const response = await axios.get(
       `${API_RESERVAS_URL}?areaComunId=${areaId}&fecha=${dateStr}`
     );
-    return response.data; // Array de reservas [{idReserva, horaInicio, horaFin, ...}]
+    return response.data;
   } catch (error) {
     console.error("Error al obtener reservas:", error);
     throw error;

@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:3000/api/reservas"; // Cambia esto por la URL de tu API
+const BASE = import.meta.env.VITE_API_URL || "https://gestionedificio-production.up.railway.app";
+const API_BASE_URL = `${BASE}/api/reservas`;
 
 export interface Reserva {
   idReserva?: number;

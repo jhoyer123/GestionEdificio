@@ -7,7 +7,8 @@ export interface Departamento {
   alquilerPrecio: number;
 }
 
-const API_URL = "http://localhost:3000/api/departamentos";
+const BASE = import.meta.env.VITE_API_URL || "https://gestionedificio-production.up.railway.app";
+const API_URL = `${BASE}/api/departamentos`;
 
 // Obtener todos los departamentos
 export const getDepartamentos = async () => {

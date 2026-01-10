@@ -50,7 +50,7 @@ const formatDateToYYYYMMDD = (d: Date) => {
   return `${y}-${m}-${dd}`;
 };
 // ⚠️ Usa la variable de entorno de Expo. Si no está definida, usamos fallback local.
-const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://192.168.26.6:3000";
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://gestionedificio-production.up.railway.app";
 
 // 1. DEFINE LAS PROPS: Recibe 'navigation' y 'route'
 type Props = NativeStackScreenProps<RootStackParamList, "AreaDetail">;
@@ -247,8 +247,8 @@ export default function AreaDetailScreen({ navigation, route }: Props) {
       if (c && typeof c === "string") return resolvePath(c);
     return "";
   }
-  let headerImageUrl = "";
-  if (!rawImage) headerImageUrl = "";
+  let headerImageUrl =`https://gestionedificio-production.up.railway.app/uploads/${rawImage}`;
+  /* if (!rawImage) headerImageUrl = "";
   else if (Array.isArray(rawImage) && rawImage.length > 0) {
     const v = rawImage[0];
     headerImageUrl =
@@ -256,7 +256,7 @@ export default function AreaDetailScreen({ navigation, route }: Props) {
   } else if (typeof rawImage === "string")
     headerImageUrl = resolvePath(rawImage);
   else if (typeof rawImage === "object")
-    headerImageUrl = resolveObjectPath(rawImage);
+    headerImageUrl = resolveObjectPath(rawImage); */
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>

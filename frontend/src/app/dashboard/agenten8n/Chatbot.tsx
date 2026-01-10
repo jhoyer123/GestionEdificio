@@ -7,10 +7,23 @@ interface Message {
   timestamp: Date;
 }
 
+// Función para generar un UUID simple (identificador único)
+// Esto asegura que cada usuario tenga una conversación única.
+const generateUUID = () => {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
 function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  // 1. Estado para almacenar el Session ID (se crea al cargar la app)
+  const [sessionId, setSessionId] = useState(() => generateUUID());
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -35,26 +48,43 @@ function Chatbot() {
     setIsLoading(true);
 
     try {
+      // 2. JSON que se envía: Incluye 'pregunta' y 'sessionid'
+      const payload = {
+        pregunta  : input, // Cambiamos 'message' por 'pregunta' (ver sección 2)
+        sessionid: sessionId,
+      };
+
       const res = await fetch(
         "https://jhoyer.app.n8n.cloud/webhook/agente-edificio",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: input }),
+          body: JSON.stringify(payload),
         }
       );
+      console.log("Respuesta del res:", res);
 
       if (!res.ok) throw new Error("Error en la respuesta del servidor");
 
+      // El Webhook de n8n ahora devuelve un JSON como: { "respuesta": "..." }
       const data = await res.json();
+
+      console.log("Datos recibidos del servidor data:", data);
       const botMessage: Message = {
         from: "bot",
-        text: data.response || "Lo siento, no pude procesar tu solicitud.",
+        // Aquí ajustamos para leer el campo "output" que n8n debe enviar
+        text:
+          data[0].output ||
+          data.response[0].output ||
+          "Lo siento, no pude procesar tu solicitud.",
         timestamp: new Date(),
       };
 
+      console.log("Respuesta del bot botMessage:", botMessage);
+
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
+      console.error(error);
       const errorMessage: Message = {
         from: "bot",
         text: "Lo siento, hubo un error al conectar con el servidor. Por favor, intenta nuevamente.",
